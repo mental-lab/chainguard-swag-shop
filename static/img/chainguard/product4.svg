@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Chainguard Swag - Product 4</title>
+  <desc id="desc">Branded placeholder image for Chainguard Swag Shop</desc>
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#a7b3ff"/>
+      <stop offset="100%" stop-color="#2f2b6b"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="url(#g4)"/>
+  <rect width="800" height="600" fill="url(#grid)"/>
+  <g font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" fill="#ffffff" text-anchor="middle">
+    <text x="400" y="300" font-size="48" font-weight="700">Chainguard Swag</text>
+    <text x="400" y="345" font-size="22" opacity="0.9">Secure by Default</text>
+  </g>
+</svg>

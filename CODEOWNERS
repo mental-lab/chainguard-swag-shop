@@ -1,0 +1,49 @@
+# CODEOWNERS - Chainguard Swag Shop Demo Project
+
+#
+
+# This file defines mandatory reviewers for specific files and directories
+
+# When a merge request modifies these files, the specified users must approve
+
+# the changes before the MR can be merged
+
+#
+
+# Format: <file_pattern> <@username> [<@username>...]
+
+# Patterns support glob syntax and are matched in order from top to bottom
+
+#
+
+# AI Assistant Integration
+
+# - Works with code review assistants for automated suggestions
+
+# - Complements code review instruction custom rules
+
+# - Ensures human oversight for critical demo infrastructure
+
+# Core Application Logic - Requires Flask expertise and demo flow understanding
+
+# /app.py
+
+# Main Flask application with all routes and business logic
+
+# Critical for demo functionality and user experience
+
+# CI/CD Pipeline - Requires DevOps expertise and platform knowledge
+
+/.gitlab-ci.yml @lfstucker
+
+# Comprehensive CI/CD pipeline with security scanning and emoji-based stages
+
+# Essential for demo platform capabilities
+
+# Demo Documentation and Presentation Materials
+
+# /README.md
+
+# Project overview and setup instructions for demo presentations
+
+# Must maintain accuracy for 60-minute demo showcases

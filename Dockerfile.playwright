@@ -1,0 +1,44 @@
+# Base: Chainguard Python image with Playwright support
+FROM cgr.dev/chainguard/python:latest-dev
+
+# Set working directory
+WORKDIR /tests
+
+# Install system dependencies required for Playwright
+# Chainguard images use apk package manager
+RUN apk add --no-cache \
+    nodejs \
+    npm \
+    chromium \
+    chromium-chromedriver \
+    firefox \
+    firefox-driver \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ttf-dejavu-sans-fonts \
+    && rm -rf /var/cache/apk/*
+
+# Copy Chainguard PyPI configuration for remediated packages
+COPY pip.conf /etc/pip.conf
+
+# Install Python dependencies - both main app and E2E testing dependencies
+COPY requirements.txt requirements-e2e.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-e2e.txt
+
+# Install Playwright browsers
+RUN playwright install chromium firefox
+
+# Copy test files
+COPY tests/ /tests/
+
+# Set environment variables for Playwright
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+# Create volume directories
+VOLUME /test-results /playwright-report
+
+# Default command (can be overridden in docker-compose)
+CMD ["pytest", "e2e/", "-v", "--headed", "--browser", "chromium"]

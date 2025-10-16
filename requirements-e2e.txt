@@ -1,0 +1,16 @@
+# E2E Testing Dependencies for Playwright
+# Updated to versions compatible with Python 3.13+
+# Chainguard PyPI Demo: Using Chainguard remediated packages for enhanced security
+# Chainguard PyPI is configured as an extra index in pip.conf
+pytest-playwright==0.7.1
+playwright==1.55.0
+pytest-base-url==2.1.0
+pytest-html==4.1.1
+pytest-xdist==3.8.0
+
+# Additional utilities for E2E tests - Will use Chainguard remediated versions when available
+requests==2.32.5         # For API health checks - Will use Chainguard remediated version if available
+python-dotenv==1.0.0     # For environment variables - Will use Chainguard remediated version if available
+
+# Note: Pillow removed due to build issues on Python 3.13
+# Screenshot comparison can use Playwright's built-in capabilities instead

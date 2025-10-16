@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Flask application service
+  swag-shop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: swag-shop-app
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=test-secret-for-e2e
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - swag-network
+
+  # Playwright test runner (for local development)
+  playwright-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    container_name: swag-shop-playwright
+    depends_on:
+      swag-shop:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://swag-shop:8000
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    volumes:
+      - ./tests:/tests
+      - ./test-results:/test-results
+      - ./playwright-report:/playwright-report
+    working_dir: /tests
+    command: >
+      sh -c "
+        pytest e2e/ -v --base-url=http://swag-shop:8000 --headed --browser chromium
+      "
+    networks:
+      - swag-network
+
+networks:
+  swag-network:
+    driver: bridge

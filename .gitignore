@@ -1,0 +1,76 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.netrc
+
+# Database files
+*.sqlite3
+*.db
+db/
+
+# Flask specific
+instance/
+.webassets-cache
+build/
+public/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Static site generation
+build/
+public/
+
+# Logs
+*.log
+logs/
+
+# CI/CD
+.scannerwork/
+
+# Temporary files
+*.tmp
+*.temp
+
+# ==========================================================================
+# Playwright E2E Testing
+# ==========================================================================
+test-results/
+playwright-report/
+playwright/.cache/
+test-results*.zip
+trace.zip
+*.webm
+.playwright/

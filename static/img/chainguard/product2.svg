@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Chainguard Swag - Product 2</title>
+  <desc id="desc">Branded placeholder image for Chainguard Swag Shop</desc>
+  <defs>
+    <radialGradient id="g2" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" stop-color="#cfd8ff"/>
+      <stop offset="70%" stop-color="#7b86e6"/>
+      <stop offset="100%" stop-color="#2f2b6b"/>
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="800" height="600" fill="url(#g2)"/>
+  <circle cx="650" cy="120" r="90" fill="rgba(255,255,255,0.12)"/>
+  <rect x="55" y="70" width="690" height="460" rx="20" fill="rgba(255,255,255,0.12)"/>
+  <g font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" fill="#ffffff" text-anchor="middle">
+    <text x="400" y="290" font-size="52" font-weight="700">Chainguard</text>
+    <text x="400" y="340" font-size="24" opacity="0.9">Swag Collection</text>
+  </g>
+</svg>

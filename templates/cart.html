@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart | Chainguard Swag Shop{% endblock %}
+
+{% block content %}
+<section class="cart-section">
+    <h1>Your Shopping Cart</h1>
+    
+    {% if cart_items %}
+        <div class="cart-items">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <div class="item-image">
+                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}" onerror="this.onerror=null; this.src='/static/img/chainguard/product{{ (item.product.id % 6) if (item.product.id % 6) != 0 else 6 }}.svg'">
+                    </div>
+                    <div class="item-details">
+                        <h3>{{ item.product.name }}</h3>
+                        <p class="price">${{ "%.2f"|format(item.product.price) }}</p>
+                    </div>
+                    <div class="item-quantity">
+                        <form action="{{ url_for('update_cart') }}" method="post" class="update-cart-form">
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                            <label for="quantity-{{ item.product.id }}">Qty:</label>
+                            <input type="number" name="quantity" id="quantity-{{ item.product.id }}" value="{{ item.quantity }}" min="1" max="10">
+                            <button type="submit" class="btn btn-small">Update</button>
+                        </form>
+                    </div>
+                    <div class="item-total">
+                        <p>${{ "%.2f"|format(item.total) }}</p>
+                    </div>
+                    <div class="item-actions">
+                        <a href="{{ url_for('remove_from_cart', product_id=item.product.id) }}" class="btn btn-small btn-danger">Remove</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="cart-summary">
+            <div class="summary-row">
+                <span>Total:</span>
+                <span class="total-price">${{ "%.2f"|format(total) }}</span>
+            </div>
+            <div class="cart-actions">
+                <a href="{{ url_for('products') }}" class="btn btn-outline">Continue Shopping</a>
+                <a href="{{ url_for('checkout') }}" class="btn btn-primary">Proceed to Checkout</a>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-cart">
+            <p>Your cart is empty.</p>
+            <a href="{{ url_for('products') }}" class="btn btn-primary">Start Shopping</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+CHAINGUARD SWAG SHOP RECEIPT
+========================
+Receipt #: 002
+Date: 2024-01-16
+Customer: Jane Smith
+Email: jane.smith@example.com
+
+ITEMS PURCHASED:
+- Chainguard Hoodie (Size: M) ............. $45.00
+- Chainguard Water Bottle ................. $12.00
+
+SUBTOTAL: $57.00
+TAX (8.5%): $4.85
+TOTAL: $61.85
+
+PAYMENT METHOD: PayPal
+TRANSACTION ID: TXN-2024-002-DEF456
+
+Thank you for your purchase!
+Visit us again at chainguard-swag-shop.com

@@ -1,0 +1,21 @@
+CHAINGUARD SWAG SHOP RECEIPT
+========================
+Receipt #: 001
+Date: 2024-01-15
+Customer: John Doe
+Email: john.doe@example.com
+
+ITEMS PURCHASED:
+- Chainguard T-Shirt (Size: L) ............ $25.00
+- Chainguard Coffee Mug ................... $15.00
+- Chainguard Sticker Pack ................. $5.00
+
+SUBTOTAL: $45.00
+TAX (8.5%): $3.83
+TOTAL: $48.83
+
+PAYMENT METHOD: Credit Card (**** 1234)
+TRANSACTION ID: TXN-2024-001-ABC123
+
+Thank you for your purchase!
+Visit us again at chainguard-swag-shop.com

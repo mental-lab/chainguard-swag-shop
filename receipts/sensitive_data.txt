@@ -1,0 +1,26 @@
+CONFIDENTIAL - INTERNAL USE ONLY
+==================================
+
+This file contains sensitive information that should not be accessible
+through the web application. It demonstrates the path traversal vulnerability.
+
+CUSTOMER DATABASE BACKUP
+========================
+Customer ID: 12345
+Name: Admin User
+Email: admin@chainguard-swag-shop.com
+Password Hash: $2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBdXzgVmeRUf0W
+Role: Administrator
+API Key: sk_live_51234567890abcdef
+Credit Card: 4111-1111-1111-1111 (DEMO DATA)
+
+SYSTEM CONFIGURATION
+====================
+Database URL: postgresql://admin:secret123@localhost:5432/swagshop
+AWS Access Key: AKIAIOSFODNN7EXAMPLE
+AWS Secret Key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+Encryption Key: super-secret-encryption-key-2024
+
+WARNING: This is demo data for security testing purposes only.
+In a real application, this type of sensitive data exposure
+would be a critical security vulnerability.

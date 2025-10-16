@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | Chainguard Swag Shop{% endblock %}
+
+{% block content %}
+<section class="product-detail">
+    <div class="product-image">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.onerror=null; this.src='/static/img/chainguard/product{{ (product.id % 6) if (product.id % 6) != 0 else 6 }}.svg'">
+    </div>
+    <div class="product-info">
+        <h1>{{ product.name }}</h1>
+        <p class="category">Category: {{ product.category }}</p>
+        <p class="price">${{ "%.2f"|format(product.price) }}</p>
+        <p class="description">{{ product.description }}</p>
+        
+        <form action="{{ url_for('add_to_cart') }}" method="post" class="add-to-cart-form">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <div class="quantity-control">
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" id="quantity" value="1" min="1" max="10">
+            </div>
+            <button type="submit" class="btn btn-primary">Add to Cart</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

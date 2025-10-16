@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Products | Chainguard Swag Shop{% endblock %}
+
+{% block content %}
+<section class="products-section">
+    <h1>All Products</h1>
+    
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" onerror="this.onerror=null; this.src='/static/img/chainguard/product{{ (product.id % 6) if (product.id % 6) != 0 else 6 }}.svg'">
+                <h3>{{ product.name }}</h3>
+                <p class="category">{{ product.category }}</p>
+                <p class="price">${{ "%.2f"|format(product.price) }}</p>
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary">View Details</a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
