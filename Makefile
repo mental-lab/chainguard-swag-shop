@@ -123,8 +123,8 @@ e2e-debug: e2e-up ## Headed + slowmo for debugging
 # Chainguard PyPI switching
 # Chainguard remediated is primary; PyPI stays as a fallback.
 # -----------------------------------------------------------------------------
-.PHONY: switch-to-chainguard
-switch-to-chainguard: ## Use Chainguard PyPI as primary and reinstall deps
+.PHONY: switch-cgr
+switch-cgr: ## Use Chainguard PyPI as primary and reinstall deps
 	@echo "Writing pip.conf (Chainguard as primary)..."
 	@printf '%s\n' \
 		'[global]' \
@@ -142,8 +142,8 @@ switch-to-chainguard: ## Use Chainguard PyPI as primary and reinstall deps
 	@if [ -f requirements-e2e.txt ]; then $(PY) -m pip install --force-reinstall -r requirements-e2e.txt; fi
 	@echo "Done."
 
-.PHONY: switch-to-regular
-switch-to-regular: ## Use regular PyPI only
+.PHONY: switch-pypi
+switch-pypi: ## Use regular PyPI only
 	echo "Writing pip.conf (regular PyPI only)..."
 	printf '%s\n' \
 		'[global]' \
@@ -152,6 +152,17 @@ switch-to-regular: ## Use regular PyPI only
 		'[install]' \
 		'timeout = 30' \
 	> pip.conf
+
+.PHONY: show-config
+show-config: ## Show pip.conf and a few installed packages
+	echo "=== pip.conf ==="
+	if [ -f pip.conf ]; then cat pip.conf; else echo "No pip.conf found"; fi
+	echo ""
+	echo "=== pip config (from venv) ==="
+	$(PY) -m pip config list || echo "No pip config set"
+	echo ""
+	echo "=== sample installed packages ==="
+	$(PY) -m pip list --format=columns | sed -n '1,6p'
 
 # -----------------------------------------------------------------------------
 # Cleanup

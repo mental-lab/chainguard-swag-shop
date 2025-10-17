@@ -1,5 +1,5 @@
 
-FROM cgr.dev/chainguard/python:latest-dev
+FROM cgr.dev/chainguard-private/python:latest-dev
 WORKDIR /app
 
 # Copy pip configuration and authentication
