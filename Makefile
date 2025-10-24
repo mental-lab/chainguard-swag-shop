@@ -164,6 +164,23 @@ show-config: ## Show pip.conf and a few installed packages
 	echo "=== sample installed packages ==="
 	$(PY) -m pip list --format=columns | sed -n '1,6p'
 
+.PHONY: show-provenance
+show-provenance: ## Show provenance for all packages in requirements.txt (stdout only)
+	@while read line; do \
+		if echo "$$line" | grep -q '=='; then \
+			pkg=$$(echo "$$line" | cut -d'=' -f1 | tr '[:upper:]' '[:lower:]'); \
+			version=$$(echo "$$line" | cut -d'=' -f3); \
+			echo "Fetching provenance for $$pkg==$$version..."; \
+			provenance_url=$$(curl -s --netrc https://libraries.cgr.dev/python-remediated/simple/$$pkg/ | grep "$$version" | grep "\.tar\.gz" | grep -o 'data-provenance="[^"]*"' | cut -d'"' -f2 | head -1); \
+			if [ -n "$$provenance_url" ]; then \
+				curl -s --netrc "$$provenance_url" | jq -r '.attestation_bundles[0].attestations[0].envelope.statement' | base64 -d | jq .; \
+			else \
+				echo "No provenance found for $$pkg-$$version"; \
+			fi; \
+			echo ""; \
+		fi; \
+	done < requirements.txt
+
 # -----------------------------------------------------------------------------
 # Cleanup
 # -----------------------------------------------------------------------------
