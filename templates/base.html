@@ -10,6 +10,21 @@
     <link rel="stylesheet" href="static/css/style.css">
     {% endif %}
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+    <style>
+        .nav-dropdown { position: relative; }
+        .nav-dropdown .dropdown-menu {
+            display: none; position: absolute; top: 100%; left: 0;
+            background: #222; list-style: none; padding: 0; margin: 0;
+            min-width: 200px; z-index: 1000; border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .nav-dropdown .dropdown-menu li a {
+            display: block; padding: 10px 16px; color: #fff; white-space: nowrap;
+            border-bottom: 1px solid #333;
+        }
+        .nav-dropdown .dropdown-menu li a:hover { background: orange; color: #fff; }
+        .nav-dropdown:hover .dropdown-menu { display: block; }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -21,8 +36,16 @@
             <ul class="nav-links">
                 <li><a href="{{ url_for('index') }}">Home</a></li>
                 <li><a href="{{ url_for('products') }}">Products</a></li>
+                <li class="nav-dropdown">
+                    <a href="{{ url_for('demo_hub') }}">Security Demos &#9660;</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('demo_hub') }}">Demo Hub</a></li>
+                        <li><a href="{{ url_for('demo_container_security') }}">Container Security</a></li>
+                        <li><a href="{{ url_for('demo_libraries') }}">Chainguard Libraries</a></li>
+                    </ul>
+                </li>
                 <li>
-                    <a href="{{ url_for('cart') }}">Cart 
+                    <a href="{{ url_for('cart') }}">Cart
                         {% if session.cart %}
                             <span class="cart-count">({{ session.cart|length }})</span>
                         {% endif %}

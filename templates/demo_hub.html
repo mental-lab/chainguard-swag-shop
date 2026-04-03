@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Security Demo Hub - Chainguard Swag Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+.demo-hub-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #fff;
+    padding: 64px 32px;
+    text-align: center;
+    margin-bottom: 48px;
+}
+.demo-hub-hero h1 { font-size: 2.4rem; margin-bottom: 12px; }
+.demo-hub-hero p { font-size: 1.15rem; opacity: 0.85; max-width: 640px; margin: 0 auto; }
+.demo-hub-hero .badge {
+    display: inline-block; background: orange; color: #fff;
+    padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;
+    font-weight: 700; letter-spacing: 1px; margin-bottom: 16px;
+    text-transform: uppercase;
+}
+.demo-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 28px; max-width: 1100px; margin: 0 auto 60px; padding: 0 24px;
+}
+.demo-card {
+    background: #fff; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.09); transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; flex-direction: column;
+}
+.demo-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.15); }
+.demo-card-header {
+    background: #0f3460; color: #fff; padding: 20px 24px;
+    display: flex; align-items: center; gap: 14px;
+}
+.demo-card-header .icon { font-size: 2rem; }
+.demo-card-header h2 { font-size: 1.15rem; margin: 0; }
+.demo-card-body { padding: 20px 24px; flex: 1; }
+.demo-card-body p { color: #555; font-size: 0.95rem; margin-bottom: 16px; }
+.demo-card-body ul { padding-left: 0; list-style: none; }
+.demo-card-body ul li {
+    padding: 5px 0; color: #444; font-size: 0.9rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+.demo-card-body ul li::before { content: "✓ "; color: #28a745; font-weight: bold; }
+.demo-card-footer { padding: 16px 24px; background: #f8f9fa; }
+.demo-card-footer a {
+    display: block; text-align: center; padding: 10px;
+    background: orange; color: #fff; border-radius: 6px;
+    font-weight: 700; font-size: 0.95rem; transition: background 0.2s;
+}
+.demo-card-footer a:hover { background: #e06000; }
+.demo-section-header {
+    text-align: center; margin-bottom: 32px; padding: 0 24px;
+}
+.demo-section-header h2 { font-size: 1.8rem; color: #1a1a2e; margin-bottom: 8px; }
+.demo-section-header p { color: #666; font-size: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="demo-hub-hero">
+    <div class="badge">Pre-Sales Demo</div>
+    <h1>Chainguard Security Demo Hub</h1>
+    <p>Explore interactive demos that show how Chainguard eliminates CVEs from your software supply chain — from base images to Python libraries.</p>
+</div>
+
+<div class="demo-section-header">
+    <h2>Available Demos</h2>
+    <p>Click any demo below to see Chainguard's security-first approach in action.</p>
+</div>
+
+<div class="demo-grid">
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <span class="icon">&#x1F433;</span>
+            <div>
+                <h2>Container Security</h2>
+                <small style="opacity:0.75">Chainguard Images</small>
+            </div>
+        </div>
+        <div class="demo-card-body">
+            <p>See how Chainguard's distroless Python image eliminates <strong>50+ CVEs</strong> compared to the standard Docker Hub image — with zero OS-level vulnerabilities.</p>
+            <ul>
+                <li>Side-by-side Grype scan results</li>
+                <li>CVE severity breakdown</li>
+                <li>Distroless &amp; minimal attack surface</li>
+                <li>FIPS-ready by default</li>
+                <li>Zero OS packages = zero OS CVEs</li>
+            </ul>
+        </div>
+        <div class="demo-card-footer">
+            <a href="/demo/container-security.html">Launch Demo &rarr;</a>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <span class="icon">&#x1F4E6;</span>
+            <div>
+                <h2>Chainguard Libraries</h2>
+                <small style="opacity:0.75">Python Package Security</small>
+            </div>
+        </div>
+        <div class="demo-card-body">
+            <p>Compare standard PyPI packages against Chainguard-remediated equivalents. See specific CVE patches, SLSA provenance attestations, and how easy it is to switch.</p>
+            <ul>
+                <li>PyPI vs. Chainguard CVE comparison</li>
+                <li>Specific patched CVE details</li>
+                <li>SLSA provenance attestation</li>
+                <li>Drop-in replacement via pip.conf</li>
+                <li>Works with existing tooling</li>
+            </ul>
+        </div>
+        <div class="demo-card-footer">
+            <a href="/demo/libraries.html">Launch Demo &rarr;</a>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <span class="icon">&#x1F50D;</span>
+            <div>
+                <h2>SQL Injection Demo</h2>
+                <small style="opacity:0.75">CWE-89 Vulnerability</small>
+            </div>
+        </div>
+        <div class="demo-card-body">
+            <p>Interactive demonstration of SQL injection vulnerabilities — shows how unsanitized user input can be exploited and what Chainguard scanning catches.</p>
+            <ul>
+                <li>Live SQL injection examples</li>
+                <li>Vulnerability detection walkthrough</li>
+                <li>CWE-89 classification</li>
+                <li>Remediation guidance</li>
+            </ul>
+        </div>
+        <div class="demo-card-footer">
+            <a href="/demo/search.html">Launch Demo &rarr;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

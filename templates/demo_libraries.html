@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}Chainguard Libraries Demo - {{ brand_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.lib-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    color: #fff; padding: 48px 32px; text-align: center; margin-bottom: 40px;
+}
+.lib-hero h1 { font-size: 2rem; margin-bottom: 8px; }
+.lib-hero p { font-size: 1.05rem; opacity: 0.85; max-width: 620px; margin: 0 auto 16px; }
+.lib-hero .back-link { color: #ffaa44; font-size: 0.9rem; }
+.lib-hero .back-link:hover { color: #fff; }
+
+.lib-container { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
+
+.section-card {
+    background: #fff; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 32px;
+}
+.section-card-header {
+    background: #0f3460; color: #fff; padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+}
+.section-card-header h2 { font-size: 1.1rem; margin: 0; }
+.section-card-header .icon { font-size: 1.4rem; }
+.section-card-body { padding: 24px; }
+
+/* Package comparison table */
+.pkg-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.pkg-table th {
+    padding: 10px 14px; text-align: left; font-size: 0.8rem;
+    color: #fff; border-bottom: 2px solid #ddd;
+}
+.pkg-table th.pypi-col { background: #7f8c8d; }
+.pkg-table th.cgr-col { background: #1e8449; }
+.pkg-table th.name-col { background: #2c3e50; }
+.pkg-table td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+.pkg-table tr:last-child td { border-bottom: none; }
+.pkg-table tr:hover td { background: #f9f9f9; }
+.cve-count-bad {
+    display: inline-block; background: #fadbd8; color: #c0392b;
+    padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 0.85rem;
+}
+.cve-count-good {
+    display: inline-block; background: #d5f5e3; color: #1e8449;
+    padding: 3px 10px; border-radius: 12px; font-weight: 700; font-size: 0.85rem;
+}
+.version-tag { font-family: monospace; font-size: 0.82rem; color: #333; }
+
+/* CVE detail cards */
+.cve-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.cve-detail-card {
+    border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;
+}
+.cve-detail-card-header {
+    padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.cve-detail-card-header.HIGH { background: #fdebd0; border-bottom: 2px solid #e67e22; }
+.cve-detail-card-header.MEDIUM { background: #fef9e7; border-bottom: 2px solid #d4ac0d; }
+.cve-detail-card-header .cve-id { font-family: monospace; font-weight: 700; font-size: 0.9rem; color: #1a1a2e; }
+.cve-detail-card-header .sev-badge {
+    padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;
+}
+.sev-badge.HIGH { background: #e67e22; color: #fff; }
+.sev-badge.MEDIUM { background: #d4ac0d; color: #fff; }
+.cve-detail-card-body { padding: 14px 16px; font-size: 0.85rem; }
+.cve-detail-card-body .pkg-label { color: #888; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.cve-detail-card-body .description { color: #444; margin-bottom: 12px; line-height: 1.5; }
+.cve-detail-card-body .versions {
+    display: flex; gap: 12px; font-size: 0.8rem; margin-bottom: 10px;
+}
+.cve-detail-card-body .versions .v-item { flex: 1; }
+.cve-detail-card-body .versions .v-label { font-weight: 700; color: #888; font-size: 0.72rem; }
+.cve-detail-card-body .versions .v-val.bad { color: #c0392b; font-family: monospace; }
+.cve-detail-card-body .versions .v-val.good { color: #1e8449; font-family: monospace; }
+.cve-detail-card-body .fix-note {
+    background: #eafaf1; border-left: 3px solid #27ae60;
+    padding: 8px 10px; border-radius: 0 4px 4px 0; color: #1e5631; font-size: 0.8rem;
+}
+
+/* Attestation */
+.attestation-block {
+    background: #0d0d1a; border-radius: 8px; padding: 20px 24px;
+    overflow-x: auto;
+}
+.attestation-block pre {
+    color: #a8d8a8; font-family: monospace; font-size: 0.8rem; line-height: 1.6;
+    margin: 0; white-space: pre;
+}
+.slsa-explainer {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-bottom: 24px;
+}
+.slsa-step {
+    background: #f8f9fa; border-radius: 8px; padding: 16px;
+    border-top: 3px solid orange;
+}
+.slsa-step .step-num { font-size: 1.4rem; font-weight: 900; color: orange; }
+.slsa-step h4 { font-size: 0.9rem; color: #1a1a2e; margin: 4px 0; }
+.slsa-step p { font-size: 0.8rem; color: #666; margin: 0; }
+
+/* Switch instructions */
+.switch-box {
+    background: #1a1a2e; color: #fff; border-radius: 8px;
+    padding: 20px 24px; margin-top: 8px;
+}
+.switch-box h4 { color: #ffaa44; margin-bottom: 12px; }
+.switch-box pre {
+    background: #0d0d1a; border-radius: 6px; padding: 14px 18px;
+    font-size: 0.85rem; overflow-x: auto; color: #a8d8a8; margin: 0;
+}
+.switch-box p { opacity: 0.8; font-size: 0.85rem; margin-top: 10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lib-hero">
+    <a href="/demo/" class="back-link">&larr; Back to Demo Hub</a>
+    <h1>Chainguard Libraries Demo</h1>
+    <p>See how {{ brand_name }} remediates CVEs in Python packages — drop-in replacements with provenance attestations and zero known vulnerabilities.</p>
+</div>
+
+<div class="lib-container">
+
+    <!-- 1. Package comparison table -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F4CA;</span>
+            <h2>PyPI vs. Chainguard Libraries &mdash; CVE Comparison</h2>
+        </div>
+        <div class="section-card-body">
+            <table class="pkg-table">
+                <thead>
+                    <tr>
+                        <th class="name-col">Package</th>
+                        <th class="pypi-col">PyPI Version</th>
+                        <th class="pypi-col">PyPI CVEs</th>
+                        <th class="cgr-col">Chainguard Version</th>
+                        <th class="cgr-col">Chainguard CVEs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pkg in pypi_packages %}
+                    {% set cgr = cgr_packages[loop.index0] %}
+                    <tr>
+                        <td><strong>{{ pkg.name }}</strong></td>
+                        <td><span class="version-tag">{{ pkg.pypi_version }}</span></td>
+                        <td>
+                            <span class="cve-count-bad">{{ pkg.cve_count }} CVE{{ 's' if pkg.cve_count != 1 else '' }}</span>
+                            {% if pkg.cves %}
+                            <br>
+                            <span style="font-size:0.75rem; color:#999; font-family:monospace;">
+                                {{ pkg.cves[:2]|join(', ') }}{% if pkg.cves|length > 2 %}&hellip;{% endif %}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td><span class="version-tag">{{ cgr.cgr_version }}</span></td>
+                        <td><span class="cve-count-good">0 CVEs</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. Specific patched CVEs -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F6E1;&#xFE0F;</span>
+            <h2>Patched CVEs &mdash; Deep Dive</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">
+                Each Chainguard package is rebuilt with targeted patches and updated upstream versions.
+                Below are key CVEs remediated in this set of libraries.
+            </p>
+            <div class="cve-cards">
+                {% for cve in notable_cves %}
+                <div class="cve-detail-card">
+                    <div class="cve-detail-card-header {{ cve.severity }}">
+                        <span class="cve-id">{{ cve.id }}</span>
+                        <span class="sev-badge {{ cve.severity }}">{{ cve.severity }} &bull; CVSS {{ cve.cvss }}</span>
+                    </div>
+                    <div class="cve-detail-card-body">
+                        <div class="pkg-label">{{ cve.package }}</div>
+                        <p class="description">{{ cve.description }}</p>
+                        <div class="versions">
+                            <div class="v-item">
+                                <div class="v-label">Affected (PyPI)</div>
+                                <div class="v-val bad">{{ cve.pypi_version }}</div>
+                            </div>
+                            <div class="v-item">
+                                <div class="v-label">Fixed (Chainguard)</div>
+                                <div class="v-val good">{{ cve.cgr_version }}</div>
+                            </div>
+                        </div>
+                        <div class="fix-note">&#x2713; {{ cve.fix }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SLSA Provenance -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F4DC;</span>
+            <h2>SLSA Provenance Attestation</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">
+                Every Chainguard package ships with a signed SLSA provenance attestation — a cryptographically
+                verifiable record of <em>how</em>, <em>where</em>, and <em>when</em> the package was built.
+            </p>
+
+            <div class="slsa-explainer">
+                <div class="slsa-step">
+                    <div class="step-num">1</div>
+                    <h4>Hermetic Build</h4>
+                    <p>Built in an isolated environment — no internet access, deterministic inputs.</p>
+                </div>
+                <div class="slsa-step">
+                    <div class="step-num">2</div>
+                    <h4>Signed Attestation</h4>
+                    <p>Build metadata signed with Sigstore Cosign — tamper-evident, publicly verifiable.</p>
+                </div>
+                <div class="slsa-step">
+                    <div class="step-num">3</div>
+                    <h4>Transparency Log</h4>
+                    <p>Attestation recorded in Rekor — immutable public audit trail.</p>
+                </div>
+                <div class="slsa-step">
+                    <div class="step-num">4</div>
+                    <h4>Policy Enforcement</h4>
+                    <p>Verify at install time with <code>cosign verify-attestation</code> in your CI pipeline.</p>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom:12px; color:#1a1a2e;">Sample Attestation (in-toto / SLSA v0.2)</h4>
+            <div class="attestation-block">
+                <pre>{{ sample_attestation }}</pre>
+            </div>
+
+            <p style="margin-top:12px; font-size:0.82rem; color:#888;">
+                Verify with: <code style="background:#f0f0f0; padding:2px 6px; border-radius:3px;">cosign verify-attestation --type slsaprovenance cgr.dev/chainguard/python:latest</code>
+            </p>
+        </div>
+    </div>
+
+    <!-- 4. How to switch -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x26A1;</span>
+            <h2>How to Switch &mdash; Drop-In Replacement</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#666; margin-bottom:16px; font-size:0.9rem;">
+                Switching to Chainguard Libraries requires a single config file change.
+                Your existing <code>requirements.txt</code> and tooling work unchanged.
+            </p>
+
+            <div class="switch-box">
+                <h4>Option 1: pip.conf (recommended)</h4>
+                <pre>[global]
+index-url = https://libraries.cgr.dev/python/
+extra-index-url = https://pypi.org/simple/</pre>
+                <p>All pip installs will prefer Chainguard-remediated packages automatically.</p>
+            </div>
+
+            <div class="switch-box" style="margin-top:16px;">
+                <h4>Option 2: make switch-cgr (this demo app)</h4>
+                <pre>make switch-cgr</pre>
+                <p>Activates the pre-configured pip.conf in this project — instantly switches all Python package installs to Chainguard Libraries.</p>
+            </div>
+
+            <div class="switch-box" style="margin-top:16px;">
+                <h4>Option 3: Docker build-arg</h4>
+                <pre>docker build \
+  --build-arg PIP_INDEX_URL=https://libraries.cgr.dev/python/ \
+  -t myapp:latest .</pre>
+                <p>No code changes required. Works with any Dockerfile that uses <code>pip install</code>.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
