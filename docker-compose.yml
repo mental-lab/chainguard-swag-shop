@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      secrets:
+        - netrc
     container_name: swag-shop-app
     ports:
       - "8000:8000"
@@ -48,3 +50,7 @@ services:
 networks:
   swag-network:
     driver: bridge
+
+secrets:
+  netrc:
+    file: ~/.netrc

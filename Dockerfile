@@ -1,33 +1,27 @@
 
+# syntax=docker/dockerfile:1
 FROM cgr.dev/chainguard-private/python:latest-dev
 WORKDIR /app
 
-# Copy pip configuration and authentication
+# Copy pip configuration
 COPY pip.conf /etc/pip.conf
 
 ENV PIP_NO_INPUT=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NETRC=/home/nonroot/.netrc \
     VIRTUAL_ENV=/home/nonroot/.venv \
     PATH="/home/nonroot/.venv/bin:$PATH"
 
-# Create venv and copy .netrc with proper permissions
+# Create venv
 RUN python3 -m venv "$VIRTUAL_ENV" && \
     mkdir -p /home/nonroot && \
     chown nonroot:nonroot /home/nonroot
 
-# Copy .netrc as nonroot user
-COPY --chown=nonroot:nonroot .netrc /home/nonroot/.netrc
-RUN chmod 600 /home/nonroot/.netrc
-
-COPY requirements.txt .
-
-RUN pip install --upgrade pip
-
 COPY requirements.txt /tmp/requirements.txt
 
-# Force fresh install to ensure Chainguard packages are used
-RUN pip install --no-cache-dir --force-reinstall -r /tmp/requirements.txt
+# Mount .netrc as a build secret (never baked into the image)
+RUN --mount=type=secret,id=netrc,target=/home/nonroot/.netrc,uid=65532 \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir --force-reinstall -r /tmp/requirements.txt
 
 COPY . .
 EXPOSE 8000

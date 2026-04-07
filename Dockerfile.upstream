@@ -1,0 +1,16 @@
+# Upstream comparison image: stock Python from Docker Hub + PyPI packages
+FROM python:3.12-slim
+WORKDIR /app
+
+ENV PIP_NO_INPUT=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["python3", "app.py"]

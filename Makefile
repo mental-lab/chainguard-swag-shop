@@ -61,8 +61,8 @@ BUILD_ARGS += --build-arg CGR_TOKEN=$(CGR_TOKEN)
 endif
 
 .PHONY: runtime
-runtime: ## Build the Docker image
-	docker build . -t $(IMAGE)
+runtime: ## Build the Docker image (uses ~/.netrc for Chainguard PyPI auth)
+	docker build --secret id=netrc,src=$(HOME)/.netrc . -t $(IMAGE)
 
 # -----------------------------------------------------------------------------
 # E2E (Playwright) + docker-compose
