@@ -45,18 +45,22 @@ jobs:
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
-      # ── 2. Trigger Custom Assembly build via Chainguard API ──
+      # ── 2. Trigger Custom Assembly build via chainctl ──
       - name: Trigger custom assembly build
         if: steps.check-config.outputs.skip == 'false'
         id: build
         run: |
-          TOKEN=$(chainctl auth token)
-          RESPONSE=$(curl -sS -X POST \
-            "https://console-api.enforce.dev/registry/v1/repos" \
-            -H "Authorization: Bearer $TOKEN" \
-            -H "Content-Type: application/json" \
-            --data-binary @build.yaml)
-          DIGEST=$(echo "$RESPONSE" | jq -r '.digest')
+          RESULT=$(chainctl images repos build apply \
+            --parent "$CHAINGUARD_ORG" \
+            --repo "$CHAINGUARD_REPO" \
+            -f build.yaml \
+            --output json)
+          DIGEST=$(echo "$RESULT" | jq -r '.digest')
+          if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
+            echo "Error: build result did not include a digest. Output:" >&2
+            echo "$RESULT" >&2
+            exit 1
+          fi
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
           echo "Built image digest: $DIGEST"
 
@@ -102,6 +106,8 @@ jobs:
       - name: Grype vulnerability scan
         if: steps.check-config.outputs.skip == 'false'
         uses: anchore/scan-action@v3
+        env:
+          GRYPE_DB_UPDATE_ON_START: "true"
         with:
           image: ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}
           fail-build: true
