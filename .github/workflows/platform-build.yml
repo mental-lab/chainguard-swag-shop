@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - build.yaml
+      - .github/workflows/platform-build.yml
   workflow_dispatch:
 
 permissions:
