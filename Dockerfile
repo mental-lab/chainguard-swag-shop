@@ -1,6 +1,6 @@
 
 # syntax=docker/dockerfile:1
-FROM cgr.dev/chainguard-private/python:latest-dev
+FROM cgr.dev/packetloss.network/python:latest-dev
 WORKDIR /app
 
 # Copy pip configuration
