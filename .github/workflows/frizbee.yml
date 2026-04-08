@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  workflows: write  # Required: GITHUB_TOKEN needs this to push branches that modify .github/workflows/ files
 
 jobs:
   pin-actions:
