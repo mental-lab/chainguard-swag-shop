@@ -10,9 +10,12 @@
 #
 # Apply with:
 #   chainctl images repos build apply \
-#     --parent $CHAINGUARD_ORG \
+#     --parent packetloss.network \
 #     --repo swag-shop \
 #     -f build.yaml
+
+# Base image — extended with additional packages and certificates below.
+base-image: cgr.dev/packetloss.network/python:latest-dev
 
 contents:
   packages:

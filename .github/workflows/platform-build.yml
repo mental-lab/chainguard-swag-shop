@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG }}
+      CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
       CHAINGUARD_REPO: swag-shop
-      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG }}/swag-shop
+      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/swag-shop
 
     steps:
       - name: Checkout
