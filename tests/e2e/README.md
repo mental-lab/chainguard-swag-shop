@@ -156,54 +156,6 @@ Key Playwright settings in `pytest.ini`:
 - `trace = retain-on-failure` - Generate traces for debugging
 
 
-## 🔄 GitLab CI Integration
-
-### Pipeline Stages
-
-The E2E tests run in GitLab CI using Docker services:
-
-1. **e2e-smoke-tests** (Runs on MRs and main)
-   - Fast smoke tests on Chromium only
-   - Critical paths validation
-   - Gates merge requests
-
-2. **e2e-full-tests** (Protected branches only)
-   - Complete E2E test suite
-   - All test scenarios
-   - Deployment validation
-
-3. **e2e-cross-browser** (Manual/Scheduled)
-   - Tests on all browsers
-   - Weekly compatibility checks
-   - Matrix strategy for parallelization
-
-### How It Works
-
-```yaml
-e2e-smoke-tests:
-  image: mcr.microsoft.com/playwright/python:v1.40.0-jammy
-  services:
-    - name: $CI_REGISTRY_IMAGE:latest
-      alias: swag-shop-app
-  variables:
-    BASE_URL: "http://swag-shop-app:8000"
-  script:
-    - pytest tests/e2e/test_smoke.py
-```
-
-The Flask app runs as a GitLab CI **service**, and Playwright tests connect to it via `BASE_URL`.
-
-### Artifacts
-
-Tests generate artifacts stored for 30 days:
-- 📸 Screenshots (on failure)
-- 🎥 Videos (on failure)
-- 📊 Test reports (HTML/JUnit)
-- 🔍 Traces (for debugging)
-
-Access artifacts from the GitLab UI: **Pipelines → Job → Browse → test-results/**
-
-
 ## 🐛 Debugging
 
 ### Run Tests in Headed Mode
@@ -374,7 +326,7 @@ When adding new E2E tests:
 3. Mark tests appropriately (`@pytest.mark.smoke`, etc.)
 4. Update this README if adding new test categories
 5. Ensure tests pass locally before committing
-6. Add to `.gitlab-ci.yml` if new critical paths
+6. Add to GitHub Actions workflow if new critical paths
 
 ## 📧 Support
 
