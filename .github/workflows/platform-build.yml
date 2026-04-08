@@ -57,21 +57,25 @@ jobs:
             -f build.yaml \
             --yes \
             --output json 2>&1)
-          echo "--- chainctl raw output ---"
           echo "$RESULT"
-          echo "---------------------------"
-          DIGEST=$(echo "$RESULT" | grep -o '"digest":"[^"]*"' | cut -d'"' -f4)
-          if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
-            echo "Error: build result did not include a digest. Output:" >&2
-            echo "$RESULT" >&2
-            exit 1
+          if echo "$RESULT" | grep -q "No changes detected"; then
+            echo "Image already up to date — no new build needed."
+            echo "skipped=true" >> $GITHUB_OUTPUT
+          else
+            DIGEST=$(echo "$RESULT" | grep -o '"digest":"[^"]*"' | cut -d'"' -f4)
+            if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
+              echo "Error: build result did not include a digest. Output:" >&2
+              echo "$RESULT" >&2
+              exit 1
+            fi
+            echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+            echo "skipped=false" >> $GITHUB_OUTPUT
+            echo "Built image digest: $DIGEST"
           fi
-          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
-          echo "Built image digest: $DIGEST"
 
       # ── 3. Verify image is cryptographically signed ──
       - name: Verify image signature (cosign)
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         run: |
           mkdir -p evidence
           cosign verify \
@@ -83,7 +87,7 @@ jobs:
 
       # ── 4. Extract SBOM ──
       - name: Extract SBOM attestation
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         run: |
           cosign verify-attestation \
             --type sbom \
@@ -96,7 +100,7 @@ jobs:
 
       # ── 5. Extract SLSA provenance ──
       - name: Extract SLSA provenance
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         run: |
           cosign verify-attestation \
             --type slsaprovenance \
@@ -109,7 +113,7 @@ jobs:
 
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         uses: anchore/scan-action@v3
         env:
           GRYPE_DB_UPDATE_ON_START: "true"
@@ -122,12 +126,12 @@ jobs:
 
       # ── 7. Copy build config into evidence bundle ──
       - name: Add build config to evidence bundle
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         run: cp build.yaml evidence/build.yaml
 
       # ── 8. Upload evidence bundle as Actions artifact ──
       - name: Upload evidence bundle
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: evidence-bundle-${{ github.sha }}
@@ -136,14 +140,14 @@ jobs:
 
       # ── 9. Update Dockerfile with new pinned digest ──
       - name: Update Dockerfile digest
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         run: |
           DIGEST="${{ steps.build.outputs.digest }}"
           sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}@${DIGEST}|" Dockerfile
           echo "Updated Dockerfile to digest: $DIGEST"
 
       - name: Open PR with updated digest
-        if: steps.check-config.outputs.skip == 'false'
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
