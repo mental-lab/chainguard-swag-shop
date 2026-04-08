@@ -17,8 +17,8 @@ jobs:
 
     env:
       CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
-      CHAINGUARD_REPO: swag-shop
-      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/swag-shop
+      CHAINGUARD_REPO: python
+      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/python
 
     steps:
       - name: Checkout

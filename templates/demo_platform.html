@@ -118,10 +118,6 @@
             </p>
             <div class="pain-grid">
                 <div class="pain-item">
-                    <h4>Manual cert injection</h4>
-                    <p>Corporate CA certs managed via COPY statements in Dockerfiles. Expires silently. No audit trail.</p>
-                </div>
-                <div class="pain-item">
                     <h4>Golden image toil</h4>
                     <p>Platform team owns rebuilding and re-scanning base images. CVE patches require manual intervention every sprint.</p>
                 </div>
@@ -146,34 +142,24 @@
         <div class="section-card-body">
             <p style="color:#555; margin-bottom:16px; font-size:0.9rem;">
                 The <code>build.yaml</code> lives in your repository alongside application code.
-                It declares exactly what packages are in the image and which CA certificates are trusted.
+                It declares exactly what packages are in the image.
                 Changes are reviewed in PRs, tracked in git history, and referenced in the image's
                 SLSA provenance attestation.
             </p>
             <div class="code-block">
 <pre><span class="comment"># build.yaml — checked into git, reviewed in PRs
-# This file is the source of truth for the swag-shop image.</span>
+# This file is the source of truth for the image.</span>
 
 <span class="key">contents</span>:
   <span class="key">packages</span>:
     - <span class="value">python-3.12</span>
     - <span class="value">py3.12-pip</span>
-    - <span class="value">ca-certificates-bundle</span>
-
-<span class="comment"># Corporate CA — baked into the image truststore at build time.
-# Cert rotation = git commit. Auditable via SLSA provenance.</span>
-<span class="key">certificates</span>:
-  <span class="key">additional</span>:
-    - <span class="key">name</span>: <span class="value">corporate-ca</span>
-      <span class="key">certificate</span>: |
-        -----BEGIN CERTIFICATE-----
-        MIICpDCCAYwCCQDU+pQ4pHgSpDANBgkqhkiG9w0BAQsFADAUMRIwEAYD...
-        -----END CERTIFICATE-----</pre>
+    - <span class="value">ca-certificates-bundle</span></pre>
             </div>
             <div class="callout">
-                &#x2713; <strong>Cert rotation is a git commit.</strong>
+                &#x2713; <strong>Package changes are git commits.</strong>
                 Every change is reviewed, approved, and recorded. The SLSA attestation on the resulting image
-                includes the certificate — your auditor can verify what CA certs were in prod at any point in time.
+                captures exactly what packages were declared — your auditor can verify what was in prod at any point in time.
             </div>
         </div>
     </div>
@@ -193,14 +179,14 @@
             <div class="cmd-block">
 <span class="prompt">$</span> chainctl images repos build apply \
     --parent $CHAINGUARD_ORG \
-    --repo swag-shop \
+    --repo python \
     -f build.yaml
 
 <span style="color:#888;">✔ Configuration validated</span>
 <span style="color:#888;">✔ Build triggered</span>
 <span style="color:#888;">✔ Image signed with Sigstore Cosign</span>
 <span style="color:#888;">✔ SLSA provenance attestation generated</span>
-<span style="color:#27ae60;">&#x2192; cgr.dev/$ORG/swag-shop@sha256:a1b2c3d4...</span>
+<span style="color:#27ae60;">&#x2192; cgr.dev/$ORG/python@sha256:a1b2c3d4...</span>
             </div>
             <p style="color:#666; font-size:0.85rem; margin: 0;">
                 The resulting image is rebuilt from Chainguard's hardened Wolfi base —
@@ -320,7 +306,7 @@ NAME                 INSTALLED   FIXED IN   TYPE   VULNERABILITY   SEVERITY
                 <div class="evidence-item">
                     <div class="ev-icon">&#x1F4DC;</div>
                     <div class="ev-file">provenance.json</div>
-                    <div class="ev-desc">SLSA attestation — where it was built, when, from what source, including CA certs</div>
+                    <div class="ev-desc">SLSA attestation — where it was built, when, and from what source packages</div>
                 </div>
                 <div class="evidence-item">
                     <div class="ev-icon">&#x1F6E1;&#xFE0F;</div>
@@ -330,11 +316,11 @@ NAME                 INSTALLED   FIXED IN   TYPE   VULNERABILITY   SEVERITY
                 <div class="evidence-item">
                     <div class="ev-icon">&#x2699;&#xFE0F;</div>
                     <div class="ev-file">build.yaml</div>
-                    <div class="ev-desc">The declared image configuration — packages and certs that produced this image</div>
+                    <div class="ev-desc">The declared image configuration — packages that produced this image</div>
                 </div>
             </div>
             <div class="callout" style="margin-top:20px;">
-                &#x1F4AC; <strong>Auditor asks:</strong> "What was running in prod on April 1st and what CA certs did it trust?"
+                &#x1F4AC; <strong>Auditor asks:</strong> "What was running in prod on April 1st and what packages did it contain?"
                 &rarr; Open the Actions run for that commit, download the evidence bundle, hand over five files.
                 No tickets. No chasing engineers.
             </div>

@@ -1,8 +1,8 @@
 # build.yaml — Chainguard Custom Assembly configuration
 #
 # This file is versioned alongside the application code.
-# It is the single source of truth for what is in the swag-shop container image:
-# which packages are included, and which CA certificates are trusted.
+# It is the single source of truth for which packages are in the
+# cgr.dev/packetloss.network/python image.
 #
 # Changes to this file trigger the platform-build GitHub Actions workflow,
 # which rebuilds the image, scans it with Grype, verifies the signature,
@@ -11,32 +11,15 @@
 # Apply with:
 #   chainctl images repos build apply \
 #     --parent packetloss.network \
-#     --repo swag-shop \
-#     -f build.yaml
-
-# Base image — extended with additional packages and certificates below.
-base-image: cgr.dev/packetloss.network/python:latest-dev
+#     --repo python \
+#     -f build.yaml \
+#     --yes
+#
+# Note: Custom Certificates require a separate entitlement.
+# Contact your Customer Success Team to enable certificate injection.
 
 contents:
   packages:
     - python-3.12
     - py3.12-pip
     - ca-certificates-bundle
-
-# Corporate CA certificate — baked into the image truststore at build time.
-# Appears in the image's SLSA provenance attestation for auditability.
-# Replace with your organization's PEM-encoded CA certificate.
-certificates:
-  additional:
-    - name: corporate-ca
-      certificate: |
-        -----BEGIN CERTIFICATE-----
-        MIICpDCCAYwCCQDU+pQ4pHgSpDANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAls
-        b2NhbGhvc3QwHhcNMjQwMTAxMDAwMDAwWhcNMjUwMTAxMDAwMDAwWjAUMRIwEAYD
-        VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
-        o4qne60TB3wolKm1EXAMPLE1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
-        ghijklmnopqrstuvwxyz0123456789+/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
-        CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCwIDAQABMA0G
-        CSqGSIb3DQEBCwUAA4IBAQCexamplecertificatefordemopurposesonly12345
-        -----END CERTIFICATE-----
