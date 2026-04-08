@@ -56,8 +56,11 @@ jobs:
             --repo "$CHAINGUARD_REPO" \
             -f build.yaml \
             --yes \
-            --output json)
-          DIGEST=$(echo "$RESULT" | jq -r '.digest')
+            --output json 2>&1)
+          echo "--- chainctl raw output ---"
+          echo "$RESULT"
+          echo "---------------------------"
+          DIGEST=$(echo "$RESULT" | grep -o '"digest":"[^"]*"' | cut -d'"' -f4)
           if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
             echo "Error: build result did not include a digest. Output:" >&2
             echo "$RESULT" >&2
