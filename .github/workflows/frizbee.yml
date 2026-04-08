@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  workflows: write   # Allows GITHUB_TOKEN to modify .github/workflows/ files
 
 jobs:
   pin-actions:
@@ -20,10 +21,7 @@ jobs:
       - name: Pin Actions refs to SHAs
         uses: stacklok/frizbee-action@v0.0.6
         env:
-          # Fine-grained PAT with workflows + contents + pull_requests write access.
-          # Create at: Settings → Developer settings → Fine-grained tokens
-          # Store as repo secret: Settings → Secrets → FRIZBEE_TOKEN
-          GITHUB_TOKEN: ${{ secrets.FRIZBEE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           actions: .github/workflows
           open_pr: true
