@@ -24,14 +24,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ── 0. Guard — skip gracefully if Chainguard org is not configured ──
+      # Set CHAINGUARD_ORG and CHAINGUARD_IDENTITY in repo Settings → Variables
+      # and configure an assumable OIDC identity in your Chainguard organization.
+      - name: Check required configuration
+        id: check-config
+        run: |
+          if [ -z "${{ vars.CHAINGUARD_ORG }}" ] || [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ]; then
+            echo "CHAINGUARD_ORG or CHAINGUARD_IDENTITY not configured — skipping build."
+            echo "See: https://edu.chainguard.dev/chainguard/administration/iam-organizations/assumable-ids/identity-examples/github-actions-identity/"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       # ── 1. Authenticate with Chainguard (OIDC — no long-lived credentials) ──
       - name: Setup chainctl
+        if: steps.check-config.outputs.skip == 'false'
         uses: chainguard-dev/setup-chainctl@v0.2.2
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
       # ── 2. Trigger Custom Assembly build via Chainguard API ──
       - name: Trigger custom assembly build
+        if: steps.check-config.outputs.skip == 'false'
         id: build
         run: |
           TOKEN=$(chainctl auth token)
@@ -46,6 +62,7 @@ jobs:
 
       # ── 3. Verify image is cryptographically signed ──
       - name: Verify image signature (cosign)
+        if: steps.check-config.outputs.skip == 'false'
         run: |
           mkdir -p evidence
           cosign verify \
@@ -57,6 +74,7 @@ jobs:
 
       # ── 4. Extract SBOM ──
       - name: Extract SBOM attestation
+        if: steps.check-config.outputs.skip == 'false'
         run: |
           cosign verify-attestation \
             --type sbom \
@@ -69,6 +87,7 @@ jobs:
 
       # ── 5. Extract SLSA provenance ──
       - name: Extract SLSA provenance
+        if: steps.check-config.outputs.skip == 'false'
         run: |
           cosign verify-attestation \
             --type slsaprovenance \
@@ -81,6 +100,7 @@ jobs:
 
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
+        if: steps.check-config.outputs.skip == 'false'
         uses: anchore/scan-action@v3
         with:
           image: ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}
@@ -91,10 +111,12 @@ jobs:
 
       # ── 7. Copy build config into evidence bundle ──
       - name: Add build config to evidence bundle
+        if: steps.check-config.outputs.skip == 'false'
         run: cp build.yaml evidence/build.yaml
 
       # ── 8. Upload evidence bundle as Actions artifact ──
       - name: Upload evidence bundle
+        if: steps.check-config.outputs.skip == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: evidence-bundle-${{ github.sha }}
@@ -103,12 +125,14 @@ jobs:
 
       # ── 9. Update Dockerfile with new pinned digest ──
       - name: Update Dockerfile digest
+        if: steps.check-config.outputs.skip == 'false'
         run: |
           DIGEST="${{ steps.build.outputs.digest }}"
           sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}@${DIGEST}|" Dockerfile
           echo "Updated Dockerfile to digest: $DIGEST"
 
       - name: Open PR with updated digest
+        if: steps.check-config.outputs.skip == 'false'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
