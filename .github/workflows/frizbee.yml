@@ -1,0 +1,30 @@
+name: Frizbee — Pin Actions to commit SHAs
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # Weekly on Monday at 6am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pin-actions:
+    name: Pin GitHub Actions to SHAs
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pin Actions refs to SHAs
+        uses: stacklok/frizbee-action@v0.0.6
+        env:
+          # Fine-grained PAT with workflows + contents + pull_requests write access.
+          # Create at: Settings → Developer settings → Fine-grained tokens
+          # Store as repo secret: Settings → Secrets → FRIZBEE_TOKEN
+          GITHUB_TOKEN: ${{ secrets.FRIZBEE_TOKEN }}
+        with:
+          actions: .github/workflows
+          open_pr: true
+          fail_on_unpinned: false

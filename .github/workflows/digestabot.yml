@@ -1,0 +1,45 @@
+name: Digestabot — Auto-update image digests
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # Daily at 6am UTC
+  workflow_dispatch:
+
+permissions:
+  id-token: write    # Required for OIDC auth with chainctl
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-digests:
+    name: Update image digests
+    runs-on: ubuntu-latest
+
+    env:
+      CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Authenticate with Chainguard so digestabot can pull the private org image
+      # to resolve the latest digest. Skip gracefully if identity not configured.
+      - name: Check required configuration
+        id: check-config
+        run: |
+          if [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ]; then
+            echo "CHAINGUARD_IDENTITY not configured — skipping Chainguard auth."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup chainctl
+        if: steps.check-config.outputs.skip == 'false'
+        uses: chainguard-dev/setup-chainctl@v0.2.2
+        with:
+          identity: ${{ vars.CHAINGUARD_IDENTITY }}
+
+      - name: Run digestabot
+        uses: chainguard-dev/digestabot@v1.2.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
