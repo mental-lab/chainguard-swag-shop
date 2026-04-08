@@ -1,0 +1,39 @@
+# build.yaml — Chainguard Custom Assembly configuration
+#
+# This file is versioned alongside the application code.
+# It is the single source of truth for what is in the swag-shop container image:
+# which packages are included, and which CA certificates are trusted.
+#
+# Changes to this file trigger the platform-build GitHub Actions workflow,
+# which rebuilds the image, scans it with Grype, verifies the signature,
+# and produces an evidence bundle for audit.
+#
+# Apply with:
+#   chainctl images repos build apply \
+#     --parent $CHAINGUARD_ORG \
+#     --repo swag-shop \
+#     -f build.yaml
+
+contents:
+  packages:
+    - python-3.12
+    - py3.12-pip
+    - ca-certificates-bundle
+
+# Corporate CA certificate — baked into the image truststore at build time.
+# Appears in the image's SLSA provenance attestation for auditability.
+# Replace with your organization's PEM-encoded CA certificate.
+certificates:
+  additional:
+    - name: corporate-ca
+      certificate: |
+        -----BEGIN CERTIFICATE-----
+        MIICpDCCAYwCCQDU+pQ4pHgSpDANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAls
+        b2NhbGhvc3QwHhcNMjQwMTAxMDAwMDAwWhcNMjUwMTAxMDAwMDAwWjAUMRIwEAYD
+        VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
+        o4qne60TB3wolKm1EXAMPLE1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
+        ghijklmnopqrstuvwxyz0123456789+/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+        CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCwIDAQABMA0G
+        CSqGSIb3DQEBCwUAA4IBAQCexamplecertificatefordemopurposesonly12345
+        -----END CERTIFICATE-----

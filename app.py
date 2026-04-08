@@ -317,5 +317,11 @@ def demo_libraries():
                            brand_name=BRAND_NAME)
 
 
+@app.route('/demo/platform.html')
+def demo_platform():
+    """Platform demo: Custom Assembly, versioned build.yaml, evidence bundle."""
+    return render_template('demo_platform.html', brand_name=BRAND_NAME)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=8000)

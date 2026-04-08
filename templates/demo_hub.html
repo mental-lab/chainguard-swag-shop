@@ -117,5 +117,27 @@
         </div>
     </div>
 
+    <div class="demo-card">
+        <div class="demo-card-header">
+            <span class="icon">&#x2699;&#xFE0F;</span>
+            <div>
+                <h2>Platform: Custom Assembly</h2>
+                <small style="opacity:0.75">Images &amp; Evidence Bundles</small>
+            </div>
+        </div>
+        <div class="demo-card-body">
+            <p>Build custom images from a versioned <code>build.yaml</code> — declare packages and corporate CA certs, get a signed, zero-CVE image with a full audit evidence bundle.</p>
+            <ul>
+                <li>Versioned build.yaml as image config</li>
+                <li>Custom CA cert baked in at build time</li>
+                <li>Automated build &rarr; scan &rarr; PR workflow</li>
+                <li>Evidence bundle: SBOM, provenance, Grype</li>
+                <li>OIDC auth — no long-lived credentials</li>
+            </ul>
+        </div>
+        <div class="demo-card-footer">
+            <a href="/demo/platform.html">Launch Demo &rarr;</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

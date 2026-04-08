@@ -1,0 +1,128 @@
+name: Platform Build — Custom Assembly + Evidence Bundle
+
+on:
+  push:
+    paths:
+      - build.yaml
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Required for OIDC auth with chainctl
+  contents: write   # Required to open PR with updated digest
+
+jobs:
+  build-and-verify:
+    name: Build, Scan, Attest, Bundle
+    runs-on: ubuntu-latest
+
+    env:
+      CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG }}
+      CHAINGUARD_REPO: swag-shop
+      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG }}/swag-shop
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 1. Authenticate with Chainguard (OIDC — no long-lived credentials) ──
+      - name: Setup chainctl
+        uses: chainguard-dev/setup-chainctl@v0.2.2
+        with:
+          identity: ${{ vars.CHAINGUARD_IDENTITY }}
+
+      # ── 2. Trigger Custom Assembly build via Chainguard API ──
+      - name: Trigger custom assembly build
+        id: build
+        run: |
+          TOKEN=$(chainctl auth token)
+          RESPONSE=$(curl -sS -X POST \
+            "https://console-api.enforce.dev/registry/v1/repos" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary @build.yaml)
+          DIGEST=$(echo "$RESPONSE" | jq -r '.digest')
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
+          echo "Built image digest: $DIGEST"
+
+      # ── 3. Verify image is cryptographically signed ──
+      - name: Verify image signature (cosign)
+        run: |
+          mkdir -p evidence
+          cosign verify \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+            --certificate-identity-regexp="https://github.com/chainguard-images" \
+            ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }} \
+            | jq . > evidence/signature-verify.json
+          echo "Signature verified"
+
+      # ── 4. Extract SBOM ──
+      - name: Extract SBOM attestation
+        run: |
+          cosign verify-attestation \
+            --type sbom \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+            --certificate-identity-regexp="https://github.com/chainguard-images" \
+            ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }} \
+            | jq -r '.payload | @base64d | fromjson | .predicate' \
+            > evidence/sbom.json
+          echo "SBOM extracted: $(jq '.packages | length' evidence/sbom.json) packages"
+
+      # ── 5. Extract SLSA provenance ──
+      - name: Extract SLSA provenance
+        run: |
+          cosign verify-attestation \
+            --type slsaprovenance \
+            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+            --certificate-identity-regexp="https://github.com/chainguard-images" \
+            ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }} \
+            | jq -r '.payload | @base64d | fromjson' \
+            > evidence/provenance.json
+          echo "Provenance extracted"
+
+      # ── 6. Grype scan — fail on critical or high CVEs ──
+      - name: Grype vulnerability scan
+        uses: anchore/scan-action@v3
+        with:
+          image: ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}
+          fail-build: true
+          severity-cutoff: high
+          output-format: json
+          output-file: evidence/grype-results.json
+
+      # ── 7. Copy build config into evidence bundle ──
+      - name: Add build config to evidence bundle
+        run: cp build.yaml evidence/build.yaml
+
+      # ── 8. Upload evidence bundle as Actions artifact ──
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-bundle-${{ github.sha }}
+          retention-days: 90
+          path: evidence/
+
+      # ── 9. Update Dockerfile with new pinned digest ──
+      - name: Update Dockerfile digest
+        run: |
+          DIGEST="${{ steps.build.outputs.digest }}"
+          sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}@${DIGEST}|" Dockerfile
+          echo "Updated Dockerfile to digest: $DIGEST"
+
+      - name: Open PR with updated digest
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update swag-shop image digest [${{ github.sha }}]"
+          title: "chore: update custom assembly image digest"
+          body: |
+            Automated digest update from Custom Assembly build.
+
+            **Build:** ${{ github.run_id }}
+            **Digest:** `${{ steps.build.outputs.digest }}`
+            **Grype:** 0 critical, 0 high CVEs ✓
+            **Signed:** cosign verified ✓
+            **Evidence bundle:** attached to this workflow run (90-day retention)
+
+            Triggered by: change to `build.yaml`
+          branch: chore/update-image-digest
+          delete-branch: true

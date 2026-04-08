@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Demo - {{ brand_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.plat-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+    color: #fff; padding: 48px 32px; text-align: center; margin-bottom: 40px;
+}
+.plat-hero h1 { font-size: 2rem; margin-bottom: 8px; }
+.plat-hero p { font-size: 1.05rem; opacity: 0.85; max-width: 620px; margin: 0 auto 16px; }
+.plat-hero .back-link { color: #ffaa44; font-size: 0.9rem; }
+.plat-hero .back-link:hover { color: #fff; }
+
+.plat-container { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
+
+.section-card {
+    background: #fff; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 32px;
+}
+.section-card-header {
+    background: #0f3460; color: #fff; padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+}
+.section-card-header h2 { font-size: 1.1rem; margin: 0; }
+.section-card-header .icon { font-size: 1.4rem; }
+.section-card-body { padding: 24px; }
+
+/* Pain points grid */
+.pain-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 8px; }
+.pain-item {
+    background: #fff8f0; border-left: 4px solid #e67e22;
+    padding: 14px 16px; border-radius: 0 6px 6px 0;
+}
+.pain-item h4 { font-size: 0.9rem; color: #1a1a2e; margin-bottom: 4px; }
+.pain-item p { font-size: 0.82rem; color: #666; margin: 0; }
+
+/* Code blocks */
+.code-block {
+    background: #0d0d1a; border-radius: 8px; padding: 20px 24px;
+    overflow-x: auto; margin-bottom: 16px;
+}
+.code-block pre {
+    color: #a8d8a8; font-family: monospace; font-size: 0.82rem;
+    line-height: 1.7; margin: 0; white-space: pre;
+}
+.code-block .comment { color: #6a9955; }
+.code-block .key { color: #9cdcfe; }
+.code-block .value { color: #ce9178; }
+.code-block .cmd { color: #dcdcaa; }
+
+.cmd-block {
+    background: #1a1a2e; border-radius: 8px; padding: 16px 20px;
+    font-family: monospace; font-size: 0.9rem; color: #a8d8a8;
+    overflow-x: auto; margin-bottom: 12px;
+}
+.cmd-block .prompt { color: #ffaa44; }
+
+/* Step flow */
+.step-flow { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 24px; }
+.step-item {
+    flex: 1; min-width: 120px; padding: 14px 16px;
+    background: #f8f9fa; border-right: 2px solid #dee2e6;
+    text-align: center;
+}
+.step-item:last-child { border-right: none; }
+.step-item .step-num { font-size: 1.3rem; font-weight: 900; color: orange; }
+.step-item .step-label { font-size: 0.78rem; color: #444; margin-top: 4px; }
+
+/* Evidence bundle */
+.evidence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.evidence-item {
+    border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px;
+    text-align: center;
+}
+.evidence-item .ev-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.evidence-item .ev-file { font-family: monospace; font-size: 0.82rem; color: #0f3460; font-weight: 700; margin-bottom: 6px; }
+.evidence-item .ev-desc { font-size: 0.78rem; color: #666; }
+
+/* Grype result */
+.grype-result {
+    background: #0d2615; border-radius: 8px; padding: 20px 24px;
+}
+.grype-result pre {
+    color: #a8d8a8; font-family: monospace; font-size: 0.82rem;
+    line-height: 1.6; margin: 0; white-space: pre;
+}
+.grype-zero { color: #27ae60; font-weight: 700; font-size: 1.1rem; }
+
+.callout {
+    background: #eafaf1; border-left: 4px solid #27ae60;
+    padding: 12px 16px; border-radius: 0 6px 6px 0;
+    font-size: 0.88rem; color: #1e5631; margin-top: 16px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="plat-hero">
+    <a href="/demo/" class="back-link">&larr; Back to Demo Hub</a>
+    <h1>Platform Demo: Custom Image Assembly</h1>
+    <p>Declare your image configuration in a versioned <code>build.yaml</code>. Chainguard builds it, signs it, and your CI pipeline verifies it — zero CVEs, full audit trail.</p>
+</div>
+
+<div class="plat-container">
+
+    <!-- 1. The Problem -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x26A0;&#xFE0F;</span>
+            <h2>Today's Problem for Platform Teams</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#555; margin-bottom:20px; font-size:0.9rem;">
+                Platform and cloud engineering teams are maintaining golden images manually —
+                a time-consuming, error-prone process that creates security and compliance debt.
+            </p>
+            <div class="pain-grid">
+                <div class="pain-item">
+                    <h4>Manual cert injection</h4>
+                    <p>Corporate CA certs managed via COPY statements in Dockerfiles. Expires silently. No audit trail.</p>
+                </div>
+                <div class="pain-item">
+                    <h4>Golden image toil</h4>
+                    <p>Platform team owns rebuilding and re-scanning base images. CVE patches require manual intervention every sprint.</p>
+                </div>
+                <div class="pain-item">
+                    <h4>No provenance</h4>
+                    <p>"We think it was built from this Dockerfile" isn't an audit answer. No cryptographic proof of what's in prod.</p>
+                </div>
+                <div class="pain-item">
+                    <h4>Drift across teams</h4>
+                    <p>Each team customizes the base image differently. No single source of truth. No consistent security posture.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. The build.yaml -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F4C4;</span>
+            <h2>build.yaml &mdash; Versioned Image Configuration</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#555; margin-bottom:16px; font-size:0.9rem;">
+                The <code>build.yaml</code> lives in your repository alongside application code.
+                It declares exactly what packages are in the image and which CA certificates are trusted.
+                Changes are reviewed in PRs, tracked in git history, and referenced in the image's
+                SLSA provenance attestation.
+            </p>
+            <div class="code-block">
+<pre><span class="comment"># build.yaml — checked into git, reviewed in PRs
+# This file is the source of truth for the swag-shop image.</span>
+
+<span class="key">contents</span>:
+  <span class="key">packages</span>:
+    - <span class="value">python-3.12</span>
+    - <span class="value">py3.12-pip</span>
+    - <span class="value">ca-certificates-bundle</span>
+
+<span class="comment"># Corporate CA — baked into the image truststore at build time.
+# Cert rotation = git commit. Auditable via SLSA provenance.</span>
+<span class="key">certificates</span>:
+  <span class="key">additional</span>:
+    - <span class="key">name</span>: <span class="value">corporate-ca</span>
+      <span class="key">certificate</span>: |
+        -----BEGIN CERTIFICATE-----
+        MIICpDCCAYwCCQDU+pQ4pHgSpDANBgkqhkiG9w0BAQsFADAUMRIwEAYD...
+        -----END CERTIFICATE-----</pre>
+            </div>
+            <div class="callout">
+                &#x2713; <strong>Cert rotation is a git commit.</strong>
+                Every change is reviewed, approved, and recorded. The SLSA attestation on the resulting image
+                includes the certificate — your auditor can verify what CA certs were in prod at any point in time.
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Build it -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F528;</span>
+            <h2>One Command to Build</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#555; margin-bottom:16px; font-size:0.9rem;">
+                Apply the <code>build.yaml</code> with <code>chainctl</code>. Chainguard builds the image
+                from source, signs it, and returns the digest. No Dockerfile. No <code>docker build</code>.
+                No manual base image maintenance.
+            </p>
+            <div class="cmd-block">
+<span class="prompt">$</span> chainctl images repos build apply \
+    --parent $CHAINGUARD_ORG \
+    --repo swag-shop \
+    -f build.yaml
+
+<span style="color:#888;">✔ Configuration validated</span>
+<span style="color:#888;">✔ Build triggered</span>
+<span style="color:#888;">✔ Image signed with Sigstore Cosign</span>
+<span style="color:#888;">✔ SLSA provenance attestation generated</span>
+<span style="color:#27ae60;">&#x2192; cgr.dev/$ORG/swag-shop@sha256:a1b2c3d4...</span>
+            </div>
+            <p style="color:#666; font-size:0.85rem; margin: 0;">
+                The resulting image is rebuilt from Chainguard's hardened Wolfi base —
+                only the packages declared in <code>build.yaml</code>, nothing else.
+            </p>
+        </div>
+    </div>
+
+    <!-- 4. Grype scan result -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F6E1;&#xFE0F;</span>
+            <h2>Grype Scan &mdash; Custom Image, Zero CVEs</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#555; margin-bottom:16px; font-size:0.9rem;">
+                Custom packages and corporate certs — and still zero critical or high CVEs.
+                Chainguard's distroless build approach means only what you declared is present.
+                Nothing to exploit that wasn't explicitly included.
+            </p>
+            <div class="grype-result">
+<pre> ✔ Scanned for vulnerabilities
+   ├── by severity: <span class="grype-zero">0 critical, 0 high</span>, 0 medium, 0 low
+   └── by status:   0 fixed, 0 not-fixed, 0 ignored
+
+NAME                 INSTALLED   FIXED IN   TYPE   VULNERABILITY   SEVERITY
+<span style="color:#27ae60; font-style:italic;">No vulnerabilities found</span></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Automated workflow -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x2699;&#xFE0F;</span>
+            <h2>Automated: build.yaml Change &rarr; PR with Verified Digest</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#555; margin-bottom:20px; font-size:0.9rem;">
+                The GitHub Actions workflow triggers on any push to <code>build.yaml</code>.
+                It builds the image, verifies the signature, scans for CVEs, and opens a PR
+                with the new pinned digest — only if everything passes.
+            </p>
+
+            <div class="step-flow">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-label">Push to<br>build.yaml</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-label">chainctl auth<br>(OIDC)</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-label">Custom Assembly<br>build + sign</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-label">cosign verify<br>+ SBOM + SLSA</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-label">Grype scan<br>(high gate)</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">6</div>
+                    <div class="step-label">PR: new<br>pinned digest</div>
+                </div>
+            </div>
+
+            <div class="code-block">
+<pre><span class="comment"># .github/workflows/platform-build.yml (excerpt)</span>
+<span class="key">on</span>:
+  <span class="key">push</span>:
+    <span class="key">paths</span>: [<span class="value">build.yaml</span>]
+
+<span class="key">steps</span>:
+  - <span class="key">uses</span>: <span class="value">chainguard-dev/setup-chainctl@v0.2.2</span>   <span class="comment"># OIDC — no secrets</span>
+    <span class="key">with</span>:
+      <span class="key">identity</span>: <span class="value">${{ vars.CHAINGUARD_IDENTITY }}</span>
+
+  - <span class="cmd">chainctl images repos build apply -f build.yaml</span>  <span class="comment"># build + sign</span>
+  - <span class="cmd">cosign verify ...</span>                                   <span class="comment"># signature check</span>
+  - <span class="cmd">cosign verify-attestation --type sbom ...</span>          <span class="comment"># extract SBOM</span>
+  - <span class="cmd">cosign verify-attestation --type slsaprovenance ...</span> <span class="comment"># extract provenance</span>
+  - <span class="key">uses</span>: <span class="value">anchore/scan-action@v3</span>                       <span class="comment"># Grype gate</span>
+    <span class="key">with</span>:
+      <span class="key">severity-cutoff</span>: <span class="value">high</span>
+      <span class="key">fail-build</span>: <span class="value">true</span></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Evidence bundle -->
+    <div class="section-card">
+        <div class="section-card-header">
+            <span class="icon">&#x1F4E6;</span>
+            <h2>Evidence Bundle &mdash; Audit-Ready for Every Build</h2>
+        </div>
+        <div class="section-card-body">
+            <p style="color:#555; margin-bottom:20px; font-size:0.9rem;">
+                Every successful build uploads an evidence bundle as a GitHub Actions artifact (90-day retention).
+                Pull it for any commit to answer an auditor's questions without chasing engineers.
+            </p>
+            <div class="evidence-grid">
+                <div class="evidence-item">
+                    <div class="ev-icon">&#x1F510;</div>
+                    <div class="ev-file">signature-verify.json</div>
+                    <div class="ev-desc">cosign verification output — cryptographic proof the image is signed</div>
+                </div>
+                <div class="evidence-item">
+                    <div class="ev-icon">&#x1F4CB;</div>
+                    <div class="ev-file">sbom.json</div>
+                    <div class="ev-desc">Full software bill of materials — every package and version in the image</div>
+                </div>
+                <div class="evidence-item">
+                    <div class="ev-icon">&#x1F4DC;</div>
+                    <div class="ev-file">provenance.json</div>
+                    <div class="ev-desc">SLSA attestation — where it was built, when, from what source, including CA certs</div>
+                </div>
+                <div class="evidence-item">
+                    <div class="ev-icon">&#x1F6E1;&#xFE0F;</div>
+                    <div class="ev-file">grype-results.json</div>
+                    <div class="ev-desc">Grype scan output — 0 critical/high CVEs at time of build</div>
+                </div>
+                <div class="evidence-item">
+                    <div class="ev-icon">&#x2699;&#xFE0F;</div>
+                    <div class="ev-file">build.yaml</div>
+                    <div class="ev-desc">The declared image configuration — packages and certs that produced this image</div>
+                </div>
+            </div>
+            <div class="callout" style="margin-top:20px;">
+                &#x1F4AC; <strong>Auditor asks:</strong> "What was running in prod on April 1st and what CA certs did it trust?"
+                &rarr; Open the Actions run for that commit, download the evidence bundle, hand over five files.
+                No tickets. No chasing engineers.
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
