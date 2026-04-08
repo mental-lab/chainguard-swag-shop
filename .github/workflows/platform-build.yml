@@ -54,6 +54,7 @@ jobs:
             --parent "$CHAINGUARD_ORG" \
             --repo "$CHAINGUARD_REPO" \
             -f build.yaml \
+            --yes \
             --output json)
           DIGEST=$(echo "$RESULT" | jq -r '.digest')
           if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
