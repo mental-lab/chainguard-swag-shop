@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       # ── 0. Guard — skip gracefully if Chainguard org is not configured ──
       # Set CHAINGUARD_ORG and CHAINGUARD_IDENTITY in repo Settings → Variables
@@ -42,7 +42,7 @@ jobs:
       # ── 1. Authenticate with Chainguard (OIDC — no long-lived credentials) ──
       - name: Setup chainctl
         if: steps.check-config.outputs.skip == 'false'
-        uses: chainguard-dev/setup-chainctl@v0.2.2
+        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
@@ -114,7 +114,7 @@ jobs:
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
-        uses: anchore/scan-action@v3
+        uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # v3
         env:
           GRYPE_DB_UPDATE_ON_START: "true"
         with:
@@ -132,7 +132,7 @@ jobs:
       # ── 8. Upload evidence bundle as Actions artifact ──
       - name: Upload evidence bundle
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: evidence-bundle-${{ github.sha }}
           retention-days: 90
@@ -148,7 +148,7 @@ jobs:
 
       - name: Open PR with updated digest
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: update swag-shop image digest [${{ github.sha }}]"

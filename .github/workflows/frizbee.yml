@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Pin Actions refs to SHAs
-        uses: stacklok/frizbee-action@v0.0.6
+        uses: stacklok/frizbee-action@7fb0f7cb0d136c932680249f65eb347c489d3106 # v0.0.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

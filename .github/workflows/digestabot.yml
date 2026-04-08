@@ -19,7 +19,7 @@ jobs:
       CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       # Authenticate with Chainguard so digestabot can pull the private org image
       # to resolve the latest digest. Skip gracefully if identity not configured.
@@ -35,11 +35,11 @@ jobs:
 
       - name: Setup chainctl
         if: steps.check-config.outputs.skip == 'false'
-        uses: chainguard-dev/setup-chainctl@v0.2.2
+        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
       - name: Run digestabot
-        uses: chainguard-dev/digestabot@v1.2.2
+        uses: chainguard-dev/digestabot@43222237fd8a07dc41a06ca13e931c95ce2cedac # v1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
