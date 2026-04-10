@@ -1,0 +1,220 @@
+name: PR Enrichment — Digest Security Evidence
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+    types: [opened, synchronize, reopened]
+
+permissions:
+  id-token: write      # Required for OIDC auth with chainctl and cosign
+  pull-requests: write  # Required to post PR comments
+  contents: read
+
+jobs:
+  enrich:
+    name: SBOM Diff + Grype Scan
+    runs-on: ubuntu-latest
+
+    env:
+      CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract digests from Dockerfile
+        id: digests
+        run: |
+          NEW_DIGEST=$(grep -m1 '^FROM' Dockerfile | grep -o 'sha256:[a-f0-9]*' || true)
+          OLD_DIGEST=$(git show HEAD^:Dockerfile 2>/dev/null | grep -m1 '^FROM' | grep -o 'sha256:[a-f0-9]*' || true)
+          echo "new_digest=${NEW_DIGEST}" >> $GITHUB_OUTPUT
+          echo "old_digest=${OLD_DIGEST}" >> $GITHUB_OUTPUT
+          echo "New digest: ${NEW_DIGEST:-none}"
+          echo "Old digest: ${OLD_DIGEST:-none}"
+
+      - name: Check Chainguard configuration
+        id: check-config
+        run: |
+          if [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Find any existing enrichment comment so we update rather than duplicate
+      - name: Find existing PR comment
+        id: find-comment
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- pr-enrichment -->'
+
+      # ── Guard: Dockerfile doesn't pin a digest ──────────────────────────────
+      - name: Post "please pin digest" comment
+        if: steps.digests.outputs.new_digest == ''
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- pr-enrichment -->
+            ## Image Digest Update
+
+            ⚠️ The `Dockerfile` change does not include a pinned digest on the `FROM` line.
+
+            Please pin the base image to a specific digest so digestabot can track future updates and security evidence can be generated:
+
+            ```dockerfile
+            FROM cgr.dev/${{ env.CHAINGUARD_ORG }}/python:latest-dev@sha256:<digest>
+            ```
+
+      - name: Skip remaining steps if no digest pinned
+        if: steps.digests.outputs.new_digest == ''
+        run: |
+          echo "No digest found in Dockerfile — skipping security scan."
+
+      # ── Guard: Chainguard identity not configured ───────────────────────────
+      - name: Post minimal comment (Chainguard not configured)
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'true'
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- pr-enrichment -->
+            ## Image Digest Update
+
+            **Image:** `cgr.dev/${{ env.CHAINGUARD_ORG }}/python`
+            **New digest:** `${{ steps.digests.outputs.new_digest }}`
+
+            ⚠️ `CHAINGUARD_IDENTITY` not configured — SBOM diff and vulnerability scan skipped.
+            Set `CHAINGUARD_IDENTITY` in repository **Settings → Variables** to enable full security evidence.
+
+      # ── Full enrichment path ────────────────────────────────────────────────
+
+      - name: Setup chainctl
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
+        with:
+          identity: ${{ vars.CHAINGUARD_IDENTITY }}
+
+      - name: Install cosign
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        uses: sigstore/cosign-installer@d7d6bc7722e57d2ce2b0d8284c96a66c4d41b7e4 # v3.8.2
+
+      - name: Extract new image SBOM
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        run: |
+          IMAGE_REF="cgr.dev/${{ env.CHAINGUARD_ORG }}/python@${{ steps.digests.outputs.new_digest }}"
+          cosign verify-attestation \
+            --type sbom \
+            --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+            --certificate-identity-regexp=https://github.com/chainguard-images \
+            "${IMAGE_REF}" \
+            | jq -r '.payload | @base64d | fromjson | .predicate.packages[] | .name + "==" + .versionInfo' \
+            | sort > new-packages.txt
+          echo "New SBOM: $(wc -l < new-packages.txt) packages"
+
+      - name: Extract old image SBOM
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        run: |
+          OLD_DIGEST="${{ steps.digests.outputs.old_digest }}"
+          if [ -n "${OLD_DIGEST}" ]; then
+            IMAGE_REF="cgr.dev/${{ env.CHAINGUARD_ORG }}/python@${OLD_DIGEST}"
+            cosign verify-attestation \
+              --type sbom \
+              --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+              --certificate-identity-regexp=https://github.com/chainguard-images \
+              "${IMAGE_REF}" \
+              | jq -r '.payload | @base64d | fromjson | .predicate.packages[] | .name + "==" + .versionInfo' \
+              | sort > old-packages.txt \
+              || touch old-packages.txt
+          else
+            touch old-packages.txt
+          fi
+          echo "Old SBOM: $(wc -l < old-packages.txt) packages"
+
+      - name: Grype vulnerability scan
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # v3
+        env:
+          GRYPE_DB_UPDATE_ON_START: "true"
+        with:
+          image: cgr.dev/${{ env.CHAINGUARD_ORG }}/python@${{ steps.digests.outputs.new_digest }}
+          fail-build: false
+          output-format: json
+          output-file: grype-results.json
+
+      - name: Build PR comment body
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        run: |
+          # ── Package diff ──
+          ADDED=$(comm -13 old-packages.txt new-packages.txt)
+          REMOVED=$(comm -23 old-packages.txt new-packages.txt)
+
+          {
+            if [ -z "$ADDED" ] && [ -z "$REMOVED" ]; then
+              printf '_(no changes)_\n'
+            else
+              printf '| Change | Package |\n'
+              printf '|--------|----------|\n'
+              while IFS= read -r pkg; do
+                [ -n "$pkg" ] && printf '| ➕ added | `%s` |\n' "$pkg"
+              done <<< "$ADDED"
+              while IFS= read -r pkg; do
+                [ -n "$pkg" ] && printf '| ➖ removed | `%s` |\n' "$pkg"
+              done <<< "$REMOVED"
+            fi
+          } > pkg-diff.txt
+
+          # ── Grype counts ──
+          CRITICAL=$(jq '[.matches[] | select(.vulnerability.severity == "Critical")] | length' grype-results.json 2>/dev/null || echo 0)
+          HIGH=$(jq '[.matches[] | select(.vulnerability.severity == "High")] | length' grype-results.json 2>/dev/null || echo 0)
+          MEDIUM=$(jq '[.matches[] | select(.vulnerability.severity == "Medium")] | length' grype-results.json 2>/dev/null || echo 0)
+
+          if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+            SCAN_ICON="❌"
+          else
+            SCAN_ICON="✅"
+          fi
+
+          {
+            printf '%s %s critical · %s high · %s medium\n' "$SCAN_ICON" "$CRITICAL" "$HIGH" "$MEDIUM"
+            FINDINGS=$(jq -r '
+              .matches[]
+              | select(.vulnerability.severity == "Critical" or .vulnerability.severity == "High")
+              | "| \(.vulnerability.id) | \(.vulnerability.severity) | \(.artifact.name)-\(.artifact.version) | \(if .vulnerability.fix.state == "fixed" then "✅ " + (.vulnerability.fix.versions | join(", ")) else "❌ none" end) |"
+            ' grype-results.json 2>/dev/null || true)
+            if [ -n "$FINDINGS" ]; then
+              printf '\n| CVE ID | Severity | Package | Fix |\n'
+              printf '|--------|----------|---------|-----|\n'
+              echo "$FINDINGS"
+            fi
+          } > scan-summary.txt
+
+          # ── Assemble comment ──
+          {
+            printf '<!-- pr-enrichment -->\n'
+            printf '## Image Digest Update\n\n'
+            printf '**Image:** `cgr.dev/%s/python`\n' "${{ env.CHAINGUARD_ORG }}"
+            printf '**New digest:** `%s`\n\n' "${{ steps.digests.outputs.new_digest }}"
+            printf '### Package changes\n\n'
+            cat pkg-diff.txt
+            printf '\n\n### Grype scan\n\n'
+            cat scan-summary.txt
+          } > comment.md
+
+      - name: Post PR comment
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-path: comment.md

@@ -1,6 +1,6 @@
 
 # syntax=docker/dockerfile:1
-FROM cgr.dev/packetloss.network/python:latest-dev
+FROM cgr.dev/packetloss.network/python:latest-dev@sha256:cf0e4256c4099ef5f68597fd48425da9e41ac62abe781691e28178393bb9da04
 WORKDIR /app
 
 # Copy pip configuration
