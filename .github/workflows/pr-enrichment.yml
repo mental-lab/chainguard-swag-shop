@@ -106,7 +106,7 @@ jobs:
 
       - name: Install cosign
         if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
-        uses: sigstore/cosign-installer@d7d6bc7722e57d2ce2b0d8284c96a66c4d41b7e4 # v3.8.2
+        uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
 
       - name: Extract new image SBOM
         if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
