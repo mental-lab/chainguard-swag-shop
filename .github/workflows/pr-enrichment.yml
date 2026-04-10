@@ -99,17 +99,29 @@ jobs:
       # ── Full enrichment path ────────────────────────────────────────────────
 
       - name: Setup chainctl
+        id: setup-chainctl
         if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        continue-on-error: true
         uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
-      - name: Install cosign
+      - name: Check chainctl auth status
+        id: check-auth
         if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        run: |
+          if [ "${{ steps.setup-chainctl.outcome }}" == "success" ]; then
+            echo "AUTH_OK=true" >> $GITHUB_OUTPUT
+          else
+            echo "AUTH_OK=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install cosign
+        if: steps.check-auth.outputs.AUTH_OK == 'true'
         uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # v3.8.2
 
       - name: Extract new image SBOM
-        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        if: steps.check-auth.outputs.AUTH_OK == 'true'
         run: |
           IMAGE_REF="cgr.dev/${{ env.CHAINGUARD_ORG }}/python@${{ steps.digests.outputs.new_digest }}"
           cosign verify-attestation \
@@ -122,7 +134,7 @@ jobs:
           echo "New SBOM: $(wc -l < new-packages.txt) packages"
 
       - name: Extract old image SBOM
-        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        if: steps.check-auth.outputs.AUTH_OK == 'true'
         run: |
           OLD_DIGEST="${{ steps.digests.outputs.old_digest }}"
           if [ -n "${OLD_DIGEST}" ]; then
@@ -141,7 +153,7 @@ jobs:
           echo "Old SBOM: $(wc -l < old-packages.txt) packages"
 
       - name: Grype vulnerability scan
-        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        if: steps.check-auth.outputs.AUTH_OK == 'true'
         uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # v3
         env:
           GRYPE_DB_UPDATE_ON_START: "true"
@@ -152,7 +164,7 @@ jobs:
           output-file: grype-results.json
 
       - name: Build PR comment body
-        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        if: steps.check-auth.outputs.AUTH_OK == 'true'
         run: |
           # ── Package diff ──
           ADDED=$(comm -13 old-packages.txt new-packages.txt)
@@ -211,10 +223,28 @@ jobs:
           } > comment.md
 
       - name: Post PR comment
-        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false'
+        if: steps.check-auth.outputs.AUTH_OK == 'true'
         uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
           body-path: comment.md
+
+      - name: Post minimal comment (auth failed)
+        if: steps.digests.outputs.new_digest != '' && steps.check-config.outputs.skip == 'false' && steps.check-auth.outputs.AUTH_OK != 'true'
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- pr-enrichment -->
+            ## Image Digest Update
+
+            **Image:** `cgr.dev/${{ env.CHAINGUARD_ORG }}/python`
+            **New digest:** `${{ steps.digests.outputs.new_digest }}`
+
+            ⚠️ `CHAINGUARD_IDENTITY` is set but authentication failed for `pull_request` events (expected — the identity trust policy only permits push events). Showing digest only.
+
+            SBOM diff and vulnerability scan require push-to-main access and will appear on merge.
