@@ -78,14 +78,22 @@ jobs:
               continue
             fi
 
-            # Debug: log full structure so we can map field names
-            echo "chainctl diff structure: $(echo "${diff}" | jq -c '.')"
+            # chainctl images diff JSON structure:
+            #   .vulnerabilities.{removed,added}[] => {cve, severity}
+            #   .packages.added[]                  => {name, version, reference}
+            #   .packages.removed[]                => {name, version, reference}
+            #   .packages.changed[]                => {name, current.{version,reference}, previous.{version,reference}}
+            # Filter to pkg:apk/ refs only to avoid duplicate CPE entries.
 
-            vulnerabilities_removed=$(jq '.diff.removed // [] | .[].cve' <<<"${diff}" | wc -l)
-            vulnerabilities_added=$(jq '.diff.added // [] | .[].cve' <<<"${diff}" | wc -l)
+            vulnerabilities_removed=$(jq '.vulnerabilities.removed // [] | length' <<<"${diff}")
+            vulnerabilities_added=$(jq '.vulnerabilities.added // [] | length' <<<"${diff}")
+            packages_changed=$(jq '.packages.changed // [] | map(select(.current.reference | startswith("pkg:apk/"))) | length' <<<"${diff}")
+            packages_added=$(jq '.packages.added // [] | map(select(.reference | startswith("pkg:apk/"))) | length' <<<"${diff}")
+            packages_removed=$(jq '.packages.removed // [] | map(select(.reference | startswith("pkg:apk/"))) | length' <<<"${diff}")
+            total_changes=$((vulnerabilities_removed + vulnerabilities_added + packages_changed + packages_added + packages_removed))
 
-            if [[ ${vulnerabilities_removed} -lt 1 ]]; then
-              echo "No vulnerabilities removed for ${image}, skipping"
+            if [[ ${total_changes} -lt 1 ]]; then
+              echo "No changes detected for ${image}, skipping"
               continue
             fi
 
@@ -93,14 +101,14 @@ jobs:
             echo "## ${image_name}" >> "${GITHUB_OUTPUT}"
             echo "\`${image}\`" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            echo "**Vulnerabilities removed:** ${vulnerabilities_removed}" >> "${GITHUB_OUTPUT}"
-            echo "**Vulnerabilities added:** ${vulnerabilities_added}" >> "${GITHUB_OUTPUT}"
+            echo "**Vulnerabilities removed:** ${vulnerabilities_removed} | **Vulnerabilities added:** ${vulnerabilities_added}" >> "${GITHUB_OUTPUT}"
+            echo "**Packages changed:** ${packages_changed} | **Packages added:** ${packages_added} | **Packages removed:** ${packages_removed}" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
 
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Removed CVEs</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            removed_cves=$(jq -r '.diff.removed // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
+            removed_cves=$(jq -r '.vulnerabilities.removed // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
             [[ -n "${removed_cves}" ]] && echo "${removed_cves}" >> "${GITHUB_OUTPUT}" || echo "No CVEs removed" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -109,7 +117,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Added CVEs</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            added_cves=$(jq -r '.diff.added // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
+            added_cves=$(jq -r '.vulnerabilities.added // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
             [[ -n "${added_cves}" ]] && echo "${added_cves}" >> "${GITHUB_OUTPUT}" || echo "No CVEs added" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -118,7 +126,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Removed Packages</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            removed_pkgs=$(jq -r '.diff.removed_packages // [] | .[] | "- \(.name) (\(.version)): \(.purl)"' <<<"${diff}")
+            removed_pkgs=$(jq -r '.packages.removed // [] | .[] | select(.reference | startswith("pkg:apk/")) | "- \(.name) (\(.version))"' <<<"${diff}")
             [[ -n "${removed_pkgs}" ]] && echo "${removed_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages removed" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -127,7 +135,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Added Packages</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            added_pkgs=$(jq -r '.diff.added_packages // [] | .[] | "- \(.name) (\(.version)): \(.purl)"' <<<"${diff}")
+            added_pkgs=$(jq -r '.packages.added // [] | .[] | select(.reference | startswith("pkg:apk/")) | "- \(.name) (\(.version))"' <<<"${diff}")
             [[ -n "${added_pkgs}" ]] && echo "${added_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages added" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -136,7 +144,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Changed Packages</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            changed_pkgs=$(jq -r '.diff.changed_packages // [] | .[] | "- \(.name): \(.old_version) -> \(.new_version): \(.purl)"' <<<"${diff}")
+            changed_pkgs=$(jq -r '.packages.changed // [] | .[] | select(.current.reference | startswith("pkg:apk/")) | "- \(.name): \(.previous.version) → \(.current.version)"' <<<"${diff}")
             [[ -n "${changed_pkgs}" ]] && echo "${changed_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages changed" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
