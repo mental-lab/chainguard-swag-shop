@@ -57,10 +57,10 @@ jobs:
 
           while read -r item; do
             image=$(jq -r '.image + "@" + .updated_digest' <<<"$item")
-            old_digest=$(jq -r '.digest' <<<"$item")
+            old_image=$(jq -r '.image + "@" + .digest' <<<"$item")
 
-            # Deduplicate by hashing the image+old_digest pair
-            image_pair_hash=$(sha256sum <<<"${image}${old_digest}" | awk '{print $1}')
+            # Deduplicate by hashing the image+old_image pair
+            image_pair_hash=$(sha256sum <<<"${image}${old_image}" | awk '{print $1}')
             if [[ $(jq -e ".[] | select(. == \"${image_pair_hash}\")" <<<"${processed_images}") ]]; then
               echo "Skipping ${image} — already processed"
               continue
@@ -68,7 +68,7 @@ jobs:
             processed_images=$(jq -c ". += [\"${image_pair_hash}\"]" <<<"${processed_images}")
 
             echo "Computing diff for ${image}"
-            if ! diff=$(chainctl images diff "${old_digest}" "${image}" -o json 2>/dev/null); then
+            if ! diff=$(chainctl images diff "${old_image}" "${image}" -o json 2>/dev/null); then
               echo "chainctl diff failed for ${image}, skipping"
               continue
             fi
