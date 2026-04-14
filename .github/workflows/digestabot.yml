@@ -78,8 +78,11 @@ jobs:
               continue
             fi
 
-            vulnerabilities_removed=$(jq '.diff.removed[].cve' <<<"${diff}" | wc -l)
-            vulnerabilities_added=$(jq '.diff.added[].cve' <<<"${diff}" | wc -l)
+            # Debug: log top-level keys so we can verify the JSON structure
+            echo "chainctl diff keys: $(echo "${diff}" | jq -c 'keys')"
+
+            vulnerabilities_removed=$(jq '.diff.removed // [] | .[].cve' <<<"${diff}" | wc -l)
+            vulnerabilities_added=$(jq '.diff.added // [] | .[].cve' <<<"${diff}" | wc -l)
 
             if [[ ${vulnerabilities_removed} -lt 1 ]]; then
               echo "No vulnerabilities removed for ${image}, skipping"
@@ -97,7 +100,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Removed CVEs</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            removed_cves=$(jq -r '.diff.removed[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
+            removed_cves=$(jq -r '.diff.removed // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
             [[ -n "${removed_cves}" ]] && echo "${removed_cves}" >> "${GITHUB_OUTPUT}" || echo "No CVEs removed" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -106,7 +109,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Added CVEs</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            added_cves=$(jq -r '.diff.added[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
+            added_cves=$(jq -r '.diff.added // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
             [[ -n "${added_cves}" ]] && echo "${added_cves}" >> "${GITHUB_OUTPUT}" || echo "No CVEs added" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -115,7 +118,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Removed Packages</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            removed_pkgs=$(jq -r '.diff.removed_packages[] | "- \(.name) (\(.version)): \(.purl)"' <<<"${diff}")
+            removed_pkgs=$(jq -r '.diff.removed_packages // [] | .[] | "- \(.name) (\(.version)): \(.purl)"' <<<"${diff}")
             [[ -n "${removed_pkgs}" ]] && echo "${removed_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages removed" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -124,7 +127,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Added Packages</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            added_pkgs=$(jq -r '.diff.added_packages[] | "- \(.name) (\(.version)): \(.purl)"' <<<"${diff}")
+            added_pkgs=$(jq -r '.diff.added_packages // [] | .[] | "- \(.name) (\(.version)): \(.purl)"' <<<"${diff}")
             [[ -n "${added_pkgs}" ]] && echo "${added_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages added" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
@@ -133,7 +136,7 @@ jobs:
             echo '<details>' >> "${GITHUB_OUTPUT}"
             echo '<summary><b>Changed Packages</b></summary>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
-            changed_pkgs=$(jq -r '.diff.changed_packages[] | "- \(.name): \(.old_version) -> \(.new_version): \(.purl)"' <<<"${diff}")
+            changed_pkgs=$(jq -r '.diff.changed_packages // [] | .[] | "- \(.name): \(.old_version) -> \(.new_version): \(.purl)"' <<<"${diff}")
             [[ -n "${changed_pkgs}" ]] && echo "${changed_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages changed" >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
             echo '</details>' >> "${GITHUB_OUTPUT}"
