@@ -68,8 +68,9 @@ jobs:
             processed_images=$(jq -c ". += [\"${image_pair_hash}\"]" <<<"${processed_images}")
 
             echo "Computing diff for ${image}"
-            if ! diff=$(chainctl images diff "${old_image}" "${image}" -o json 2>/dev/null); then
+            if ! diff=$(chainctl images diff "${old_image}" "${image}" -o json 2>/tmp/chainctl-diff-err.txt); then
               echo "chainctl diff failed for ${image}, skipping"
+              echo "Error: $(cat /tmp/chainctl-diff-err.txt)" >> "${GITHUB_STEP_SUMMARY}"
               continue
             fi
 
