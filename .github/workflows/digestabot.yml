@@ -50,125 +50,135 @@ jobs:
         if: ${{ steps.digestabot.outputs.pull_request_number != '' }}
         run: curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
-      # Compute chainctl image diff and post as a comment on the digestabot PR.
-      # Requires chainctl to already be authenticated (setup-chainctl above).
+      # Compute chainctl image diff and update the PR body to match the format
+      # at https://github.com/chainguard-demo/digestabot-examples/pull/2
+      # Requires chainctl authenticated (setup-chainctl above) and grype in PATH.
       - name: Compute chainctl image diff
-        id: chainctl_diff
         if: ${{ steps.digestabot.outputs.pull_request_number != '' }}
         shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.digestabot.outputs.pull_request_number }}
         run: |
+          body_file=$(mktemp)
+          echo "Results of \`chainctl image diff\` for each image." >> "${body_file}"
+          echo "" >> "${body_file}"
+
           processed_images='[]'
-          echo 'body<<EOF' >> "${GITHUB_OUTPUT}"
 
           while read -r item; do
             image=$(jq -r '.image + "@" + .updated_digest' <<<"$item")
             old_image=$(jq -r '.image + "@" + .digest' <<<"$item")
+            old_digest=$(jq -r '.digest' <<<"$item")
+            new_digest=$(jq -r '.updated_digest' <<<"$item")
 
-            # Deduplicate by hashing the image+old_image pair
+            # Deduplicate
             image_pair_hash=$(sha256sum <<<"${image}${old_image}" | awk '{print $1}')
             if [[ $(jq -e ".[] | select(. == \"${image_pair_hash}\")" <<<"${processed_images}") ]]; then
-              echo "Skipping ${image} — already processed"
               continue
             fi
             processed_images=$(jq -c ". += [\"${image_pair_hash}\"]" <<<"${processed_images}")
 
             echo "Computing diff for ${image}"
             if ! diff=$(chainctl images diff "${old_image}" "${image}" -o json 2>/tmp/chainctl-diff.log); then
-              echo "chainctl diff failed for ${image}: $(cat /tmp/chainctl-diff.log)"
+              echo "chainctl diff failed: $(cat /tmp/chainctl-diff.log)"
               continue
             fi
 
             # chainctl images diff JSON structure:
             #   .vulnerabilities.{removed,added}[] => {cve, severity}
-            #   .packages.added[]                  => {name, version, reference}
-            #   .packages.removed[]                => {name, version, reference}
-            #   .packages.changed[]                => {name, current.{version,reference}, previous.{version,reference}}
-            # Filter to pkg:apk/ refs only to avoid duplicate CPE entries.
-
-            vulnerabilities_removed=$(jq '.vulnerabilities.removed // [] | length' <<<"${diff}")
-            vulnerabilities_added=$(jq '.vulnerabilities.added // [] | length' <<<"${diff}")
-            packages_changed=$(jq '.packages.changed // [] | map(select(.current.reference | startswith("pkg:apk/"))) | length' <<<"${diff}")
-            packages_added=$(jq '.packages.added // [] | map(select(.reference | startswith("pkg:apk/"))) | length' <<<"${diff}")
-            packages_removed=$(jq '.packages.removed // [] | map(select(.reference | startswith("pkg:apk/"))) | length' <<<"${diff}")
-            total_changes=$((vulnerabilities_removed + vulnerabilities_added + packages_changed + packages_added + packages_removed))
+            #   .packages.{added,removed}[]        => {name, version, reference}
+            #   .packages.changed[]                => {name, current.{version,reference}, previous.version}
+            # Filter to pkg:apk/ refs to avoid duplicate CPE entries.
+            total_changes=$(jq '
+              (.vulnerabilities.removed // [] | length) +
+              (.vulnerabilities.added // [] | length) +
+              (.packages.changed // [] | map(select(.current.reference | startswith("pkg:apk/"))) | length) +
+              (.packages.added // [] | map(select(.reference | startswith("pkg:apk/"))) | length) +
+              (.packages.removed // [] | map(select(.reference | startswith("pkg:apk/"))) | length)
+            ' <<<"${diff}")
 
             if [[ ${total_changes} -lt 1 ]]; then
-              echo "No changes detected for ${image}, skipping"
+              echo "No changes for ${image}, skipping"
               continue
             fi
 
             image_name=$(jq -r '.image' <<<"$item")
-            echo "## ${image_name}" >> "${GITHUB_OUTPUT}"
-            echo "\`${image}\`" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            echo "**Vulnerabilities removed:** ${vulnerabilities_removed} | **Vulnerabilities added:** ${vulnerabilities_added}" >> "${GITHUB_OUTPUT}"
-            echo "**Packages changed:** ${packages_changed} | **Packages added:** ${packages_added} | **Packages removed:** ${packages_removed}" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
 
-            echo '<details>' >> "${GITHUB_OUTPUT}"
-            echo '<summary><b>Removed CVEs</b></summary>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            removed_cves=$(jq -r '.vulnerabilities.removed // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
-            [[ -n "${removed_cves}" ]] && echo "${removed_cves}" >> "${GITHUB_OUTPUT}" || echo "No CVEs removed" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            echo '</details>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
+            # Image header + digest table
+            echo "## ${image_name}" >> "${body_file}"
+            echo "" >> "${body_file}"
+            echo "|      | Digest |" >> "${body_file}"
+            echo "| ---- | ------ |" >> "${body_file}"
+            echo "| From | \`${old_digest}\` |" >> "${body_file}"
+            echo "| To   | \`${new_digest}\` |" >> "${body_file}"
+            echo "" >> "${body_file}"
+            echo "<details>" >> "${body_file}"
+            echo "" >> "${body_file}"
 
-            echo '<details>' >> "${GITHUB_OUTPUT}"
-            echo '<summary><b>Added CVEs</b></summary>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            added_cves=$(jq -r '.vulnerabilities.added // [] | .[] | "- [\(.cve)](https://nvd.nist.gov/vuln/detail/\(.cve)) (\(.severity))"' <<<"${diff}")
-            [[ -n "${added_cves}" ]] && echo "${added_cves}" >> "${GITHUB_OUTPUT}" || echo "No CVEs added" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            echo '</details>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
+            # Vulnerabilities Added
+            echo "### Vulnerabilities Added" >> "${body_file}"
+            vuln_added=$(jq -r '.vulnerabilities.added // []' <<<"${diff}")
+            if [[ $(echo "${vuln_added}" | jq 'length') -gt 0 ]]; then
+              echo "| Id | Severity |" >> "${body_file}"
+              echo "| -- | -------- |" >> "${body_file}"
+              echo "${vuln_added}" | jq -r '.[] | "| \(.cve) | \(.severity) |"' >> "${body_file}"
+            else
+              echo "None" >> "${body_file}"
+            fi
+            echo "" >> "${body_file}"
 
-            echo '<details>' >> "${GITHUB_OUTPUT}"
-            echo '<summary><b>Removed Packages</b></summary>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            removed_pkgs=$(jq -r '.packages.removed // [] | .[] | select(.reference | startswith("pkg:apk/")) | "- \(.name) (\(.version))"' <<<"${diff}")
-            [[ -n "${removed_pkgs}" ]] && echo "${removed_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages removed" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            echo '</details>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
+            # Vulnerabilities Removed
+            echo "### Vulnerabilities Removed" >> "${body_file}"
+            vuln_removed=$(jq -r '.vulnerabilities.removed // []' <<<"${diff}")
+            if [[ $(echo "${vuln_removed}" | jq 'length') -gt 0 ]]; then
+              echo "| Id | Severity |" >> "${body_file}"
+              echo "| -- | -------- |" >> "${body_file}"
+              echo "${vuln_removed}" | jq -r '.[] | "| \(.cve) | \(.severity) |"' >> "${body_file}"
+            else
+              echo "None" >> "${body_file}"
+            fi
+            echo "" >> "${body_file}"
 
-            echo '<details>' >> "${GITHUB_OUTPUT}"
-            echo '<summary><b>Added Packages</b></summary>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            added_pkgs=$(jq -r '.packages.added // [] | .[] | select(.reference | startswith("pkg:apk/")) | "- \(.name) (\(.version))"' <<<"${diff}")
-            [[ -n "${added_pkgs}" ]] && echo "${added_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages added" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            echo '</details>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
+            # Packages Added
+            echo "### Packages Added" >> "${body_file}"
+            pkgs_added=$(jq '.packages.added // [] | map(select(.reference | startswith("pkg:apk/")))' <<<"${diff}")
+            if [[ $(echo "${pkgs_added}" | jq 'length') -gt 0 ]]; then
+              echo "| Name | Version | Reference |" >> "${body_file}"
+              echo "| ---- | ------- | --------- |" >> "${body_file}"
+              echo "${pkgs_added}" | jq -r '.[] | "| \(.name) | \(.version) | \(.reference) |"' >> "${body_file}"
+            else
+              echo "None" >> "${body_file}"
+            fi
+            echo "" >> "${body_file}"
 
-            echo '<details>' >> "${GITHUB_OUTPUT}"
-            echo '<summary><b>Changed Packages</b></summary>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            changed_pkgs=$(jq -r '.packages.changed // [] | .[] | select(.current.reference | startswith("pkg:apk/")) | "- \(.name): \(.previous.version) → \(.current.version)"' <<<"${diff}")
-            [[ -n "${changed_pkgs}" ]] && echo "${changed_pkgs}" >> "${GITHUB_OUTPUT}" || echo "No packages changed" >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
-            echo '</details>' >> "${GITHUB_OUTPUT}"
-            echo "" >> "${GITHUB_OUTPUT}"
+            # Packages Removed
+            echo "### Packages Removed" >> "${body_file}"
+            pkgs_removed=$(jq '.packages.removed // [] | map(select(.reference | startswith("pkg:apk/")))' <<<"${diff}")
+            if [[ $(echo "${pkgs_removed}" | jq 'length') -gt 0 ]]; then
+              echo "| Name | Version | Reference |" >> "${body_file}"
+              echo "| ---- | ------- | --------- |" >> "${body_file}"
+              echo "${pkgs_removed}" | jq -r '.[] | "| \(.name) | \(.version) | \(.reference) |"' >> "${body_file}"
+            else
+              echo "None" >> "${body_file}"
+            fi
+            echo "" >> "${body_file}"
+
+            # Packages Changed
+            echo "### Packages Changed" >> "${body_file}"
+            pkgs_changed=$(jq '.packages.changed // [] | map(select(.current.reference | startswith("pkg:apk/")))' <<<"${diff}")
+            if [[ $(echo "${pkgs_changed}" | jq 'length') -gt 0 ]]; then
+              echo "| Name | Previous Version | Current Version |" >> "${body_file}"
+              echo "| ---- | ---------------- | --------------- |" >> "${body_file}"
+              echo "${pkgs_changed}" | jq -r '.[] | "| \(.name) | \(.previous.version) | \(.current.version) |"' >> "${body_file}"
+            else
+              echo "None" >> "${body_file}"
+            fi
+            echo "" >> "${body_file}"
+
+            echo "</details>" >> "${body_file}"
+            echo "" >> "${body_file}"
 
           done < <(jq -c '.updates // [] | .[]' <<<'${{ steps.digestabot.outputs.json }}')
 
-          echo 'EOF' >> "${GITHUB_OUTPUT}"
-
-      - uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
-        id: find_comment
-        if: ${{ steps.digestabot.outputs.pull_request_number != '' }}
-        with:
-          issue-number: ${{ steps.digestabot.outputs.pull_request_number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: 'Chainctl Image Diff'
-
-      - uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
-        if: ${{ steps.digestabot.outputs.pull_request_number != '' }}
-        with:
-          comment-id: ${{ steps.find_comment.outputs.comment-id }}
-          issue-number: ${{ steps.digestabot.outputs.pull_request_number }}
-          body: |
-            ## Chainctl Image Diff
-            ${{ steps.chainctl_diff.outputs.body }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          edit-mode: replace
+          gh pr edit "${PR_NUMBER}" --body "$(cat ${body_file})" --repo "${{ github.repository }}"
