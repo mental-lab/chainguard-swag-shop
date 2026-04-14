@@ -78,8 +78,8 @@ jobs:
               continue
             fi
 
-            # Debug: log top-level keys so we can verify the JSON structure
-            echo "chainctl diff keys: $(echo "${diff}" | jq -c 'keys')"
+            # Debug: log full structure so we can map field names
+            echo "chainctl diff structure: $(echo "${diff}" | jq -c '.')"
 
             vulnerabilities_removed=$(jq '.diff.removed // [] | .[].cve' <<<"${diff}" | wc -l)
             vulnerabilities_added=$(jq '.diff.added // [] | .[].cve' <<<"${diff}" | wc -l)
