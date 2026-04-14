@@ -68,11 +68,11 @@ jobs:
             processed_images=$(jq -c ". += [\"${image_pair_hash}\"]" <<<"${processed_images}")
 
             echo "Computing diff for ${image}"
-            if ! diff=$(chainctl images diff "${old_image}" "${image}" -o json 2>/tmp/chainctl-diff-err.txt); then
-              echo "chainctl diff failed for ${image}, skipping"
-              echo "Error: $(cat /tmp/chainctl-diff-err.txt)" >> "${GITHUB_STEP_SUMMARY}"
+            chainctl_err=$(chainctl images diff "${old_image}" "${image}" -o json 2>&1) && diff="${chainctl_err}" || {
+              echo "chainctl diff failed for ${image}:"
+              echo "${chainctl_err}"
               continue
-            fi
+            }
 
             vulnerabilities_removed=$(jq '.diff.removed[].cve' <<<"${diff}" | wc -l)
             vulnerabilities_added=$(jq '.diff.added[].cve' <<<"${diff}" | wc -l)
