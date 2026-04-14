@@ -57,7 +57,7 @@ jobs:
 
           while read -r item; do
             image=$(jq -r '.image + "@" + .updated_digest' <<<"$item")
-            old_digest=$(jq -r '.previous_digest' <<<"$item")
+            old_digest=$(jq -r '.digest' <<<"$item")
 
             # Deduplicate by hashing the image+old_digest pair
             image_pair_hash=$(sha256sum <<<"${image}${old_digest}" | awk '{print $1}')
@@ -134,7 +134,7 @@ jobs:
             echo '</details>' >> "${GITHUB_OUTPUT}"
             echo "" >> "${GITHUB_OUTPUT}"
 
-          done < <(jq -c '.updates // [] | .[]' <<<"${{ steps.digestabot.outputs.json }}")
+          done < <(jq -c '.updates // [] | .[]' <<<'${{ steps.digestabot.outputs.json }}')
 
           echo 'EOF' >> "${GITHUB_OUTPUT}"
 
