@@ -46,8 +46,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # grype is required by chainctl images diff for vulnerability scanning
-      - uses: anchore/scan-action/download-grype@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
+      - name: Install grype
         if: ${{ steps.digestabot.outputs.pull_request_number != '' }}
+        run: curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
       # Compute chainctl image diff and post as a comment on the digestabot PR.
       # Requires chainctl to already be authenticated (setup-chainctl above).
