@@ -40,7 +40,7 @@ venv: ## Create virtualenv if missing
 
 .PHONY: install
 install: venv ## Install app dependencies
-	$(PY) -m pip install --upgrade pip
+	$(PY) -m pip install --upgrade pip setuptools
 	$(PY) -m pip install -r requirements.txt
 
 .PHONY: develop
@@ -138,20 +138,26 @@ switch-cgr: ## Use Chainguard PyPI as primary and reinstall deps
 	@test -d "$(VENV)" || { echo "Virtual environment not found. Run '\''make install'\'' first."; exit 1; }
 	@echo "Reinstalling dependencies..."
 	@$(PY) -m pip install --upgrade pip
-	@$(PY) -m pip install --force-reinstall -r requirements.txt
-	@if [ -f requirements-e2e.txt ]; then $(PY) -m pip install --force-reinstall -r requirements-e2e.txt; fi
+	@$(PY) -m pip install --no-cache-dir --force-reinstall -r requirements.txt
+	@if [ -f requirements-e2e.txt ]; then $(PY) -m pip install --no-cache-dir --force-reinstall -r requirements-e2e.txt; fi
 	@echo "Done."
 
 .PHONY: switch-pypi
-switch-pypi: ## Use regular PyPI only
-	echo "Writing pip.conf (regular PyPI only)..."
-	printf '%s\n' \
+switch-pypi: ## Use regular PyPI only and reinstall deps
+	@echo "Writing pip.conf (regular PyPI only)..."
+	@printf '%s\n' \
 		'[global]' \
 		'index-url = https://pypi.org/simple' \
 		'' \
 		'[install]' \
 		'timeout = 30' \
 	> pip.conf
+	@test -d "$(VENV)" || { echo "Virtual environment not found. Run 'make install' first."; exit 1; }
+	@echo "Reinstalling dependencies..."
+	@$(PY) -m pip install --upgrade pip
+	@$(PY) -m pip install --no-cache-dir --force-reinstall -r requirements.txt
+	@if [ -f requirements-e2e.txt ]; then $(PY) -m pip install --no-cache-dir --force-reinstall -r requirements-e2e.txt; fi
+	@echo "Done."
 
 .PHONY: show-config
 show-config: ## Show pip.conf and a few installed packages
@@ -169,13 +175,16 @@ show-provenance: ## Show provenance for all packages in requirements.txt (stdout
 	@while read line; do \
 		if echo "$$line" | grep -q '=='; then \
 			pkg=$$(echo "$$line" | cut -d'=' -f1 | tr '[:upper:]' '[:lower:]'); \
-			version=$$(echo "$$line" | cut -d'=' -f3); \
-			echo "Fetching provenance for $$pkg==$$version..."; \
-			provenance_url=$$(curl -s --netrc https://libraries.cgr.dev/python-remediated/simple/$$pkg/ | grep "$$version" | grep "\.tar\.gz" | grep -o 'data-provenance="[^"]*"' | cut -d'"' -f2 | head -1); \
+			pinned=$$(echo "$$line" | cut -d'=' -f3); \
+			echo "Looking up Chainguard provenance for $$pkg (pinned $$pinned)..."; \
+			provenance_url=$$(curl -s --netrc https://libraries.cgr.dev/python-remediated/simple/$$pkg/ \
+				| grep -o 'data-provenance="[^"]*"' | cut -d'"' -f2 | tail -1); \
 			if [ -n "$$provenance_url" ]; then \
+				cgr_version=$$(echo "$$provenance_url" | cut -d'/' -f7); \
+				echo "  → latest Chainguard version: $$cgr_version"; \
 				curl -s --netrc "$$provenance_url" | jq -r '.attestation_bundles[0].attestations[0].envelope.statement' | base64 -d | jq .; \
 			else \
-				echo "No provenance found for $$pkg-$$version"; \
+				echo "  → no Chainguard-remediated version available for $$pkg"; \
 			fi; \
 			echo ""; \
 		fi; \
