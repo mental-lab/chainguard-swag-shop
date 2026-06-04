@@ -20,6 +20,8 @@
 
 contents:
   packages:
-    - python-3.12
-    - py3.12-pip
+    # Use the version-agnostic pip so the package resolves against each
+    # variant's native Python. Pinning py3.12-pip conflicts with the 3.13+
+    # variants this repo builds (both provide cmd:pip3) and fails the build.
+    - py3-pip
     - ca-certificates-bundle
