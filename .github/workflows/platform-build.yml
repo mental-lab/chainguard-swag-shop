@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
 
       # ── 0. Guard — skip gracefully if Chainguard org is not configured ──
       # Set CHAINGUARD_ORG and CHAINGUARD_IDENTITY in repo Settings → Variables
@@ -251,7 +251,7 @@ jobs:
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
         if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
-        uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
+        uses: chainguard-actions/anchore-scan-action@5470f64f241ff0b662c1efed80f982517e2340d6 # v7.4.0
         env:
           GRYPE_DB_AUTO_UPDATE: "true"   # default true; v7.4.0 bundles grype
                                          # v0.110 using the current (v6) DB schema
@@ -270,7 +270,7 @@ jobs:
       # ── 8. Upload evidence bundle as Actions artifact ──
       - name: Upload evidence bundle
         if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: chainguard-actions/actions-upload-artifact@8dd583ff8251c4a96857f05031036783608a6a96 # v7.0.1
         with:
           name: evidence-bundle-${{ github.sha }}
           retention-days: 90
@@ -286,7 +286,7 @@ jobs:
 
       - name: Open PR with updated digest
         if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        uses: chainguard-actions/peter-evans-create-pull-request@b1c1e3ffe178bd1a9a7a827f434c4ac9afdf4386 # v8.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: update swag-shop image digest [${{ github.sha }}]"
