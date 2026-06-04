@@ -48,22 +48,19 @@ jobs:
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
-      # ── 2. Trigger Custom Assembly build via chainctl ──
+      # ── 2a. Customize image — apply config + certificates ──
         # Builds the chainctl invocation dynamically: starts from the base
         # config file, then appends one `--with-certificates=<file>` flag for
-        # every CA certificate found under $CERTS_DIR. The flag is repeatable
-        # and certificates are merged with the YAML config (and the image's
-        # default CA bundle) by Custom Assembly.
-      - name: Trigger custom assembly build
+        # every CA certificate found under $CERTS_DIR. `build apply` only prints
+        # a config diff and starts an async build — it returns no digest — so we
+        # snapshot the existing build reports here to identify the ones this
+        # apply triggers (tracked in step 2b).
+      - name: Customize image (apply config + certificates)
         if: steps.check-config.outputs.skip == 'false'
-        id: build
+        id: customize
         run: |
           set -euo pipefail
 
-          # Base arguments — always apply the config file. NOTE: `build apply`
-          # only prints a human-readable config diff and kicks off an async
-          # build; it does NOT return an image digest. We therefore wait for the
-          # build to finish (step below) and resolve the digest from the tag.
           ARGS=(
             images repos build apply
             --parent "$CHAINGUARD_ORG"
@@ -88,16 +85,14 @@ jobs:
           echo "Found $CERT_COUNT additional CA certificate(s)."
           echo "cert_count=$CERT_COUNT" >> "$GITHUB_OUTPUT"
 
-          # Snapshot existing build report IDs so we can identify the build(s)
-          # this apply triggers (one report per published image variant).
-          list_reports() {
-            chainctl images repos build list \
-              --parent "$CHAINGUARD_ORG" --repo "$CHAINGUARD_REPO" \
-              --output json 2>/dev/null
-          }
-          BEFORE_IDS=$(list_reports | jq -c '[.reports[].id]')
+          # Snapshot existing build report IDs so the next step can identify the
+          # build(s) this apply triggers (one report per published variant).
+          BEFORE_IDS=$(chainctl images repos build list \
+            --parent "$CHAINGUARD_ORG" --repo "$CHAINGUARD_REPO" \
+            --output json 2>/dev/null | jq -c '[.reports[].id]')
+          echo "before_ids=$BEFORE_IDS" >> "$GITHUB_OUTPUT"
 
-          # Run the build (apply config + certificates).
+          # Apply config + certificates (triggers the async build).
           set +e
           APPLY_OUT=$(chainctl "${ARGS[@]}" 2>&1)
           APPLY_RC=$?
@@ -111,7 +106,38 @@ jobs:
           if echo "$APPLY_OUT" | grep -q "No changes detected"; then
             echo "Image already up to date — no new build needed."
             echo "skipped=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          else
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── 2b. Check build status — wait for the triggered build(s) and gate on
+      #        the variant that backs the tag we consume (IMAGE_TAG). ──
+      - name: Check build status
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        id: build-status
+        run: |
+          set -euo pipefail
+          BEFORE_IDS='${{ steps.customize.outputs.before_ids }}'
+
+          list_reports() {
+            chainctl images repos build list \
+              --parent "$CHAINGUARD_ORG" --repo "$CHAINGUARD_REPO" \
+              --output json 2>/dev/null
+          }
+
+          # Identify which build backs the tag we consume. One apply rebuilds
+          # every Python version variant (3.10…3.14); the report whose
+          # annotation dev.chainguard.package.main = "python-<ver>" is the one
+          # that produces the ${IMAGE_TAG} image. Floating tags (latest,
+          # latest-dev) have no fixed version, so we fall back to requiring any
+          # triggered build to succeed.
+          VER=$(printf '%s' "$IMAGE_TAG" | grep -oE '^[0-9]+\.[0-9]+' || true)
+          TARGET_MAIN=""
+          if [ -n "$VER" ]; then
+            TARGET_MAIN="python-$VER"
+            echo "Gating on build variant '$TARGET_MAIN' (backs tag '$IMAGE_TAG')."
+          else
+            echo "Tag '$IMAGE_TAG' is not version-specific; gating on any triggered build."
           fi
 
           # Wait for the triggered build(s) to complete. We identify them as
@@ -124,33 +150,46 @@ jobs:
                     '[.reports[] | select((.id as $i | $before | index($i)) | not)]')
             TOTAL=$(echo "$NEW"   | jq 'length')
             PENDING=$(echo "$NEW" | jq '[.[] | select(.result == null)] | length')
-            SUCCESS=$(echo "$NEW" | jq '[.[] | select(.result == "Success")] | length')
-            FAILED=$(echo "$NEW"  | jq '[.[] | select(.result == "Failure")] | length')
-            echo "  reports: total=$TOTAL pending=$PENDING success=$SUCCESS failed=$FAILED"
+            echo "  triggered reports: total=$TOTAL pending=$PENDING"
 
             if [ "$TOTAL" -gt 0 ] && [ "$PENDING" -eq 0 ]; then
-              if [ "$SUCCESS" -gt 0 ]; then
-                break
-              fi
-              echo "Error: all $TOTAL triggered build(s) failed. Most recent log:" >&2
-              echo "$NEW" | jq -r 'sort_by(.completedAt) | last | .log' | tail -c 3000 >&2
-              exit 1
+              break
             fi
-
             if [ "$(date +%s)" -ge "$DEADLINE" ]; then
               echo "Error: timed out after 10m waiting for build(s)." >&2
-              echo "$NEW" | jq -r '.[] | "  \(.startedAt) \(.result // "pending")"' >&2
+              echo "$NEW" | jq -r '.[] | "  \(.startedAt) \((.config|fromjson).annotations["dev.chainguard.package.main"]) \(.result // "pending")"' >&2
               exit 1
             fi
             sleep 20
           done
-          echo "Build(s) completed successfully."
 
-          # Resolve the digest of the tag the application consumes. The tag is
-          # the source of truth (it tracks whichever variant is current), so we
-          # read it straight from chainctl rather than guess a variant from a
-          # report. (One apply rebuilds every variant — 3.10…3.14 — each with
-          # its own digest; the tag tells us which one matters.)
+          # Decide pass/fail from the build that backs our tag, and surface
+          # that build's log on failure (not some other variant's).
+          if [ -n "$TARGET_MAIN" ]; then
+            TARGET=$(echo "$NEW" | jq -c --arg m "$TARGET_MAIN" \
+                       '[.[] | select((.config|fromjson).annotations["dev.chainguard.package.main"] == $m)]')
+          else
+            TARGET="$NEW"
+          fi
+          if [ "$(echo "$TARGET" | jq 'length')" -eq 0 ]; then
+            echo "Error: no build report found for '${TARGET_MAIN:-any variant}' among triggered builds." >&2
+            echo "$NEW" | jq -r '.[] | "  \(.startedAt) \((.config|fromjson).annotations["dev.chainguard.package.main"]) \(.result)"' >&2
+            exit 1
+          fi
+          if [ "$(echo "$TARGET" | jq '[.[] | select(.result == "Success")] | length')" -eq 0 ]; then
+            echo "Error: the build backing '${TARGET_MAIN:-tag $IMAGE_TAG}' did not succeed. Log of most recent attempt:" >&2
+            echo "$TARGET" | jq -r 'sort_by(.completedAt) | last | .log' | tail -c 3000 >&2
+            exit 1
+          fi
+          echo "Build backing '${TARGET_MAIN:-tag $IMAGE_TAG}' completed successfully."
+
+      # ── 2c. Get updated digest — resolve the digest of the tag the
+      #        application consumes (the tag is the source of truth). ──
+      - name: Get updated image digest
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        id: build
+        run: |
+          set -euo pipefail
           echo "Resolving digest for tag '${IMAGE_TAG}' ..."
           DIGEST=""
           for attempt in 1 2 3 4 5 6; do
@@ -168,12 +207,11 @@ jobs:
             exit 1
           fi
           echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-          echo "skipped=false" >> "$GITHUB_OUTPUT"
-          echo "Built image digest: $DIGEST"
+          echo "Resolved image digest: $DIGEST"
 
       # ── 3. Verify image is cryptographically signed ──
       - name: Verify image signature (cosign)
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         run: |
           mkdir -p evidence
           cosign verify \
@@ -185,7 +223,7 @@ jobs:
 
       # ── 4. Extract SBOM ──
       - name: Extract SBOM attestation
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         run: |
           cosign verify-attestation \
             --type sbom \
@@ -198,7 +236,7 @@ jobs:
 
       # ── 5. Extract SLSA provenance ──
       - name: Extract SLSA provenance
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         run: |
           cosign verify-attestation \
             --type slsaprovenance \
@@ -211,7 +249,7 @@ jobs:
 
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # v3
         env:
           GRYPE_DB_UPDATE_ON_START: "true"
@@ -224,12 +262,12 @@ jobs:
 
       # ── 7. Copy build config into evidence bundle ──
       - name: Add build config to evidence bundle
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         run: cp build.yaml evidence/build.yaml
 
       # ── 8. Upload evidence bundle as Actions artifact ──
       - name: Upload evidence bundle
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: evidence-bundle-${{ github.sha }}
@@ -238,14 +276,14 @@ jobs:
 
       # ── 9. Update Dockerfile with new pinned digest ──
       - name: Update Dockerfile digest
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         run: |
           DIGEST="${{ steps.build.outputs.digest }}"
           sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}@${DIGEST}|" Dockerfile
           echo "Updated Dockerfile to digest: $DIGEST"
 
       - name: Open PR with updated digest
-        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
