@@ -85,18 +85,40 @@ jobs:
           echo "Found $CERT_COUNT additional CA certificate(s)."
           echo "cert_count=$CERT_COUNT" >> "$GITHUB_OUTPUT"
 
-          # Run the build.
-          RESULT=$(chainctl "${ARGS[@]}" 2>&1)
-          echo "$RESULT"
+          # Run the build. Capture stdout (the --output json result, which
+          # carries the digest) separately from stderr (the human-readable
+          # plan/diff, which can run to hundreds of lines when certificates
+          # change). Mixing the two would corrupt digest parsing.
+          set +e
+          STDOUT=$(chainctl "${ARGS[@]}" 2>stderr.log)
+          EXIT_CODE=$?
+          set -e
 
-          if echo "$RESULT" | grep -q "No changes detected"; then
+          echo "── chainctl plan/diff (stderr) ──"
+          cat stderr.log
+          echo "── chainctl result (stdout) ──"
+          echo "$STDOUT"
+
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "Error: chainctl exited with code $EXIT_CODE." >&2
+            exit "$EXIT_CODE"
+          fi
+
+          # "No changes detected" may land on either stream.
+          if grep -q "No changes detected" stderr.log || echo "$STDOUT" | grep -q "No changes detected"; then
             echo "Image already up to date — no new build needed."
             echo "skipped=true" >> "$GITHUB_OUTPUT"
           else
-            DIGEST=$(echo "$RESULT" | grep -o '"digest":"[^"]*"' | cut -d'"' -f4)
+            # Prefer jq on the JSON result (handles nesting and whitespace);
+            # fall back to grep. `|| true` keeps a no-match from tripping
+            # pipefail and aborting before the diagnostic below.
+            DIGEST=$(echo "$STDOUT" | jq -r '.. | .digest? // empty' 2>/dev/null | head -1 || true)
+            if [ -z "$DIGEST" ]; then
+              DIGEST=$(echo "$STDOUT" | grep -oE '"digest"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed -E 's/.*"([^"]*)"$/\1/' || true)
+            fi
             if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
               echo "Error: build result did not include a digest. Output:" >&2
-              echo "$RESULT" >&2
+              echo "$STDOUT" >&2
               exit 1
             fi
             echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
