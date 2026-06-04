@@ -286,7 +286,7 @@ jobs:
 
       - name: Open PR with updated digest
         if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
-        uses: chainguard-actions/peter-evans-create-pull-request@b1c1e3ffe178bd1a9a7a827f434c4ac9afdf4386 # v8.1.0
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: update swag-shop image digest [${{ github.sha }}]"
