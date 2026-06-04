@@ -45,7 +45,7 @@ jobs:
       # ── 1. Authenticate with Chainguard (OIDC — no long-lived credentials) ──
       - name: Setup chainctl
         if: steps.check-config.outputs.skip == 'false'
-        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
+        uses: chainguard-dev/setup-chainctl@2cddd35a2f120d9973e58094dc6878c93cf58c28 # v0.5.1
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
