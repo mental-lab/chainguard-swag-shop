@@ -20,4 +20,5 @@
 
 contents:
   packages:
-    - ca-certificates-bundle
+    - jq
+    - curl
