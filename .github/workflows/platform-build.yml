@@ -20,6 +20,7 @@ jobs:
       CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
       CHAINGUARD_REPO: python
       IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/python
+      IMAGE_TAG: 3.12-dev   # tag the application consumes; pinned by digest below
       CERTS_DIR: certs        # directory scanned for additional CA certificates
 
     steps:
@@ -59,14 +60,16 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Base arguments — always apply the config file.
+          # Base arguments — always apply the config file. NOTE: `build apply`
+          # only prints a human-readable config diff and kicks off an async
+          # build; it does NOT return an image digest. We therefore wait for the
+          # build to finish (step below) and resolve the digest from the tag.
           ARGS=(
             images repos build apply
             --parent "$CHAINGUARD_ORG"
             --repo   "$CHAINGUARD_REPO"
             --file   build.yaml
             --yes
-            --output json
           )
 
           # Discover additional CA certificates and add a flag for each.
@@ -85,46 +88,88 @@ jobs:
           echo "Found $CERT_COUNT additional CA certificate(s)."
           echo "cert_count=$CERT_COUNT" >> "$GITHUB_OUTPUT"
 
-          # Run the build. Capture stdout (the --output json result, which
-          # carries the digest) separately from stderr (the human-readable
-          # plan/diff, which can run to hundreds of lines when certificates
-          # change). Mixing the two would corrupt digest parsing.
+          # Snapshot existing build report IDs so we can identify the build(s)
+          # this apply triggers (one report per published image variant).
+          list_reports() {
+            chainctl images repos build list \
+              --parent "$CHAINGUARD_ORG" --repo "$CHAINGUARD_REPO" \
+              --output json 2>/dev/null
+          }
+          BEFORE_IDS=$(list_reports | jq -c '[.reports[].id]')
+
+          # Run the build (apply config + certificates).
           set +e
-          STDOUT=$(chainctl "${ARGS[@]}" 2>stderr.log)
-          EXIT_CODE=$?
+          APPLY_OUT=$(chainctl "${ARGS[@]}" 2>&1)
+          APPLY_RC=$?
           set -e
-
-          echo "── chainctl plan/diff (stderr) ──"
-          cat stderr.log
-          echo "── chainctl result (stdout) ──"
-          echo "$STDOUT"
-
-          if [ "$EXIT_CODE" -ne 0 ]; then
-            echo "Error: chainctl exited with code $EXIT_CODE." >&2
-            exit "$EXIT_CODE"
+          echo "$APPLY_OUT"
+          if [ "$APPLY_RC" -ne 0 ]; then
+            echo "Error: chainctl build apply exited with code $APPLY_RC." >&2
+            exit "$APPLY_RC"
           fi
 
-          # "No changes detected" may land on either stream.
-          if grep -q "No changes detected" stderr.log || echo "$STDOUT" | grep -q "No changes detected"; then
+          if echo "$APPLY_OUT" | grep -q "No changes detected"; then
             echo "Image already up to date — no new build needed."
             echo "skipped=true" >> "$GITHUB_OUTPUT"
-          else
-            # Prefer jq on the JSON result (handles nesting and whitespace);
-            # fall back to grep. `|| true` keeps a no-match from tripping
-            # pipefail and aborting before the diagnostic below.
-            DIGEST=$(echo "$STDOUT" | jq -r '.. | .digest? // empty' 2>/dev/null | head -1 || true)
-            if [ -z "$DIGEST" ]; then
-              DIGEST=$(echo "$STDOUT" | grep -oE '"digest"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed -E 's/.*"([^"]*)"$/\1/' || true)
-            fi
-            if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
-              echo "Error: build result did not include a digest. Output:" >&2
-              echo "$STDOUT" >&2
+            exit 0
+          fi
+
+          # Wait for the triggered build(s) to complete. We identify them as
+          # report IDs that did not exist before the apply, so concurrent or
+          # historical builds don't confuse completion detection.
+          echo "Waiting for custom build(s) to complete..."
+          DEADLINE=$(( $(date +%s) + 600 ))   # 10 minute budget
+          while :; do
+            NEW=$(list_reports | jq -c --argjson before "$BEFORE_IDS" \
+                    '[.reports[] | select((.id as $i | $before | index($i)) | not)]')
+            TOTAL=$(echo "$NEW"   | jq 'length')
+            PENDING=$(echo "$NEW" | jq '[.[] | select(.result == null)] | length')
+            SUCCESS=$(echo "$NEW" | jq '[.[] | select(.result == "Success")] | length')
+            FAILED=$(echo "$NEW"  | jq '[.[] | select(.result == "Failure")] | length')
+            echo "  reports: total=$TOTAL pending=$PENDING success=$SUCCESS failed=$FAILED"
+
+            if [ "$TOTAL" -gt 0 ] && [ "$PENDING" -eq 0 ]; then
+              if [ "$SUCCESS" -gt 0 ]; then
+                break
+              fi
+              echo "Error: all $TOTAL triggered build(s) failed. Most recent log:" >&2
+              echo "$NEW" | jq -r 'sort_by(.completedAt) | last | .log' | tail -c 3000 >&2
               exit 1
             fi
-            echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
-            echo "skipped=false" >> "$GITHUB_OUTPUT"
-            echo "Built image digest: $DIGEST"
+
+            if [ "$(date +%s)" -ge "$DEADLINE" ]; then
+              echo "Error: timed out after 10m waiting for build(s)." >&2
+              echo "$NEW" | jq -r '.[] | "  \(.startedAt) \(.result // "pending")"' >&2
+              exit 1
+            fi
+            sleep 20
+          done
+          echo "Build(s) completed successfully."
+
+          # Resolve the digest of the tag the application consumes. The tag is
+          # the source of truth (it tracks whichever variant is current), so we
+          # read it straight from chainctl rather than guess a variant from a
+          # report. (One apply rebuilds every variant — 3.10…3.14 — each with
+          # its own digest; the tag tells us which one matters.)
+          echo "Resolving digest for tag '${IMAGE_TAG}' ..."
+          DIGEST=""
+          for attempt in 1 2 3 4 5 6; do
+            DIGEST=$(chainctl images list \
+                       --parent "$CHAINGUARD_ORG" --repo "$CHAINGUARD_REPO" \
+                       --output json 2>/dev/null \
+                     | jq -r --arg t "$IMAGE_TAG" \
+                         'first(.[0].tags[]? | select(.name == $t) | .digest) // empty')
+            [ -n "$DIGEST" ] && break
+            echo "  tag '${IMAGE_TAG}' not resolvable yet (attempt $attempt) — retrying in 10s..."
+            sleep 10
+          done
+          if [ -z "$DIGEST" ]; then
+            echo "Error: could not resolve digest for tag '${IMAGE_TAG}'." >&2
+            exit 1
           fi
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "skipped=false" >> "$GITHUB_OUTPUT"
+          echo "Built image digest: $DIGEST"
 
       # ── 3. Verify image is cryptographically signed ──
       - name: Verify image signature (cosign)
@@ -196,7 +241,7 @@ jobs:
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         run: |
           DIGEST="${{ steps.build.outputs.digest }}"
-          sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}@${DIGEST}|" Dockerfile
+          sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}@${DIGEST}|" Dockerfile
           echo "Updated Dockerfile to digest: $DIGEST"
 
       - name: Open PR with updated digest
