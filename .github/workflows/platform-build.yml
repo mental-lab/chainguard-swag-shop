@@ -250,9 +250,10 @@ jobs:
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
         if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
-        uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # v3
+        uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
         env:
-          GRYPE_DB_UPDATE_ON_START: "true"
+          GRYPE_DB_AUTO_UPDATE: "true"   # default true; v7.4.0 bundles grype
+                                         # v0.110 using the current (v6) DB schema
         with:
           image: ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}
           fail-build: true
