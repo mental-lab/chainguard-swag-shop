@@ -20,6 +20,7 @@ jobs:
       CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
       CHAINGUARD_REPO: python
       IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/python
+      CERTS_DIR: certs        # directory scanned for additional CA certificates
 
     steps:
       - name: Checkout
@@ -47,20 +48,50 @@ jobs:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
       # ── 2. Trigger Custom Assembly build via chainctl ──
+        # Builds the chainctl invocation dynamically: starts from the base
+        # config file, then appends one `--with-certificates=<file>` flag for
+        # every CA certificate found under $CERTS_DIR. The flag is repeatable
+        # and certificates are merged with the YAML config (and the image's
+        # default CA bundle) by Custom Assembly.
       - name: Trigger custom assembly build
         if: steps.check-config.outputs.skip == 'false'
         id: build
         run: |
-          RESULT=$(chainctl images repos build apply \
-            --parent "$CHAINGUARD_ORG" \
-            --repo "$CHAINGUARD_REPO" \
-            -f build.yaml \
-            --yes \
-            --output json 2>&1)
+          set -euo pipefail
+
+          # Base arguments — always apply the config file.
+          ARGS=(
+            images repos build apply
+            --parent "$CHAINGUARD_ORG"
+            --repo   "$CHAINGUARD_REPO"
+            --file   build.yaml
+            --yes
+            --output json
+          )
+
+          # Discover additional CA certificates and add a flag for each.
+          CERT_COUNT=0
+          if [ -d "$CERTS_DIR" ]; then
+            while IFS= read -r -d '' cert; do
+              echo "Adding CA certificate: $cert"
+              ARGS+=( "--with-certificates=$cert" )
+              CERT_COUNT=$((CERT_COUNT + 1))
+            done < <(find "$CERTS_DIR" -type f \
+                        \( -iname '*.pem' -o -iname '*.crt' -o -iname '*.cer' -o -iname '*.ca' \) \
+                        -print0 | sort -z)
+          else
+            echo "No certificate directory '$CERTS_DIR' found — building without extra CAs."
+          fi
+          echo "Found $CERT_COUNT additional CA certificate(s)."
+          echo "cert_count=$CERT_COUNT" >> "$GITHUB_OUTPUT"
+
+          # Run the build.
+          RESULT=$(chainctl "${ARGS[@]}" 2>&1)
           echo "$RESULT"
+
           if echo "$RESULT" | grep -q "No changes detected"; then
             echo "Image already up to date — no new build needed."
-            echo "skipped=true" >> $GITHUB_OUTPUT
+            echo "skipped=true" >> "$GITHUB_OUTPUT"
           else
             DIGEST=$(echo "$RESULT" | grep -o '"digest":"[^"]*"' | cut -d'"' -f4)
             if [ -z "$DIGEST" ] || [ "$DIGEST" = "null" ]; then
@@ -68,8 +99,8 @@ jobs:
               echo "$RESULT" >&2
               exit 1
             fi
-            echo "digest=$DIGEST" >> $GITHUB_OUTPUT
-            echo "skipped=false" >> $GITHUB_OUTPUT
+            echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+            echo "skipped=false" >> "$GITHUB_OUTPUT"
             echo "Built image digest: $DIGEST"
           fi
 
