@@ -3,7 +3,7 @@ name: Platform Build — Custom Assembly + Evidence Bundle
 on:
   push:
     paths:
-      - build.yaml
+      - ca-images-iac/**
       - .github/workflows/platform-build.yml
   workflow_dispatch:
 
@@ -13,66 +13,111 @@ permissions:
   pull-requests: write  # Required for create-pull-request to open the PR
 
 jobs:
-  build-and-verify:
-    name: Build, Scan, Attest, Bundle
+  # ── Discover — build the image matrix from ca-images-iac/*/*.yaml ──
+  # Each overlay file carries an `x-meta` block (repo/tag/dockerfile/certs_dir).
+  # We read those into a matrix so the build job runs once per image, in
+  # parallel. If the Chainguard org/identity isn't configured, or no overlay
+  # files exist, we emit an empty matrix and the build job skips gracefully.
+  discover:
+    name: Discover images
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
+
+      - name: Build matrix from ca-images-iac/
+        id: set
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          # Guard — skip gracefully if Chainguard org is not configured.
+          # Set CHAINGUARD_ORG and CHAINGUARD_IDENTITY in repo Settings → Variables
+          # and configure an assumable OIDC identity in your Chainguard organization.
+          if [ -z "${{ vars.CHAINGUARD_ORG }}" ] || [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ]; then
+            echo "CHAINGUARD_ORG or CHAINGUARD_IDENTITY not configured — skipping build."
+            echo "See: https://edu.chainguard.dev/chainguard/administration/iam-organizations/assumable-ids/identity-examples/github-actions-identity/"
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Each image lives in its own directory: ca-images-iac/<image>/<image>.yaml
+          files=(ca-images-iac/*/*.yaml)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No overlay files found under ca-images-iac/*/ — nothing to build."
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # One matrix entry per overlay file: read its x-meta block as JSON and
+          # attach the file path under `config`.
+          INCLUDE=$(
+            for f in "${files[@]}"; do
+              yq -o=json -I=0 '.["x-meta"]' "$f" \
+                | jq -c --arg c "$f" '. + {config: $c}'
+            done | jq -s -c '{include: .}'
+          )
+          echo "Discovered images:"
+          echo "$INCLUDE" | jq -r '.include[] | "  - \(.repo):\(.tag)  (\(.config))"'
+          echo "matrix=$INCLUDE" >> "$GITHUB_OUTPUT"
+
+  build-and-verify:
+    name: Build ${{ matrix.repo }}:${{ matrix.tag }}
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false   # one image failing must not cancel the others
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
 
     env:
       CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
-      CHAINGUARD_REPO: python
-      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/python
-      IMAGE_TAG: 3.12-dev   # tag the application consumes; pinned by digest below
-      CERTS_DIR: certs        # directory scanned for additional CA certificates
+      CHAINGUARD_REPO: ${{ matrix.repo }}
+      IMAGE_REF: cgr.dev/${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}/${{ matrix.repo }}
+      IMAGE_TAG: ${{ matrix.tag }}
+      CONFIG_FILE: ${{ matrix.config }}        # overlay file (includes x-meta)
+      DOCKERFILE: ${{ matrix.dockerfile }}     # Dockerfile to pin ("" to skip)
+      CERTS_DIR: ${{ matrix.certs_dir }}       # cert scan dir ("" to skip)
 
     steps:
       - name: Checkout
         uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
 
-      # ── 0. Guard — skip gracefully if Chainguard org is not configured ──
-      # Set CHAINGUARD_ORG and CHAINGUARD_IDENTITY in repo Settings → Variables
-      # and configure an assumable OIDC identity in your Chainguard organization.
-      - name: Check required configuration
-        id: check-config
-        run: |
-          if [ -z "${{ vars.CHAINGUARD_ORG }}" ] || [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ]; then
-            echo "CHAINGUARD_ORG or CHAINGUARD_IDENTITY not configured — skipping build."
-            echo "See: https://edu.chainguard.dev/chainguard/administration/iam-organizations/assumable-ids/identity-examples/github-actions-identity/"
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-
       # ── 1. Authenticate with Chainguard (OIDC — no long-lived credentials) ──
       - name: Setup chainctl
-        if: steps.check-config.outputs.skip == 'false'
         uses: chainguard-dev/setup-chainctl@2cddd35a2f120d9973e58094dc6878c93cf58c28 # v0.5.1
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
       # ── 2a. Customize image — apply config + certificates ──
-        # Builds the chainctl invocation dynamically: starts from the base
-        # config file, then appends one `--with-certificates=<file>` flag for
-        # every CA certificate found under $CERTS_DIR. `build apply` only prints
-        # a config diff and starts an async build — it returns no digest — so we
-        # snapshot the existing build reports here to identify the ones this
-        # apply triggers (tracked in step 2b).
+        # Strips the x-meta routing block out of the overlay (chainctl only
+        # wants apko config), then builds the chainctl invocation dynamically:
+        # starts from the cleaned config file and appends one
+        # `--with-certificates=<file>` flag for every CA certificate found under
+        # $CERTS_DIR. `build apply` only prints a config diff and starts an async
+        # build — it returns no digest — so we snapshot the existing build
+        # reports here to identify the ones this apply triggers (tracked in 2b).
       - name: Customize image (apply config + certificates)
-        if: steps.check-config.outputs.skip == 'false'
         id: customize
         run: |
           set -euo pipefail
+
+          # Strip the workflow-only x-meta block; hand chainctl pure apko config.
+          APPLY_FILE="$(mktemp --suffix=.yaml)"
+          yq 'del(.["x-meta"])' "$CONFIG_FILE" > "$APPLY_FILE"
 
           ARGS=(
             images repos build apply
             --parent "$CHAINGUARD_ORG"
             --repo   "$CHAINGUARD_REPO"
-            --file   build.yaml
+            --file   "$APPLY_FILE"
             --yes
           )
 
           # Discover additional CA certificates and add a flag for each.
           CERT_COUNT=0
-          if [ -d "$CERTS_DIR" ]; then
+          if [ -n "$CERTS_DIR" ] && [ -d "$CERTS_DIR" ]; then
             while IFS= read -r -d '' cert; do
               echo "Adding CA certificate: $cert"
               ARGS+=( "--with-certificates=$cert" )
@@ -81,7 +126,7 @@ jobs:
                         \( -iname '*.pem' -o -iname '*.crt' -o -iname '*.cer' -o -iname '*.ca' \) \
                         -print0 | sort -z)
           else
-            echo "No certificate directory '$CERTS_DIR' found — building without extra CAs."
+            echo "No certificate directory '${CERTS_DIR:-<none>}' — building without extra CAs."
           fi
           echo "Found $CERT_COUNT additional CA certificate(s)."
           echo "cert_count=$CERT_COUNT" >> "$GITHUB_OUTPUT"
@@ -111,10 +156,10 @@ jobs:
             echo "skipped=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # ── 2b. Check build status — wait for the triggered build(s) and gate on
-      #        the variant that backs the tag we consume (IMAGE_TAG). ──
+      # ── 2b. Check build status — wait for the triggered build(s) to finish and
+      #        fail if any of them did not succeed. ──
       - name: Check build status
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         id: build-status
         run: |
           set -euo pipefail
@@ -126,25 +171,10 @@ jobs:
               --output json 2>/dev/null
           }
 
-          # Identify which build backs the tag we consume. One apply rebuilds
-          # every Python version variant (3.10…3.14); the report whose
-          # annotation dev.chainguard.package.main = "python-<ver>" is the one
-          # that produces the ${IMAGE_TAG} image. Floating tags (latest,
-          # latest-dev) have no fixed version, so we fall back to requiring any
-          # triggered build to succeed.
-          VER=$(printf '%s' "$IMAGE_TAG" | grep -oE '^[0-9]+\.[0-9]+' || true)
-          TARGET_MAIN=""
-          if [ -n "$VER" ]; then
-            TARGET_MAIN="python-$VER"
-            echo "Gating on build variant '$TARGET_MAIN' (backs tag '$IMAGE_TAG')."
-          else
-            echo "Tag '$IMAGE_TAG' is not version-specific; gating on any triggered build."
-          fi
-
           # Wait for the triggered build(s) to complete. We identify them as
           # report IDs that did not exist before the apply, so concurrent or
           # historical builds don't confuse completion detection.
-          echo "Waiting for custom build(s) to complete..."
+          echo "Waiting for custom build(s) of '$CHAINGUARD_REPO' to complete..."
           DEADLINE=$(( $(date +%s) + 600 ))   # 10 minute budget
           while :; do
             NEW=$(list_reports | jq -c --argjson before "$BEFORE_IDS" \
@@ -164,30 +194,23 @@ jobs:
             sleep 20
           done
 
-          # Decide pass/fail from the build that backs our tag, and surface
-          # that build's log on failure (not some other variant's).
-          if [ -n "$TARGET_MAIN" ]; then
-            TARGET=$(echo "$NEW" | jq -c --arg m "$TARGET_MAIN" \
-                       '[.[] | select((.config|fromjson).annotations["dev.chainguard.package.main"] == $m)]')
-          else
-            TARGET="$NEW"
-          fi
-          if [ "$(echo "$TARGET" | jq 'length')" -eq 0 ]; then
-            echo "Error: no build report found for '${TARGET_MAIN:-any variant}' among triggered builds." >&2
-            echo "$NEW" | jq -r '.[] | "  \(.startedAt) \((.config|fromjson).annotations["dev.chainguard.package.main"]) \(.result)"' >&2
+          # Require every triggered build to succeed. (One apply may rebuild
+          # several version variants of this repo; any failure fails the run and
+          # surfaces that build's log.)
+          FAILED=$(echo "$NEW" | jq -c '[.[] | select(.result != "Success")]')
+          if [ "$(echo "$FAILED" | jq 'length')" -ne 0 ]; then
+            echo "Error: one or more triggered builds of '$CHAINGUARD_REPO' did not succeed:" >&2
+            echo "$FAILED" | jq -r '.[] | "  \(.startedAt) \((.config|fromjson).annotations["dev.chainguard.package.main"]) \(.result)"' >&2
+            echo "Log of most recent failed attempt:" >&2
+            echo "$FAILED" | jq -r 'sort_by(.completedAt) | last | .log' | tail -c 3000 >&2
             exit 1
           fi
-          if [ "$(echo "$TARGET" | jq '[.[] | select(.result == "Success")] | length')" -eq 0 ]; then
-            echo "Error: the build backing '${TARGET_MAIN:-tag $IMAGE_TAG}' did not succeed. Log of most recent attempt:" >&2
-            echo "$TARGET" | jq -r 'sort_by(.completedAt) | last | .log' | tail -c 3000 >&2
-            exit 1
-          fi
-          echo "Build backing '${TARGET_MAIN:-tag $IMAGE_TAG}' completed successfully."
+          echo "All triggered builds of '$CHAINGUARD_REPO' completed successfully."
 
       # ── 2c. Get updated digest — resolve the digest of the tag the
       #        application consumes (the tag is the source of truth). ──
       - name: Get updated image digest
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         id: build
         run: |
           set -euo pipefail
@@ -212,7 +235,7 @@ jobs:
 
       # ── 3. Verify image is cryptographically signed ──
       - name: Verify image signature (cosign)
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         run: |
           mkdir -p evidence
           cosign verify \
@@ -224,7 +247,7 @@ jobs:
 
       # ── 4. Extract SBOM ──
       - name: Extract SBOM attestation
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         run: |
           cosign verify-attestation \
             --type sbom \
@@ -237,7 +260,7 @@ jobs:
 
       # ── 5. Extract SLSA provenance ──
       - name: Extract SLSA provenance
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         run: |
           cosign verify-attestation \
             --type slsaprovenance \
@@ -250,7 +273,7 @@ jobs:
 
       # ── 6. Grype scan — fail on critical or high CVEs ──
       - name: Grype vulnerability scan
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         uses: chainguard-actions/anchore-scan-action@5470f64f241ff0b662c1efed80f982517e2340d6 # v7.4.0
         env:
           GRYPE_DB_AUTO_UPDATE: "true"   # default true; v7.4.0 bundles grype
@@ -264,42 +287,46 @@ jobs:
 
       # ── 7. Copy build config into evidence bundle ──
       - name: Add build config to evidence bundle
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
-        run: cp build.yaml evidence/build.yaml
+        if: steps.customize.outputs.skipped != 'true'
+        run: cp "$CONFIG_FILE" "evidence/$(basename "$CONFIG_FILE")"
 
       # ── 8. Upload evidence bundle as Actions artifact ──
       - name: Upload evidence bundle
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true'
         uses: chainguard-actions/actions-upload-artifact@8dd583ff8251c4a96857f05031036783608a6a96 # v7.0.1
         with:
-          name: evidence-bundle-${{ github.sha }}
+          name: evidence-bundle-${{ matrix.repo }}-${{ github.sha }}
           retention-days: 90
           path: evidence/
 
       # ── 9. Update Dockerfile with new pinned digest ──
       - name: Update Dockerfile digest
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true' && env.DOCKERFILE != ''
         run: |
+          set -euo pipefail
           DIGEST="${{ steps.build.outputs.digest }}"
-          sed -i "s|FROM cgr.dev/[^ ]*|FROM ${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}@${DIGEST}|" Dockerfile
-          echo "Updated Dockerfile to digest: $DIGEST"
+          # Only repin the FROM line that references THIS image, so a Dockerfile
+          # with multiple cgr.dev bases isn't clobbered.
+          sed -i "s|FROM ${IMAGE_REF}\(:[^ @]*\)\?\(@sha256:[a-f0-9]*\)\?|FROM ${IMAGE_REF}:${IMAGE_TAG}@${DIGEST}|" "$DOCKERFILE"
+          echo "Updated $DOCKERFILE to digest: $DIGEST"
 
       - name: Open PR with updated digest
-        if: steps.check-config.outputs.skip == 'false' && steps.customize.outputs.skipped != 'true'
+        if: steps.customize.outputs.skipped != 'true' && env.DOCKERFILE != ''
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: update swag-shop image digest [${{ github.sha }}]"
-          title: "chore: update custom assembly image digest"
+          commit-message: "chore: update ${{ matrix.repo }} image digest [${{ github.sha }}]"
+          title: "chore: update ${{ matrix.repo }} custom assembly image digest"
           body: |
             Automated digest update from Custom Assembly build.
 
+            **Image:** `${{ env.IMAGE_REF }}:${{ env.IMAGE_TAG }}`
             **Build:** ${{ github.run_id }}
             **Digest:** `${{ steps.build.outputs.digest }}`
             **Grype:** 0 critical, 0 high CVEs ✓
             **Signed:** cosign verified ✓
             **Evidence bundle:** attached to this workflow run (90-day retention)
 
-            Triggered by: change to `build.yaml`
-          branch: chore/update-image-digest
+            Triggered by: change to `${{ env.CONFIG_FILE }}`
+          branch: chore/update-${{ matrix.repo }}-digest
           delete-branch: true
