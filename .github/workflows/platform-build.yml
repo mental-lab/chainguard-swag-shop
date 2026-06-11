@@ -8,7 +8,7 @@ on:
       - .github/workflows/platform-build.yml
   workflow_dispatch:
 
-# Least privilege at the top; each job widens only what it needs.
+# Least privilege at the top; the pipeline job widens only what it needs.
 permissions: {}
 
 env:
@@ -17,28 +17,27 @@ env:
   CERTS_DIR: certs
 
 jobs:
-  # ── Discover — build the image matrix from ca-images-iac/<image>/ dirs ──
+  # ── Discover — one matrix entry per image directory ──
   # Each image is a directory: ca-images-iac/<repo>/ containing
   #   <repo>.yaml — pure Custom Assembly config (sent to chainctl)   [required]
   #   meta.yaml   — provenance/pin routing (dockerfile)              [optional]
-  # The build phase only needs the config, so EVERY image with a <repo>.yaml is
-  # always built. meta.yaml is optional and consumed later (by the change gate /
-  # provenance / update-digest) to decide which images get verified and pinned.
-  # If the Chainguard org/identity isn't configured, or no image dirs exist, we
-  # emit an empty matrix and downstream jobs skip.
+  # Every image with a <repo>.yaml is built. `dockerfile` (from meta.yaml, "" if
+  # absent) tells the pipeline whether to also verify + pin that image. The
+  # pipeline job runs once PER IMAGE, fully isolated, so one image failing
+  # never blocks another. If the org isn't configured or no images exist, the
+  # matrix is empty and the pipeline is skipped.
   discover:
     name: Discover images
     runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
-      matrix: ${{ steps.set.outputs.matrix }}            # all images to build
-      pin_matrix: ${{ steps.set.outputs.pin_matrix }}    # images to verify + pin
+      matrix: ${{ steps.set.outputs.matrix }}
     steps:
       - name: Checkout
         uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
 
-      - name: Build matrices from ca-images-iac/
+      - name: Build matrix from ca-images-iac/
         id: set
         run: |
           set -euo pipefail
@@ -51,74 +50,61 @@ jobs:
             echo "CHAINGUARD_ORG or CHAINGUARD_IDENTITY not configured — skipping build."
             echo "See: https://edu.chainguard.dev/chainguard/administration/iam-organizations/assumable-ids/identity-examples/github-actions-identity/"
             echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
-            echo 'pin_matrix={"include":[]}' >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Two matrices per image directory (repo = directory name):
-          #   matrix     — every image with a <repo>.yaml config (always built)
-          #   pin_matrix — images that also declare a `dockerfile` in meta.yaml
-          #                (these get provenance + digest pinning, one combo each)
-          build_entries=()
-          pin_entries=()
+          # repo = directory name, config = <repo>.yaml. dockerfile comes from
+          # meta.yaml (empty when absent → build-only, no verify/pin).
+          entries=()
           for dir in ca-images-iac/*/; do
             repo=$(basename "$dir")
             config="${dir}${repo}.yaml"
             meta="${dir}meta.yaml"
             if [ ! -f "$config" ]; then echo "::warning::$dir has no ${repo}.yaml — skipping."; continue; fi
-            build_entries+=( "$(jq -nc --arg repo "$repo" --arg config "$config" '{repo: $repo, config: $config}')" )
-
-            if [ -f "$meta" ]; then
-              df=$(yq -r '.dockerfile // ""' "$meta")
-              if [ -n "$df" ]; then
-                pin_entries+=( "$(jq -nc --arg repo "$repo" --arg df "$df" '{repo: $repo, dockerfile: $df}')" )
-              fi
-            fi
+            df=""
+            [ -f "$meta" ] && df=$(yq -r '.dockerfile // ""' "$meta")
+            entries+=( "$(jq -nc --arg repo "$repo" --arg config "$config" --arg df "$df" \
+                          '{repo: $repo, config: $config, dockerfile: $df}')" )
           done
 
-          if [ ${#build_entries[@]} -eq 0 ]; then
+          if [ ${#entries[@]} -eq 0 ]; then
             echo "No valid image directories under ca-images-iac/ — nothing to build."
             echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
-            echo 'pin_matrix={"include":[]}' >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          MATRIX=$(printf '%s\n' "${build_entries[@]}" | jq -s -c '{include: .}')
-          if [ ${#pin_entries[@]} -eq 0 ]; then
-            PIN='{"include":[]}'
-          else
-            PIN=$(printf '%s\n' "${pin_entries[@]}" | jq -s -c '{include: .}')
-          fi
-
-          echo "Images to build:"
-          echo "$MATRIX" | jq -r '.include[] | "  - \(.repo)  (\(.config))"'
-          echo "Images to verify + pin:"
-          echo "$PIN" | jq -r 'if (.include | length) == 0 then "  (none)" else (.include[] | "  - \(.repo) -> \(.dockerfile)") end'
-
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
-          echo "pin_matrix=$PIN" >> "$GITHUB_OUTPUT"
+          INCLUDE=$(printf '%s\n' "${entries[@]}" | jq -s -c '{include: .}')
+          echo "Discovered images:"
+          echo "$INCLUDE" | jq -r '.include[] | "  - \(.repo)  build=\(.config)  pin=\(if .dockerfile == "" then "no" else .dockerfile end)"'
+          echo "matrix=$INCLUDE" >> "$GITHUB_OUTPUT"
 
   # ════════════════════════════════════════════════════════════════════
-  # PHASE 1 — BUILD
-  # Apply each image's config (+ certificates) and wait for the async build
-  # to finish. This phase only triggers and gates builds; it produces no
-  # digest — the published tag is the source of truth, resolved in PHASE 2.
+  # PER-IMAGE PIPELINE — runs once per image, isolated (fail-fast: false).
+  # Each image flows through three phases in sequence:
+  #   1. BUILD            — apply config (+ certs), wait for the build
+  #   2. IMAGE PROVENANCE — (if it opts into pinning and the digest changed)
+  #                         verify signature, SBOM, SLSA, Grype, evidence bundle
+  #   3. UPDATE DIGEST    — pin the Dockerfile FROM and open a PR
+  # Because every image has its own job, a slow or failing image (e.g. a build
+  # timeout) only fails its own pipeline — others build, verify and pin normally.
   # ════════════════════════════════════════════════════════════════════
-  build:
-    name: Build ${{ matrix.repo }}
+  pipeline:
+    name: Pipeline — ${{ matrix.repo }}
     needs: discover
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write     # OIDC auth with chainctl
+      contents: write        # push the digest-update branch
+      pull-requests: write   # open the PR
+      id-token: write        # OIDC auth with chainctl
     strategy:
-      fail-fast: false    # one image failing must not cancel the others
+      fail-fast: false       # one image failing must not cancel the others
       matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
 
     env:
       CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
       CHAINGUARD_REPO: ${{ matrix.repo }}
       CONFIG_FILE: ${{ matrix.config }}        # pure Custom Assembly config
+      DOCKERFILE: ${{ matrix.dockerfile }}     # "" → build-only (no verify/pin)
       # CERTS_DIR is global (workflow-level env), not per-image.
 
     steps:
@@ -130,11 +116,12 @@ jobs:
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
+      # ── PHASE 1 — BUILD ──────────────────────────────────────────────
       # Build the invocation dynamically: start from the image's Custom Assembly
       # config and append one `--with-certificates=<file>` flag per CA certificate
       # found under $CERTS_DIR. `build apply` is async and returns no digest, so
       # we snapshot existing build report IDs to identify the build(s) it triggers.
-      - name: Customize image (apply config + certificates)
+      - name: Build — apply config + certificates
         id: customize
         run: |
           set -euo pipefail
@@ -188,7 +175,7 @@ jobs:
       # Wait for the triggered build(s) to finish and fail if any did not
       # succeed. Identifies them as report IDs absent before the apply, so
       # concurrent/historical builds don't confuse completion detection.
-      - name: Wait for build to complete
+      - name: Build — wait for completion
         if: steps.customize.outputs.skipped != 'true'
         run: |
           set -euo pipefail
@@ -230,41 +217,19 @@ jobs:
           fi
           echo "All triggered builds of '$CHAINGUARD_REPO' completed successfully."
 
-  # ════════════════════════════════════════════════════════════════════
-  # PHASE 2 — IMAGE PROVENANCE  (one combo per image that opts into pinning)
-  # For each image whose meta.yaml declares a `dockerfile`, resolve the live
-  # digest it consumes and, if it changed, verify it: signature, SBOM, SLSA
-  # provenance, Grype scan, evidence bundle. Unchanged images no-op their combo.
-  # Matrixed with fail-fast:false so images are verified independently.
-  # ════════════════════════════════════════════════════════════════════
-  provenance:
-    name: Image provenance (${{ matrix.repo }})
-    needs: [discover, build]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write     # OIDC auth with chainctl (registry pulls)
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.discover.outputs.pin_matrix) }}
-    steps:
-      - name: Checkout
-        uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
-
-      - name: Setup chainctl
-        uses: chainguard-dev/setup-chainctl@2cddd35a2f120d9973e58094dc6878c93cf58c28 # v0.5.1
-        with:
-          identity: ${{ vars.CHAINGUARD_IDENTITY }}
-
-      - name: Resolve consumed image digest and detect change
+      # ── PHASE 2 — IMAGE PROVENANCE ───────────────────────────────────
+      # Only for images that opt into pinning (DOCKERFILE set). Resolve the live
+      # digest the Dockerfile consumes; the verify steps run only if it changed.
+      - name: Provenance — resolve consumed digest
         id: resolve
+        if: env.DOCKERFILE != ''
         uses: ./.github/actions/resolve-consumed-digest
         with:
           repo: ${{ matrix.repo }}
           dockerfile: ${{ matrix.dockerfile }}
 
-      - name: Verify image signature (cosign)
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Provenance — verify image signature (cosign)
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
           mkdir -p evidence
           cosign verify \
@@ -274,8 +239,8 @@ jobs:
             | jq . > evidence/signature-verify.json
           echo "Signature verified"
 
-      - name: Extract SBOM attestation
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Provenance — extract SBOM attestation
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
           cosign verify-attestation \
             --type sbom \
@@ -286,8 +251,8 @@ jobs:
             > evidence/sbom.json
           echo "SBOM extracted: $(jq '.packages | length' evidence/sbom.json) packages"
 
-      - name: Extract SLSA provenance
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Provenance — extract SLSA provenance
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
           cosign verify-attestation \
             --type slsaprovenance \
@@ -298,8 +263,8 @@ jobs:
             > evidence/provenance.json
           echo "Provenance extracted"
 
-      - name: Grype vulnerability scan
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Provenance — Grype vulnerability scan
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         uses: chainguard-actions/anchore-scan-action@5470f64f241ff0b662c1efed80f982517e2340d6 # v7.4.0
         env:
           GRYPE_DB_AUTO_UPDATE: "true"
@@ -311,60 +276,30 @@ jobs:
           output-format: json
           output-file: evidence/grype-results.json
 
-      - name: Add build config to evidence bundle
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Provenance — add build config to evidence bundle
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
           CONFIG="ca-images-iac/${{ matrix.repo }}/${{ matrix.repo }}.yaml"
           [ -f "$CONFIG" ] && cp "$CONFIG" evidence/ || echo "No overlay config found at $CONFIG — skipping."
 
-      - name: Upload evidence bundle
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Provenance — upload evidence bundle
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         uses: chainguard-actions/actions-upload-artifact@8dd583ff8251c4a96857f05031036783608a6a96 # v7.0.1
         with:
           name: evidence-bundle-${{ matrix.repo }}-${{ github.sha }}
           retention-days: 90
           path: evidence/
 
-  # ════════════════════════════════════════════════════════════════════
-  # PHASE 3 — UPDATE DIGEST  (one combo per image that opts into pinning)
-  # Pin each changed image's FROM to the verified digest and open a PR. Runs
-  # after provenance, so a failing Grype scan never produces a PR. Unchanged
-  # images no-op their combo.
-  # ════════════════════════════════════════════════════════════════════
-  update-digest:
-    name: Update digest (${{ matrix.repo }})
-    needs: [discover, provenance]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write        # push the digest-update branch
-      pull-requests: write   # open the PR
-      id-token: write        # OIDC auth with chainctl (digest re-resolve)
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.discover.outputs.pin_matrix) }}
-    steps:
-      - name: Checkout
-        uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
-
-      - name: Setup chainctl
-        uses: chainguard-dev/setup-chainctl@2cddd35a2f120d9973e58094dc6878c93cf58c28 # v0.5.1
-        with:
-          identity: ${{ vars.CHAINGUARD_IDENTITY }}
-
-      - name: Resolve consumed image digest and detect change
-        id: resolve
-        uses: ./.github/actions/resolve-consumed-digest
-        with:
-          repo: ${{ matrix.repo }}
-          dockerfile: ${{ matrix.dockerfile }}
-
-      - name: Pin Dockerfile digest
-        if: steps.resolve.outputs.changed == 'true'
+      # ── PHASE 3 — UPDATE DIGEST ──────────────────────────────────────
+      # Pin the Dockerfile FROM to the verified digest and open a PR. Reached
+      # only after provenance passed (Grype gates the job), and only when the
+      # digest actually changed.
+      - name: Update digest — pin Dockerfile
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         env:
           IMAGE_REF: ${{ steps.resolve.outputs.image_ref }}
           IMAGE_TAG: ${{ steps.resolve.outputs.tag }}
           DIGEST: ${{ steps.resolve.outputs.digest }}
-          DOCKERFILE: ${{ matrix.dockerfile }}
         run: |
           set -euo pipefail
           # Repin only the FROM line that references THIS image, so a Dockerfile
@@ -372,8 +307,8 @@ jobs:
           sed -i "s|FROM ${IMAGE_REF}\(:[^ @]*\)\?\(@sha256:[a-f0-9]*\)\?|FROM ${IMAGE_REF}:${IMAGE_TAG}@${DIGEST}|" "$DOCKERFILE"
           echo "Updated $DOCKERFILE to digest: $DIGEST"
 
-      - name: Open PR with updated digest
-        if: steps.resolve.outputs.changed == 'true'
+      - name: Update digest — open PR
+        if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
