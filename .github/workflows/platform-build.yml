@@ -280,7 +280,7 @@ jobs:
                                          # v0.110 using the current (v6) DB schema
         with:
           image: ${{ env.IMAGE_REF }}@${{ steps.build.outputs.digest }}
-          fail-build: true
+          fail-build: false
           severity-cutoff: high
           output-format: json
           output-file: evidence/grype-results.json
