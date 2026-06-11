@@ -27,4 +27,3 @@ x-meta:
 contents:
   packages:
     - jq
-    - curl
