@@ -212,23 +212,23 @@ jobs:
           echo "All triggered builds of '$CHAINGUARD_REPO' completed successfully."
 
   # ════════════════════════════════════════════════════════════════════
-  # PHASE 2 — IMAGE PROVENANCE
-  # Specific to the application Dockerfile: resolve the digest of the image
-  # the Dockerfile consumes (the published tag is the source of truth), then
-  # verify signature, extract SBOM + SLSA provenance, scan with Grype, and
-  # assemble an evidence bundle. Runs only after every build succeeds.
+  # CHANGE GATE — did the image the Dockerfile consumes actually change?
+  # Resolve the live digest of the consumed tag (the published tag is the
+  # source of truth) and compare it to the digest currently pinned in the
+  # Dockerfile. If they match, nothing was updated — provenance and
+  # update-digest are skipped via their `if:` on this job's `changed` output.
   # ════════════════════════════════════════════════════════════════════
-  provenance:
-    name: Image provenance
+  check:
+    name: Check for image changes
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write     # OIDC auth with chainctl
     env:
-      CHAINGUARD_ORG: ${{ vars.CHAINGUARD_ORG || 'packetloss.network' }}
       DOCKERFILE: Dockerfile
     outputs:
+      changed: ${{ steps.resolve.outputs.changed }}
       image_ref: ${{ steps.resolve.outputs.image_ref }}
       tag: ${{ steps.resolve.outputs.tag }}
       digest: ${{ steps.resolve.outputs.digest }}
@@ -242,10 +242,9 @@ jobs:
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
-      # Parse the Dockerfile's cgr.dev base, then resolve the live digest of the
-      # tag it consumes. The tag is the source of truth, so we don't need the
-      # build phase to hand us a digest — we read it straight from the registry.
-      - name: Resolve consumed image digest
+      # Parse the Dockerfile's cgr.dev base, resolve the live digest of the tag
+      # it consumes, and compare to the digest currently pinned in the FROM line.
+      - name: Resolve consumed image digest and detect change
         id: resolve
         run: |
           set -euo pipefail
@@ -258,11 +257,12 @@ jobs:
             echo "Error: no 'FROM cgr.dev/...' line in $DOCKERFILE — nothing to verify." >&2; exit 1
           fi
           if [ "$COUNT" -gt 1 ]; then
-            echo "::warning::$DOCKERFILE has $COUNT cgr.dev FROM lines; provenance gates only the first."
+            echo "::warning::$DOCKERFILE has $COUNT cgr.dev FROM lines; gating only the first."
           fi
 
           REF=$(grep -m1 -E '^[[:space:]]*FROM[[:space:]]+cgr\.dev/' "$DOCKERFILE" \
                   | sed -E 's/^[[:space:]]*FROM[[:space:]]+([^[:space:]]+).*/\1/')
+          PINNED=$(printf '%s' "$REF" | grep -oE 'sha256:[a-f0-9]+' || true)   # currently pinned (may be empty)
           NO_DIGEST=${REF%@*}            # cgr.dev/org/repo:tag
           IMAGE_REF=${NO_DIGEST%:*}      # cgr.dev/org/repo
           TAG=${NO_DIGEST##*:}           # tag
@@ -285,15 +285,46 @@ jobs:
           if [ -z "$DIGEST" ]; then
             echo "Error: could not resolve digest for '$IMAGE_REF:$TAG'." >&2; exit 1
           fi
-          echo "Resolved image digest: $DIGEST"
+          echo "Live digest:   $DIGEST"
+          echo "Pinned digest: ${PINNED:-<none>}"
+
+          if [ "$DIGEST" = "$PINNED" ]; then
+            CHANGED=false
+            echo "No change — image already pinned to the live digest. Downstream jobs will be skipped."
+          else
+            CHANGED=true
+            echo "Image changed — provenance and digest update will run."
+          fi
 
           {
+            echo "changed=$CHANGED"
             echo "image_ref=$IMAGE_REF"
             echo "tag=$TAG"
             echo "digest=$DIGEST"
-            echo "org=$ORG"
             echo "repo=$REPO"
           } >> "$GITHUB_OUTPUT"
+
+  # ════════════════════════════════════════════════════════════════════
+  # PHASE 2 — IMAGE PROVENANCE
+  # Verify the consumed image: signature, SBOM, SLSA provenance, Grype scan,
+  # and an evidence bundle. Runs only when the change gate reports a new digest.
+  # ════════════════════════════════════════════════════════════════════
+  provenance:
+    name: Image provenance
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write     # OIDC auth with chainctl (registry pulls)
+    steps:
+      - name: Checkout
+        uses: chainguard-actions/actions-checkout@d1f1061cdaee56aa3a3bc3deb86b67b1db772dd6 # v6.0.2
+
+      - name: Setup chainctl
+        uses: chainguard-dev/setup-chainctl@2cddd35a2f120d9973e58094dc6878c93cf58c28 # v0.5.1
+        with:
+          identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
       - name: Verify image signature (cosign)
         run: |
@@ -301,7 +332,7 @@ jobs:
           cosign verify \
             --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
             --certificate-identity-regexp="https://github.com/chainguard-images" \
-            ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
+            ${{ needs.check.outputs.image_ref }}@${{ needs.check.outputs.digest }} \
             | jq . > evidence/signature-verify.json
           echo "Signature verified"
 
@@ -311,7 +342,7 @@ jobs:
             --type sbom \
             --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
             --certificate-identity-regexp="https://github.com/chainguard-images" \
-            ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
+            ${{ needs.check.outputs.image_ref }}@${{ needs.check.outputs.digest }} \
             | jq -r '.payload | @base64d | fromjson | .predicate' \
             > evidence/sbom.json
           echo "SBOM extracted: $(jq '.packages | length' evidence/sbom.json) packages"
@@ -322,7 +353,7 @@ jobs:
             --type slsaprovenance \
             --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
             --certificate-identity-regexp="https://github.com/chainguard-images" \
-            ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
+            ${{ needs.check.outputs.image_ref }}@${{ needs.check.outputs.digest }} \
             | jq -r '.payload | @base64d | fromjson' \
             > evidence/provenance.json
           echo "Provenance extracted"
@@ -332,7 +363,7 @@ jobs:
         env:
           GRYPE_DB_AUTO_UPDATE: "true"
         with:
-          image: ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }}
+          image: ${{ needs.check.outputs.image_ref }}@${{ needs.check.outputs.digest }}
           fail-build: true
           severity-cutoff: high
           output-format: json
@@ -340,32 +371,34 @@ jobs:
 
       - name: Add build config to evidence bundle
         run: |
-          CONFIG="ca-images-iac/${{ steps.resolve.outputs.repo }}/${{ steps.resolve.outputs.repo }}.yaml"
+          CONFIG="ca-images-iac/${{ needs.check.outputs.repo }}/${{ needs.check.outputs.repo }}.yaml"
           [ -f "$CONFIG" ] && cp "$CONFIG" evidence/ || echo "No overlay config found at $CONFIG — skipping."
 
       - name: Upload evidence bundle
         uses: chainguard-actions/actions-upload-artifact@8dd583ff8251c4a96857f05031036783608a6a96 # v7.0.1
         with:
-          name: evidence-bundle-${{ steps.resolve.outputs.repo }}-${{ github.sha }}
+          name: evidence-bundle-${{ needs.check.outputs.repo }}-${{ github.sha }}
           retention-days: 90
           path: evidence/
 
   # ════════════════════════════════════════════════════════════════════
   # PHASE 3 — UPDATE DIGEST
   # Pin the Dockerfile's FROM to the verified digest and open a PR. Runs only
-  # after provenance passes, so a failing Grype scan never produces a PR.
+  # when the change gate reports a new digest and provenance passed, so a
+  # failing Grype scan (or an unchanged image) never produces a PR.
   # ════════════════════════════════════════════════════════════════════
   update-digest:
     name: Update digest
-    needs: provenance
+    needs: [check, provenance]
+    if: needs.check.outputs.changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write        # push the digest-update branch
       pull-requests: write   # open the PR
     env:
-      IMAGE_REF: ${{ needs.provenance.outputs.image_ref }}
-      IMAGE_TAG: ${{ needs.provenance.outputs.tag }}
-      DIGEST: ${{ needs.provenance.outputs.digest }}
+      IMAGE_REF: ${{ needs.check.outputs.image_ref }}
+      IMAGE_TAG: ${{ needs.check.outputs.tag }}
+      DIGEST: ${{ needs.check.outputs.digest }}
       DOCKERFILE: Dockerfile
     steps:
       - name: Checkout
@@ -383,8 +416,8 @@ jobs:
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: update ${{ needs.provenance.outputs.repo }} image digest [${{ github.sha }}]"
-          title: "chore: update ${{ needs.provenance.outputs.repo }} custom assembly image digest"
+          commit-message: "chore: update ${{ needs.check.outputs.repo }} image digest [${{ github.sha }}]"
+          title: "chore: update ${{ needs.check.outputs.repo }} custom assembly image digest"
           body: |
             Automated digest update from Custom Assembly build.
 
@@ -396,5 +429,5 @@ jobs:
             **Evidence bundle:** attached to this workflow run (90-day retention)
 
             Triggered by: change under `ca-images-iac/`
-          branch: chore/update-${{ needs.provenance.outputs.repo }}-digest
+          branch: chore/update-${{ needs.check.outputs.repo }}-digest
           delete-branch: true
