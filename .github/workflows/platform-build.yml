@@ -20,7 +20,7 @@ jobs:
   # ── Discover — build the image matrix from ca-images-iac/<image>/ dirs ──
   # Each image is a directory: ca-images-iac/<repo>/ containing
   #   <repo>.yaml — pure Custom Assembly config (sent to chainctl)
-  #   meta.yaml   — build routing (tag, dockerfile)
+  #   meta.yaml   — build routing (dockerfile)
   # repo and the config path are derived from the directory name; meta.yaml
   # supplies the rest. We read those into a matrix so the build job runs once
   # per image, in parallel. If the Chainguard org/identity isn't configured, or
@@ -53,8 +53,8 @@ jobs:
           fi
 
           # One matrix entry per image directory. repo = directory name,
-          # config = <repo>.yaml inside it; tag/dockerfile/certs_dir come from
-          # meta.yaml. Dirs missing either file are warned about and skipped.
+          # config = <repo>.yaml inside it; dockerfile comes from meta.yaml.
+          # Dirs missing either file are warned about and skipped.
           entries=()
           for dir in ca-images-iac/*/; do
             repo=$(basename "$dir")
@@ -63,7 +63,7 @@ jobs:
             if [ ! -f "$meta" ];   then echo "::warning::$dir has no meta.yaml — skipping.";        continue; fi
             if [ ! -f "$config" ]; then echo "::warning::$dir has no ${repo}.yaml — skipping.";      continue; fi
             entries+=( "$(
-              yq -o=json -I=0 '{"tag": .tag, "dockerfile": (.dockerfile // "")}' "$meta" \
+              yq -o=json -I=0 '{"dockerfile": (.dockerfile // "")}' "$meta" \
                 | jq -c --arg repo "$repo" --arg config "$config" '. + {repo: $repo, config: $config}'
             )" )
           done
@@ -76,7 +76,7 @@ jobs:
 
           INCLUDE=$(printf '%s\n' "${entries[@]}" | jq -s -c '{include: .}')
           echo "Discovered images:"
-          echo "$INCLUDE" | jq -r '.include[] | "  - \(.repo):\(.tag)  (\(.config))"'
+          echo "$INCLUDE" | jq -r '.include[] | "  - \(.repo)  (\(.config))"'
           echo "matrix=$INCLUDE" >> "$GITHUB_OUTPUT"
 
   # ════════════════════════════════════════════════════════════════════
@@ -86,7 +86,7 @@ jobs:
   # digest — the published tag is the source of truth, resolved in PHASE 2.
   # ════════════════════════════════════════════════════════════════════
   build:
-    name: Build ${{ matrix.repo }}:${{ matrix.tag }}
+    name: Build ${{ matrix.repo }}
     needs: discover
     runs-on: ubuntu-latest
     permissions:
