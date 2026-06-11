@@ -1,0 +1,88 @@
+name: Resolve consumed image digest
+description: >
+  Resolve the live digest of the image a Dockerfile consumes (the published tag
+  is the source of truth) and report whether it differs from the digest
+  currently pinned in the Dockerfile's FROM line. Requires chainctl to be set up
+  beforehand (e.g. via chainguard-dev/setup-chainctl).
+
+inputs:
+  repo:
+    description: Chainguard repo name (also the cgr.dev/<org>/<repo> path segment).
+    required: true
+  dockerfile:
+    description: Path to the Dockerfile that consumes the image.
+    required: true
+
+outputs:
+  changed:
+    description: "'true' if the live digest differs from the pinned digest."
+    value: ${{ steps.run.outputs.changed }}
+  image_ref:
+    description: "cgr.dev/<org>/<repo> reference parsed from the Dockerfile."
+    value: ${{ steps.run.outputs.image_ref }}
+  tag:
+    description: "Tag the Dockerfile consumes."
+    value: ${{ steps.run.outputs.tag }}
+  digest:
+    description: "Live digest resolved for that tag."
+    value: ${{ steps.run.outputs.digest }}
+
+runs:
+  using: composite
+  steps:
+    - id: run
+      shell: bash
+      env:
+        REPO: ${{ inputs.repo }}
+        DOCKERFILE: ${{ inputs.dockerfile }}
+      run: |
+        set -euo pipefail
+        if [ ! -f "$DOCKERFILE" ]; then
+          echo "Error: '$DOCKERFILE' (for repo '$REPO') not found." >&2; exit 1
+        fi
+
+        # Find the FROM line for THIS repo (handles multi-base Dockerfiles).
+        REF=$(grep -m1 -E "^[[:space:]]*FROM[[:space:]]+cgr\.dev/[^/]+/${REPO}([:@[:space:]]|\$)" "$DOCKERFILE" \
+                | sed -E 's/^[[:space:]]*FROM[[:space:]]+([^[:space:]]+).*/\1/' || true)
+        if [ -z "$REF" ]; then
+          echo "Error: no 'FROM cgr.dev/<org>/${REPO}' line in $DOCKERFILE." >&2; exit 1
+        fi
+        PINNED=$(printf '%s' "$REF" | grep -oE 'sha256:[a-f0-9]+' || true)   # currently pinned (may be empty)
+        NO_DIGEST=${REF%@*}            # cgr.dev/org/repo:tag
+        IMAGE_REF=${NO_DIGEST%:*}      # cgr.dev/org/repo
+        TAG=${NO_DIGEST##*:}           # tag
+        if [ "$IMAGE_REF" = "$TAG" ]; then TAG=latest; fi
+        P=${IMAGE_REF#cgr.dev/}
+        ORG=${P%%/*}
+        echo "Consumed image: $IMAGE_REF tag=$TAG (org=$ORG repo=$REPO)"
+
+        DIGEST=""
+        for attempt in 1 2 3 4 5 6; do
+          DIGEST=$(chainctl images list \
+                     --parent "$ORG" --repo "$REPO" --output json 2>/dev/null \
+                   | jq -r --arg t "$TAG" \
+                       'first(.[0].tags[]? | select(.name == $t) | .digest) // empty')
+          [ -n "$DIGEST" ] && break
+          echo "  tag '$TAG' not resolvable yet (attempt $attempt) — retrying in 10s..."
+          sleep 10
+        done
+        if [ -z "$DIGEST" ]; then
+          echo "Error: could not resolve digest for '$IMAGE_REF:$TAG'." >&2; exit 1
+        fi
+        echo "Live digest:   $DIGEST"
+        echo "Pinned digest: ${PINNED:-<none>}"
+
+        if [ "$DIGEST" = "$PINNED" ]; then
+          CHANGED=false
+          echo "No change — '$REPO' already pinned to the live digest."
+        else
+          CHANGED=true
+          echo "Changed — '$REPO' will be verified and pinned."
+        fi
+
+        {
+          echo "changed=$CHANGED"
+          echo "image_ref=$IMAGE_REF"
+          echo "tag=$TAG"
+          echo "digest=$DIGEST"
+        } >> "$GITHUB_OUTPUT"
