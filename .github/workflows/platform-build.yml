@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - ca-images-iac/**
+      - certs/**
       - .github/workflows/platform-build.yml
   workflow_dispatch:
 
