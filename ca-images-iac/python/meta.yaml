@@ -1,0 +1,12 @@
+# ca-images-iac/python/meta.yaml — build routing for the platform-build workflow
+#
+# This file is NOT sent to chainctl. It tells the workflow how to build and
+# consume the image whose Custom Assembly config sits next to it (python.yaml).
+# The image repo and config path are derived from the directory name:
+#   ca-images-iac/<repo>/  ->  repo=<repo>, config=<repo>.yaml
+
+tag: 3.12-dev        # tag the application consumes (pinned by digest)
+dockerfile: Dockerfile # Dockerfile whose FROM is pinned to the new digest ("" to skip)
+
+# Note: CA certificates are a global setting (CERTS_DIR in the workflow),
+# applied to every image — not configured per image here.

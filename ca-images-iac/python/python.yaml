@@ -1,28 +1,15 @@
-# ca-images-iac/python/python.yaml — Chainguard Custom Assembly overlay
+# ca-images-iac/python/python.yaml — Chainguard Custom Assembly config
 #
-# One directory per custom image: ca-images-iac/<image>/<image>.yaml. Add a new
-# image by creating ca-images-iac/<image>/<image>.yaml — the platform-build
-# workflow discovers and builds it automatically, no workflow edits (GitOps).
+# A pure apko overlay: only valid Custom Assembly keys belong here
+# (contents, environment, annotations, accounts, certificates). This file is
+# passed verbatim to `chainctl images repos build apply -f`. Build routing
+# (tag, Dockerfile to pin, cert dir) lives alongside it in meta.yaml.
 #
-# The `x-meta` block below is consumed by the workflow to route the build
-# (which repo/tag to build, which Dockerfile to pin, which cert dir to scan).
-# It is stripped out before the file is handed to `chainctl ... build apply`,
-# so everything outside x-meta is pure apko overlay config.
+# Schema reference:
+#   https://edu.chainguard.dev/chainguard/chainguard-images/features/ca-docs/custom-assembly-chainctl/
 #
-# Apply manually with:
-#   yq 'del(.["x-meta"])' ca-images-iac/python/python.yaml > /tmp/python.apko.yaml
-#   chainctl images repos build apply \
-#     --parent packetloss.network --repo python \
-#     -f /tmp/python.apko.yaml --yes
-#
-# Note: Custom Certificates require a separate entitlement.
-# Contact your Customer Success Team to enable certificate injection.
-
-x-meta:
-  repo: python          # cgr.dev/<org>/<repo>
-  tag: 3.12-dev         # tag the application consumes (pinned by digest)
-  dockerfile: Dockerfile # Dockerfile whose FROM is pinned to the new digest
-  certs_dir: certs      # directory scanned for additional CA certificates ("" to skip)
+# Note: `org.opencontainers.*` and `dev.chainguard.*` annotations and
+# `CHAINGUARD_*` environment variables are reserved and cannot be set.
 
 contents:
   packages:
