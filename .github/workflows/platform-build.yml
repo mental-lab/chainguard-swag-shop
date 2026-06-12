@@ -116,6 +116,12 @@ jobs:
         with:
           identity: ${{ vars.CHAINGUARD_IDENTITY }}
 
+      # cosign is used by the provenance phase to verify the image signature and
+      # extract attestations. Only needed by images that opt into pinning.
+      - name: Install cosign
+        if: env.DOCKERFILE != ''
+        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da # v3.7.0
+
       # ── PHASE 1 — BUILD ──────────────────────────────────────────────
       # Build the invocation dynamically: start from the image's Custom Assembly
       # config and append one `--with-certificates=<file>` flag per CA certificate
@@ -231,6 +237,7 @@ jobs:
       - name: Provenance — verify image signature (cosign)
         if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
+          set -euo pipefail
           mkdir -p evidence
           cosign verify \
             --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
@@ -242,6 +249,7 @@ jobs:
       - name: Provenance — extract SBOM attestation
         if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
+          set -euo pipefail
           cosign verify-attestation \
             --type sbom \
             --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
@@ -254,6 +262,7 @@ jobs:
       - name: Provenance — extract SLSA provenance
         if: env.DOCKERFILE != '' && steps.resolve.outputs.changed == 'true'
         run: |
+          set -euo pipefail
           cosign verify-attestation \
             --type slsaprovenance \
             --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
