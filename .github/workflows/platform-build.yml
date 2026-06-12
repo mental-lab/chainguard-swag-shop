@@ -259,7 +259,7 @@ jobs:
         run: |
           set -euo pipefail
           cosign verify-attestation \
-            --type sbom \
+            --type spdx \
             --certificate-oidc-issuer="$SIGNING_ISSUER" \
             --certificate-identity-regexp="$SIGNING_IDENTITY_REGEXP" \
             ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
@@ -272,7 +272,7 @@ jobs:
         run: |
           set -euo pipefail
           cosign verify-attestation \
-            --type slsaprovenance \
+            --type slsaprovenance1 \
             --certificate-oidc-issuer="$SIGNING_ISSUER" \
             --certificate-identity-regexp="$SIGNING_IDENTITY_REGEXP" \
             ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
