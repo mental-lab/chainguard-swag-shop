@@ -16,6 +16,14 @@ env:
   # the org's internal/private CAs, applied uniformly, not a per-image setting.
   CERTS_DIR: certs
 
+  # Signature verification — Custom Assembly images are signed by YOUR Chainguard
+  # org's build identity (apko-builder / catalog-syncer) through the Fulcio
+  # issuer issuer.enforce.dev — NOT the public chainguard-images GitHub identity.
+  # The identity regexp is scoped to the org's root UIDP. Set CHAINGUARD_ORG_UID in
+  # repo Settings → Variables; find it via: chainctl iam organizations list -o json
+  SIGNING_ISSUER: https://issuer.enforce.dev
+  SIGNING_IDENTITY_REGEXP: '^https://issuer\.enforce\.dev/${{ vars.CHAINGUARD_ORG_UID }}/'
+
 jobs:
   # ── Discover — one matrix entry per image directory ──
   # Each image is a directory: ca-images-iac/<repo>/ containing
@@ -46,8 +54,8 @@ jobs:
           # Guard — skip gracefully if Chainguard org is not configured.
           # Set CHAINGUARD_ORG and CHAINGUARD_IDENTITY in repo Settings → Variables
           # and configure an assumable OIDC identity in your Chainguard organization.
-          if [ -z "${{ vars.CHAINGUARD_ORG }}" ] || [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ]; then
-            echo "CHAINGUARD_ORG or CHAINGUARD_IDENTITY not configured — skipping build."
+          if [ -z "${{ vars.CHAINGUARD_ORG }}" ] || [ -z "${{ vars.CHAINGUARD_IDENTITY }}" ] || [ -z "${{ vars.CHAINGUARD_ORG_UID }}" ]; then
+            echo "CHAINGUARD_ORG, CHAINGUARD_IDENTITY or CHAINGUARD_ORG_UID not configured — skipping build."
             echo "See: https://edu.chainguard.dev/chainguard/administration/iam-organizations/assumable-ids/identity-examples/github-actions-identity/"
             echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
             exit 0
@@ -240,8 +248,8 @@ jobs:
           set -euo pipefail
           mkdir -p evidence
           cosign verify \
-            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
-            --certificate-identity-regexp="https://github.com/chainguard-images" \
+            --certificate-oidc-issuer="$SIGNING_ISSUER" \
+            --certificate-identity-regexp="$SIGNING_IDENTITY_REGEXP" \
             ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
             | jq . > evidence/signature-verify.json
           echo "Signature verified"
@@ -252,8 +260,8 @@ jobs:
           set -euo pipefail
           cosign verify-attestation \
             --type sbom \
-            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
-            --certificate-identity-regexp="https://github.com/chainguard-images" \
+            --certificate-oidc-issuer="$SIGNING_ISSUER" \
+            --certificate-identity-regexp="$SIGNING_IDENTITY_REGEXP" \
             ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
             | jq -r '.payload | @base64d | fromjson | .predicate' \
             > evidence/sbom.json
@@ -265,8 +273,8 @@ jobs:
           set -euo pipefail
           cosign verify-attestation \
             --type slsaprovenance \
-            --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
-            --certificate-identity-regexp="https://github.com/chainguard-images" \
+            --certificate-oidc-issuer="$SIGNING_ISSUER" \
+            --certificate-identity-regexp="$SIGNING_IDENTITY_REGEXP" \
             ${{ steps.resolve.outputs.image_ref }}@${{ steps.resolve.outputs.digest }} \
             | jq -r '.payload | @base64d | fromjson' \
             > evidence/provenance.json
