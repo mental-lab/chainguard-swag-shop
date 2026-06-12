@@ -1,0 +1,17 @@
+# ca-images-iac/python/python.yaml — Chainguard Custom Assembly config
+#
+# A pure apko overlay: only valid Custom Assembly keys belong here
+# (contents, environment, annotations, accounts, certificates). This file is
+# passed verbatim to `chainctl images repos build apply -f`. Build routing
+# (tag, Dockerfile to pin, cert dir) lives alongside it in meta.yaml.
+#
+# Schema reference:
+#   https://edu.chainguard.dev/chainguard/chainguard-images/features/ca-docs/custom-assembly-chainctl/
+#
+# Note: `org.opencontainers.*` and `dev.chainguard.*` annotations and
+# `CHAINGUARD_*` environment variables are reserved and cannot be set.
+
+contents:
+  packages:
+    - jq
+    - curl
