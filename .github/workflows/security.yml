@@ -34,7 +34,10 @@ jobs:
           saga: draugr.saga.yaml
           tools: true            # provision cosign-verified scanners on the runner
           mode: auto             # diff on PRs (sticky new/fixed comment), scan otherwise
-          fail-on: error
+          # Draugr reports; Conftest gates. Failing here would skip the Grype
+          # step and starve the policy-gate of its scan-results artifact —
+          # on vulnerable main, findings are the expected state.
+          fail-on: never
           output: draugr-out
 
       - name: Upload merged SARIF to code scanning
