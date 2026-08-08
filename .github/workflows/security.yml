@@ -20,6 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Draugr clones the saga's repository URL itself; give git the workflow
+      # token so the clone of this private repo authenticates.
+      - name: Authenticate git for the draugr clone
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+
       - name: Draugr security scan
         id: draugr
         uses: draugr-dev/draugr@v0.72.0
