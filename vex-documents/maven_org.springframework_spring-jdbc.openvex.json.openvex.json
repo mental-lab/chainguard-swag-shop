@@ -1,0 +1,361 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-448ff963a4d380f87b512aeb79e81d913a2bb8f1e707da1b49b0effc80c8bf89",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-292g-h4h9-g54w",
+    "aliases": [
+     "CGA-m63g-v3f5-mpcw",
+     "CVE-2024-22259",
+     "GHSA-hgjh-9rj2-g67j"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:01.822Z",
+   "last_updated": "2026-05-09T06:02:01.822Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-3qvr-f567-mq5x",
+    "aliases": [
+     "CGA-g939-wc7w-9wcg",
+     "CVE-2024-38819",
+     "GHSA-g5vr-rgqm-vf78"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:18.114Z",
+   "last_updated": "2026-05-01T08:42:18.114Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-499m-f6g4-5mfj",
+    "aliases": [
+     "CGA-c55r-mqj9-jp27",
+     "CVE-2022-22968",
+     "GHSA-g5mm-vmx4-3rg7"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:01.784Z",
+   "last_updated": "2026-05-09T06:02:01.784Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-6493-rrqm-xr3v",
+    "aliases": [
+     "CGA-jfvw-f67x-xrrh",
+     "CVE-2024-38816",
+     "GHSA-cx7f-g6mp-7hqm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:18.161Z",
+   "last_updated": "2026-05-01T08:42:18.161Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fch8-5pqm-pqgr",
+    "aliases": [
+     "CGA-7vr7-8qxr-v5r4",
+     "CVE-2026-22737",
+     "GHSA-4773-3jfm-qmx3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:18.221Z",
+   "last_updated": "2026-05-01T08:42:18.221Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-h27g-5g5r-8cf3",
+    "aliases": [
+     "CGA-8ppg-jcjx-jmc2",
+     "CVE-2024-22262",
+     "GHSA-2wrp-6fg6-hmc5"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.33-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:01.86Z",
+   "last_updated": "2026-06-25T06:03:04.035Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-m8j9-9866-24x6",
+    "aliases": [
+     "CGA-jv8r-5vrc-9287",
+     "CVE-2025-41249",
+     "GHSA-jmp9-x22r-554x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:18.068Z",
+   "last_updated": "2026-05-01T08:42:18.068Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-p7vg-jrqc-8m42",
+    "aliases": [
+     "CGA-5mx7-xgfj-5q2p",
+     "CVE-2022-22950",
+     "GHSA-558x-2xjg-6232"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.1.20.RELEASE-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:03:04.122Z",
+   "last_updated": "2026-06-25T06:03:04.122Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-wf8g-4v54-3hm2",
+    "aliases": [
+     "CGA-5jh4-m8vv-m4mr",
+     "CVE-2022-22965",
+     "GHSA-36p3-wjmg-h94x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.1.20.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-jdbc@5.2.1.RELEASE-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:01.902Z",
+   "last_updated": "2026-06-25T06:03:04.078Z"
+  }
+ ],
+ "timestamp": "2026-05-01T08:42:18Z",
+ "last_updated": "2026-06-25T06:03:04Z"
+}

@@ -1,0 +1,131 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-f7148c2ad135359eced62ad0c785f62b06a3f650fa803c0a0d1ac1259b583b7e",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-5hwj-pfhw-24j6",
+    "aliases": [
+     "CGA-j2h4-853h-52pc",
+     "CVE-2024-22257",
+     "GHSA-f3jh-qvm4-mg39"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.11-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.11-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T16:43:01.829Z",
+   "last_updated": "2026-05-08T16:43:01.829Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-6cx5-25rr-c9jr",
+    "aliases": [
+     "CGA-35r4-qv8v-4x4v",
+     "CVE-2025-22228",
+     "GHSA-mg83-c7gq-rv5c"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.11-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.11-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.11-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.14-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T06:03:28.838Z",
+   "last_updated": "2026-05-08T16:43:02.082Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-gr8c-j28r-5p4r",
+    "aliases": [
+     "CGA-6g73-q3c3-92w7",
+     "CVE-2024-38821",
+     "GHSA-c4q5-6c82-3qpw"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.11-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T16:43:01.913Z",
+   "last_updated": "2026-05-08T16:43:01.913Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-v2gx-fv9v-wgvg",
+    "aliases": [
+     "CGA-j87j-7fw6-jfqx",
+     "CVE-2026-22732",
+     "GHSA-mf92-479x-3373"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.14-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.7.14-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@5.8.16-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@6.3.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-rsocket@6.4.13-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:51:30.63Z",
+   "last_updated": "2026-05-08T16:43:01.999Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:51:30Z",
+ "last_updated": "2026-05-08T16:43:02Z"
+}

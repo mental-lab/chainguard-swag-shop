@@ -1,0 +1,361 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-e809bcad859f1ea62fe8f662186617f7362a0af1ea90070dc82dbcfe7f816684",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-42jm-28p8-mxrv",
+    "aliases": [
+     "CGA-jfvw-f67x-xrrh",
+     "CVE-2024-38816",
+     "GHSA-cx7f-g6mp-7hqm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:24.766Z",
+   "last_updated": "2026-05-01T08:42:24.766Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-c6qv-5p9x-467c",
+    "aliases": [
+     "CGA-5jh4-m8vv-m4mr",
+     "CVE-2022-22965",
+     "GHSA-36p3-wjmg-h94x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.1.20.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:00.557Z",
+   "last_updated": "2026-06-25T06:03:07.448Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-g2gr-h9x2-6664",
+    "aliases": [
+     "CGA-5mx7-xgfj-5q2p",
+     "CVE-2022-22950",
+     "GHSA-558x-2xjg-6232"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.1.20.RELEASE-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:03:07.493Z",
+   "last_updated": "2026-06-25T06:03:07.493Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-j4rq-xxw9-9mg6",
+    "aliases": [
+     "CGA-7vr7-8qxr-v5r4",
+     "CVE-2026-22737",
+     "GHSA-4773-3jfm-qmx3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:24.811Z",
+   "last_updated": "2026-05-01T08:42:24.811Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-q7rm-r8m8-j327",
+    "aliases": [
+     "CGA-jv8r-5vrc-9287",
+     "CVE-2025-41249",
+     "GHSA-jmp9-x22r-554x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:24.857Z",
+   "last_updated": "2026-05-01T08:42:24.857Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-qjw7-9xj7-w4w4",
+    "aliases": [
+     "CGA-c55r-mqj9-jp27",
+     "CVE-2022-22968",
+     "GHSA-g5mm-vmx4-3rg7"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:00.437Z",
+   "last_updated": "2026-05-09T06:02:00.437Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-rqv3-gc74-38mf",
+    "aliases": [
+     "CGA-m63g-v3f5-mpcw",
+     "CVE-2024-22259",
+     "GHSA-hgjh-9rj2-g67j"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:00.478Z",
+   "last_updated": "2026-05-09T06:02:00.478Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-rvx3-hvwj-xhcg",
+    "aliases": [
+     "CGA-8ppg-jcjx-jmc2",
+     "CVE-2024-22262",
+     "GHSA-2wrp-6fg6-hmc5"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.14.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@4.3.3.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.2.1.RELEASE-0.cgr.4"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.33-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-09T06:02:00.516Z",
+   "last_updated": "2026-06-25T06:03:07.542Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-xmg2-3f9f-x54h",
+    "aliases": [
+     "CGA-g939-wc7w-9wcg",
+     "CVE-2024-38819",
+     "GHSA-g5vr-rgqm-vf78"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework/spring-aop@5.3.39-0.cgr.4"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:24.722Z",
+   "last_updated": "2026-05-01T08:42:24.722Z"
+  }
+ ],
+ "timestamp": "2026-05-01T08:42:24Z",
+ "last_updated": "2026-06-25T06:03:07Z"
+}

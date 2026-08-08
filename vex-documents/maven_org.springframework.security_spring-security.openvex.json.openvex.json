@@ -1,0 +1,46 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-2afac0417aa7b2519412ba9a7de222d0f152f348981ee5fbe8f4fe6d73bed17c",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-9qv6-p33g-4whq",
+    "aliases": [
+     "CGA-j87j-7fw6-jfqx",
+     "CVE-2026-22732",
+     "GHSA-mf92-479x-3373"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security@5.7.14-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security@5.8.16-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security@6.3.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security@6.4.13-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-15T16:02:47.414Z",
+   "last_updated": "2026-04-15T16:02:47.414Z"
+  }
+ ],
+ "timestamp": "2026-04-15T16:02:47Z",
+ "last_updated": "2026-04-15T16:02:47Z"
+}

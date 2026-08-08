@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-5605d0b01586b19829b188bf03161c4c2269008e61d2bb3b10134ca063ebecd4",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-28qw-p3wh-vrfm",
+    "aliases": [
+     "CGA-c2gf-mp9g-r4fh",
+     "CVE-2023-27586",
+     "GHSA-rwmf-w63j-p7gv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/cairosvg@2.6.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-11-01T06:02:11.368Z",
+   "last_updated": "2025-11-01T06:02:11.368Z"
+  }
+ ],
+ "timestamp": "2025-11-01T06:02:11Z",
+ "last_updated": "2025-11-01T06:02:11Z"
+}

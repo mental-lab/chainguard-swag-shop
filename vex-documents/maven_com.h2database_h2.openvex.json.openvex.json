@@ -1,0 +1,136 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-8e648f344a59795e75838e194e823278a7322fefd0f7a626904892feb54a9930",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-3xh4-h5vj-xr3v",
+    "aliases": [
+     "CGA-gmp6-h686-9p65",
+     "CVE-2022-23221",
+     "GHSA-45hx-wfhj-473x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.197-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.200-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.200-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:17.798Z",
+   "last_updated": "2026-07-10T00:02:40.799Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-8vm3-q87f-pm4w",
+    "aliases": [
+     "CGA-4gqg-5rrq-p8q8",
+     "CVE-2021-42392",
+     "GHSA-h376-j262-vhq6"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.197-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.197-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.200-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.200-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.200-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:17.751Z",
+   "last_updated": "2026-07-10T00:02:40.735Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-94pc-5gc9-pxrj",
+    "aliases": [
+     "CGA-qjw2-cj8q-g728",
+     "CVE-2022-45868",
+     "GHSA-22wj-vf5f-wrvj"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.200-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-01T08:42:17.847Z",
+   "last_updated": "2026-05-01T08:42:17.847Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-969j-cm8h-h8vx",
+    "aliases": [
+     "CGA-prv5-x2q7-g765",
+     "CVE-2018-14335",
+     "GHSA-wm64-883p-84j3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.195-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.197-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.197-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/com.h2database/h2@1.4.197-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-08T06:01:55.196Z",
+   "last_updated": "2026-07-14T15:01:56.617Z"
+  }
+ ],
+ "timestamp": "2026-05-01T08:42:17Z",
+ "last_updated": "2026-07-14T15:01:56Z"
+}

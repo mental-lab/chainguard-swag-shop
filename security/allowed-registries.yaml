@@ -1,0 +1,28 @@
+# Allow-listed artifact sources. Enforced by the CI policy gate and (when
+# deployed to Kubernetes) an admission policy.
+version: 1
+registries:
+  - name: chainguard
+    host: cgr.dev
+    purpose: hardened base images + Chainguard Libraries (PyPI)
+    verification: [cosign-signature, sbom-attestation, slsa-provenance]
+  - name: github-container-registry
+    host: ghcr.io
+    purpose: internally built swag-shop application image
+    verification: [cosign-keyless-signature, github-artifact-attestation]
+  - name: jfrog-artifactory
+    host: artifactory.example.com
+    purpose: enterprise pull-through cache / internal promotion
+    verification: [cosign-signature]
+  - name: sonatype-nexus
+    host: nexus.example.com
+    purpose: enterprise pull-through cache
+    verification: [cosign-signature]
+  - name: google-artifact-registry
+    host: us-docker.pkg.dev
+    purpose: enterprise pull-through cache
+    verification: [cosign-signature]
+
+# Directionality (do not call this "bidirectional"):
+#   Chainguard --> enterprise registry --> consumers   = pull-through/consumption
+#   CI build   --> enterprise registry                 = internal publish/promote

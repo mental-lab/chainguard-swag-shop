@@ -1,0 +1,36 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-29c279df1a6f30ac3f12f96cc2a6d8674f08651ae3bfe79e15af446276bd9520",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-536v-m992-2fx5",
+    "aliases": [
+     "CGA-hwhg-wr6c-6rj8",
+     "CVE-2024-53899",
+     "GHSA-rqc4-2hc7-8c8v"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/virtualenv@20.16.6%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/virtualenv@20.26.3%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-25T06:01:39.506Z",
+   "last_updated": "2025-11-15T06:02:08.54Z"
+  }
+ ],
+ "timestamp": "2025-10-25T06:01:39Z",
+ "last_updated": "2025-11-15T06:02:08Z"
+}

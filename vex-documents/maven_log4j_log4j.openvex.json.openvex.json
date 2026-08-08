@@ -1,0 +1,141 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-6c738b9b8c7476169333c9fbcf1bf109ee12e88afd1fb915c69ce74c5c4d6e29",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-6qv2-4cj8-cr3h",
+    "aliases": [
+     "CGA-73pf-6whc-hgh7",
+     "CVE-2022-23302",
+     "GHSA-w9p3-5cr8-m3jj"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-16T21:01:46.386Z",
+   "last_updated": "2026-07-16T21:01:46.386Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-mhqv-q276-4m6f",
+    "aliases": [
+     "CGA-9gwh-w37q-jhf7",
+     "CVE-2019-17571",
+     "GHSA-2qrg-x229-3v8q"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-16T21:01:46.431Z",
+   "last_updated": "2026-07-16T21:01:46.431Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-pfq8-h5w3-7fwr",
+    "aliases": [
+     "CGA-5q8g-m6j2-rm98",
+     "CVE-2022-23305",
+     "GHSA-65fg-84f6-3jq3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-16T21:01:46.467Z",
+   "last_updated": "2026-07-16T21:01:46.467Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-q4q3-4hw5-3229",
+    "aliases": [
+     "CGA-v47r-2742-xj2x",
+     "CVE-2022-23307",
+     "GHSA-f7vh-qwp3-x37m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-14T15:01:56.531Z",
+   "last_updated": "2026-07-16T21:01:46.509Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-r829-6whv-4cpp",
+    "aliases": [
+     "CGA-xg77-mvqx-rj85",
+     "CVE-2020-9493",
+     "GHSA-prp9-9gxw-38j8"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-14T15:01:56.571Z",
+   "last_updated": "2026-07-16T21:01:46.546Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-v7fm-9rx9-jxgq",
+    "aliases": [
+     "CGA-ghgh-c6gr-6qfv",
+     "CVE-2021-4104",
+     "GHSA-fp5r-v3w9-4333"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/log4j/log4j@1.2.17-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-16T21:01:46.586Z",
+   "last_updated": "2026-07-16T21:01:46.586Z"
+  }
+ ],
+ "timestamp": "2026-07-14T15:01:56Z",
+ "last_updated": "2026-07-16T21:01:46Z"
+}

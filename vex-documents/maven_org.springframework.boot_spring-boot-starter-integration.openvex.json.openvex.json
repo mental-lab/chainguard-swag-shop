@@ -1,0 +1,681 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-07be4249541aa6dd745164b2556ade61c82a42dc35f1ae0fe84e101a0eded36b",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-285q-vwx3-fh49",
+    "aliases": [
+     "CGA-6vgg-qx8j-v46q",
+     "CVE-2024-23672",
+     "GHSA-v682-8vv8-vpwr"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.649Z",
+   "last_updated": "2026-06-05T06:02:44.649Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-2mm3-h8rg-68vf",
+    "aliases": [
+     "CGA-jg26-97xh-9744",
+     "CVE-2025-55752",
+     "GHSA-wmwf-9ccg-fff5"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.721Z",
+   "last_updated": "2026-06-05T06:02:44.721Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-2px8-grmx-78q3",
+    "aliases": [
+     "CGA-q9w2-5fvj-m9fm",
+     "CVE-2026-40973",
+     "GHSA-wwpq-f5c3-7hvx"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.4.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-20T06:02:50.381Z",
+   "last_updated": "2026-06-24T06:02:31.917Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-5v48-vmmm-234c",
+    "aliases": [
+     "CGA-g939-wc7w-9wcg",
+     "CVE-2024-38819",
+     "GHSA-g5vr-rgqm-vf78"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.947Z",
+   "last_updated": "2026-06-05T06:02:44.947Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-629p-m892-w9fx",
+    "aliases": [
+     "CGA-pxhm-4j32-f4g4",
+     "CVE-2023-42795",
+     "GHSA-g8pj-r55q-5c2v"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.303Z",
+   "last_updated": "2026-06-05T06:02:44.303Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-6c6x-c3v8-g5xf",
+    "aliases": [
+     "CGA-7h95-gfx9-4jv5",
+     "CVE-2025-22235",
+     "GHSA-rc42-6c7j-7h5r"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.7.18-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.7.18-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:06.331Z",
+   "last_updated": "2026-06-05T06:02:44.545Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-6hqv-jqvv-7v54",
+    "aliases": [
+     "CGA-9chh-8q5j-3pcq",
+     "CVE-2024-24549",
+     "GHSA-7w75-32cg-r6g2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.866Z",
+   "last_updated": "2026-06-05T06:02:44.866Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-997r-x9fh-9c8p",
+    "aliases": [
+     "CGA-vrjw-jjcq-h6wm",
+     "CVE-2026-22733",
+     "GHSA-mgvc-8q2h-5pgc"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.7.18-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.5-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:06.376Z",
+   "last_updated": "2026-06-05T06:02:44.793Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9pr8-r9g5-hpqh",
+    "aliases": [
+     "CGA-wwph-fxq5-rj2m",
+     "CVE-2025-55754",
+     "GHSA-vfww-5hm6-hx2j"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.269Z",
+   "last_updated": "2026-06-05T06:02:44.269Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-c3hv-p784-rcwv",
+    "aliases": [
+     "CGA-jfvw-f67x-xrrh",
+     "CVE-2024-38816",
+     "GHSA-cx7f-g6mp-7hqm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.439Z",
+   "last_updated": "2026-06-05T06:02:44.439Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fc4m-f28m-gx6h",
+    "aliases": [
+     "CGA-mg2c-38j6-4pxp",
+     "CVE-2022-38749",
+     "GHSA-c4r9-r8fh-9vj2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.611Z",
+   "last_updated": "2026-06-05T06:02:44.611Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fxxh-gw36-5h4r",
+    "aliases": [
+     "CGA-jv8r-5vrc-9287",
+     "CVE-2025-41249",
+     "GHSA-jmp9-x22r-554x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.507Z",
+   "last_updated": "2026-06-05T06:02:44.507Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-g59g-3h6f-3rw8",
+    "aliases": [
+     "CGA-23pp-w78p-76cf",
+     "CVE-2026-42587",
+     "GHSA-f6hv-jmp6-3vwv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.905Z",
+   "last_updated": "2026-06-05T06:02:44.905Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-hj6m-w699-r9c9",
+    "aliases": [
+     "CGA-pcp8-xw84-x72j",
+     "CVE-2023-44487",
+     "GHSA-qppj-fm5r-hxr3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.336Z",
+   "last_updated": "2026-06-05T06:02:44.336Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-j3v2-whrj-q56q",
+    "aliases": [
+     "CGA-7vr7-8qxr-v5r4",
+     "CVE-2026-22737",
+     "GHSA-4773-3jfm-qmx3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.474Z",
+   "last_updated": "2026-06-05T06:02:44.474Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-j56x-r9m6-2pgv",
+    "aliases": [
+     "CGA-xvpq-3fmc-q2jr",
+     "CVE-2025-24813",
+     "GHSA-83qj-6fr2-vhqg"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.405Z",
+   "last_updated": "2026-06-05T06:02:44.405Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-mv82-72h5-qj9m",
+    "aliases": [
+     "CGA-x88f-r7p4-m2wg",
+     "CVE-2023-45648",
+     "GHSA-r6j3-px5g-cq3x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.37Z",
+   "last_updated": "2026-06-05T06:02:44.37Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-mvj9-49qq-cf73",
+    "aliases": [
+     "CGA-gmw6-3xjc-xf3x",
+     "CVE-2023-6378",
+     "GHSA-vmq6-5m68-f53m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.208Z",
+   "last_updated": "2026-06-05T06:02:44.208Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-pgwh-8xwm-x2jc",
+    "aliases": [
+     "CGA-6ggh-r2vp-457q",
+     "CVE-2026-40975",
+     "GHSA-m4x9-hx6x-2c43"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-24T06:02:31.86Z",
+   "last_updated": "2026-06-24T06:02:31.86Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-pp82-8386-jvw5",
+    "aliases": [
+     "CGA-w4ff-2m4v-j788",
+     "CVE-2022-25857",
+     "GHSA-3mc7-4q67-w48m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.238Z",
+   "last_updated": "2026-06-05T06:02:44.238Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-rp64-298x-2rr7",
+    "aliases": [
+     "CGA-pfvr-2rwf-cg7p",
+     "CVE-2026-33871",
+     "GHSA-w9fj-cfpg-grvv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.755Z",
+   "last_updated": "2026-06-05T06:02:44.755Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-v2cm-m236-69rx",
+    "aliases": [
+     "CGA-ff6f-wpxq-25h8",
+     "CVE-2024-50379",
+     "GHSA-5j33-cvvr-w245"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.683Z",
+   "last_updated": "2026-06-05T06:02:44.683Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-v79j-43q8-fcmf",
+    "aliases": [
+     "CGA-jrf8-j5gh-6f8p",
+     "CVE-2023-6481",
+     "GHSA-gm62-rw4g-vrc4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.577Z",
+   "last_updated": "2026-06-05T06:02:44.577Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-vvpq-hxw4-8hpw",
+    "aliases": [
+     "CGA-fxw6-vmq6-5gwv",
+     "CVE-2023-46589",
+     "GHSA-fccv-jmmp-qg76"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:44.827Z",
+   "last_updated": "2026-06-05T06:02:44.827Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-xw3g-5mmj-5ffw",
+    "aliases": [
+     "CGA-qmm4-hfpf-7hmh",
+     "CVE-2026-22731",
+     "GHSA-8hfc-fq58-r658"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.0-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.3-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.4-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.6-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.7-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.8-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.9-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-integration@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-13T06:02:09.556Z",
+   "last_updated": "2026-05-14T06:02:55.741Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:56:06Z",
+ "last_updated": "2026-06-24T06:02:31Z"
+}

@@ -1,0 +1,60 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-422abe05d2cb136927da0517ffc3e752aa5c3fe06f08becd1eb6e7b9dda99477",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-48r6-j473-jc3p",
+    "aliases": [
+     "CGA-9mwv-6gm4-mvjg",
+     "GHSA-m9g8-fxxm-xg86"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/django@4.2.16%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/django@5.0.8%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/django@5.0.9%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:33.162Z",
+   "last_updated": "2025-10-23T06:01:33.162Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-rj2m-rhp2-6v6p",
+    "aliases": [
+     "CGA-mx83-5m72-gp28",
+     "CVE-2024-39614",
+     "GHSA-f6f8-9mx6-9mx2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/django@5.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:33.118Z",
+   "last_updated": "2025-10-23T06:01:33.118Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:33Z",
+ "last_updated": "2025-10-23T06:01:33Z"
+}

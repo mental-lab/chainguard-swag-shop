@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-32e3b93807d4f42cb790a868f32056c95410301d35ba015432474369cd236b50",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-c6mx-4mg4-3v44",
+    "aliases": [
+     "CGA-w9fg-x5mf-7rr4",
+     "CVE-2026-32874",
+     "GHSA-wgvc-ghv9-3pmm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/ujson@5.10.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-19T06:02:50.724Z",
+   "last_updated": "2026-05-19T06:02:50.724Z"
+  }
+ ],
+ "timestamp": "2026-05-19T06:02:50Z",
+ "last_updated": "2026-05-19T06:02:50Z"
+}

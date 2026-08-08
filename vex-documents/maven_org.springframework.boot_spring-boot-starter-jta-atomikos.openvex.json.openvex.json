@@ -1,0 +1,481 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-f8ca82c331b771153599b663ad11f1b3f1995ec2a756c010a5602598dc56fcf0",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-26w5-prx5-6q58",
+    "aliases": [
+     "CGA-g939-wc7w-9wcg",
+     "CVE-2024-38819",
+     "GHSA-g5vr-rgqm-vf78"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.777Z",
+   "last_updated": "2026-06-05T06:02:36.777Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-36qf-h4w5-r4hp",
+    "aliases": [
+     "CGA-7h95-gfx9-4jv5",
+     "CVE-2025-22235",
+     "GHSA-rc42-6c7j-7h5r"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.7.18-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.7.18-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:04.06Z",
+   "last_updated": "2026-06-05T06:02:36.444Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-37jw-64c2-f9m2",
+    "aliases": [
+     "CGA-gmw6-3xjc-xf3x",
+     "CVE-2023-6378",
+     "GHSA-vmq6-5m68-f53m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.507Z",
+   "last_updated": "2026-06-05T06:02:36.507Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-37mf-8m89-mg69",
+    "aliases": [
+     "CGA-fxw6-vmq6-5gwv",
+     "CVE-2023-46589",
+     "GHSA-fccv-jmmp-qg76"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:37.069Z",
+   "last_updated": "2026-06-05T06:02:37.069Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-4gvj-c5pg-9crh",
+    "aliases": [
+     "CGA-w4ff-2m4v-j788",
+     "CVE-2022-25857",
+     "GHSA-3mc7-4q67-w48m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.95Z",
+   "last_updated": "2026-06-05T06:02:36.95Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-5m5h-x35j-682m",
+    "aliases": [
+     "CGA-ff6f-wpxq-25h8",
+     "CVE-2024-50379",
+     "GHSA-5j33-cvvr-w245"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.917Z",
+   "last_updated": "2026-06-05T06:02:36.917Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-5x7f-j6v5-4r57",
+    "aliases": [
+     "CGA-xvpq-3fmc-q2jr",
+     "CVE-2025-24813",
+     "GHSA-83qj-6fr2-vhqg"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.409Z",
+   "last_updated": "2026-06-05T06:02:36.409Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-669v-m3qq-f2c7",
+    "aliases": [
+     "CGA-vrjw-jjcq-h6wm",
+     "CVE-2026-22733",
+     "GHSA-mgvc-8q2h-5pgc"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.7.18-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:04.107Z",
+   "last_updated": "2026-06-05T06:02:36.475Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-66pj-r8v2-7gxh",
+    "aliases": [
+     "CGA-jfvw-f67x-xrrh",
+     "CVE-2024-38816",
+     "GHSA-cx7f-g6mp-7hqm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.812Z",
+   "last_updated": "2026-06-05T06:02:36.812Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-6fmx-9jvv-qr5w",
+    "aliases": [
+     "CGA-jrf8-j5gh-6f8p",
+     "CVE-2023-6481",
+     "GHSA-gm62-rw4g-vrc4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.54Z",
+   "last_updated": "2026-06-05T06:02:36.54Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9h8c-gw38-qgvw",
+    "aliases": [
+     "CGA-jv8r-5vrc-9287",
+     "CVE-2025-41249",
+     "GHSA-jmp9-x22r-554x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.844Z",
+   "last_updated": "2026-06-05T06:02:36.844Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-f7c4-m5v4-jh6p",
+    "aliases": [
+     "CGA-x88f-r7p4-m2wg",
+     "CVE-2023-45648",
+     "GHSA-r6j3-px5g-cq3x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.881Z",
+   "last_updated": "2026-06-05T06:02:36.881Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fqw8-3r3g-h756",
+    "aliases": [
+     "CGA-jg26-97xh-9744",
+     "CVE-2025-55752",
+     "GHSA-wmwf-9ccg-fff5"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.673Z",
+   "last_updated": "2026-06-05T06:02:36.673Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-hcfp-67q4-vhc8",
+    "aliases": [
+     "CGA-pfvr-2rwf-cg7p",
+     "CVE-2026-33871",
+     "GHSA-w9fj-cfpg-grvv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.346Z",
+   "last_updated": "2026-06-05T06:02:36.346Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-hrfx-9xpc-j7w6",
+    "aliases": [
+     "CGA-9chh-8q5j-3pcq",
+     "CVE-2024-24549",
+     "GHSA-7w75-32cg-r6g2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.639Z",
+   "last_updated": "2026-06-05T06:02:36.639Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-mhm9-q8rh-gqgv",
+    "aliases": [
+     "CGA-pcp8-xw84-x72j",
+     "CVE-2023-44487",
+     "GHSA-qppj-fm5r-hxr3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.606Z",
+   "last_updated": "2026-06-05T06:02:36.606Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-qcxg-649r-jqw5",
+    "aliases": [
+     "CGA-6vgg-qx8j-v46q",
+     "CVE-2024-23672",
+     "GHSA-v682-8vv8-vpwr"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.377Z",
+   "last_updated": "2026-06-05T06:02:36.377Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-r57w-8gmv-pjg6",
+    "aliases": [
+     "CGA-wwph-fxq5-rj2m",
+     "CVE-2025-55754",
+     "GHSA-vfww-5hm6-hx2j"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.705Z",
+   "last_updated": "2026-06-05T06:02:36.705Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-r5m7-vpq3-6rw4",
+    "aliases": [
+     "CGA-7vr7-8qxr-v5r4",
+     "CVE-2026-22737",
+     "GHSA-4773-3jfm-qmx3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:37.026Z",
+   "last_updated": "2026-06-05T06:02:37.026Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-vw75-wc5h-v9pj",
+    "aliases": [
+     "CGA-mg2c-38j6-4pxp",
+     "CVE-2022-38749",
+     "GHSA-c4r9-r8fh-9vj2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.576Z",
+   "last_updated": "2026-06-05T06:02:36.576Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-wcq2-7667-v935",
+    "aliases": [
+     "CGA-23pp-w78p-76cf",
+     "CVE-2026-42587",
+     "GHSA-f6hv-jmp6-3vwv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.743Z",
+   "last_updated": "2026-06-05T06:02:36.743Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-x87c-9gx3-9qq8",
+    "aliases": [
+     "CGA-pxhm-4j32-f4g4",
+     "CVE-2023-42795",
+     "GHSA-g8pj-r55q-5c2v"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-jta-atomikos@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:36.989Z",
+   "last_updated": "2026-06-05T06:02:36.989Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:56:04Z",
+ "last_updated": "2026-06-05T06:02:37Z"
+}

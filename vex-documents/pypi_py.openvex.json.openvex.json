@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-53c72d24bf67a51d242a01fd47f4a5a96123715cf836ece3e4ade9ed5d67a84b",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-xm98-pf2f-cc3j",
+    "aliases": [
+     "CGA-3gj5-m8qg-3522",
+     "CVE-2020-29651",
+     "GHSA-hj5v-574p-mj7c"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/py@1.9.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-11-15T06:02:08.159Z",
+   "last_updated": "2025-11-15T06:02:08.159Z"
+  }
+ ],
+ "timestamp": "2025-11-15T06:02:08Z",
+ "last_updated": "2025-11-15T06:02:08Z"
+}

@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-52694b930c06b13f08b1c151759a7778f5a8c6ff4db5c38d10aa47afb4f40880",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-q447-hxgj-vqc5",
+    "aliases": [
+     "CGA-f67w-874q-wh5v",
+     "CVE-2024-1135",
+     "GHSA-w3h3-4rj7-4ph4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/gunicorn@20.1.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.364Z",
+   "last_updated": "2025-10-23T06:01:32.364Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-10-23T06:01:32Z"
+}

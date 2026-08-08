@@ -1,0 +1,53 @@
+# Machine-readable contract for severity gates, SLOs and exception handling.
+# Consumed by the Conftest gate (policy/vex/remediation.rego) in CI and policy/vex/slo.rego.
+version: 1
+
+# Severity gates: which findings block merge/promotion, per environment.
+gates:
+  production:
+    deny_severities: [CRITICAL, HIGH]
+    fail_closed: true # no scan data = deny, never silently allow
+  staging:
+    deny_severities: [CRITICAL]
+    fail_closed: true
+  development:
+    deny_severities: []
+    fail_closed: false
+
+# Service Level Objectives by severity and remediation type.
+slos:
+  CRITICAL:
+    upgrade: { turnaround_hours: 24 }
+    backport: { turnaround_hours: 48 }
+    replacement: { turnaround_hours: 72 }
+    compensating_control: { approval_required: security-leadership, max_age_days: 30 }
+  HIGH:
+    upgrade: { turnaround_hours: 168 } # 7 days
+    backport: { turnaround_hours: 336 }
+    replacement: { turnaround_hours: 720 }
+    compensating_control: { approval_required: security-engineering, max_age_days: 90 }
+  MEDIUM:
+    upgrade: { turnaround_hours: 720 } # 30 days
+    compensating_control: { approval_required: security-engineering, max_age_days: 180 }
+
+# Escalation when an SLO is breached.
+escalation:
+  paths:
+    - after: "50% of SLO consumed"
+      notify: [application-owner]
+    - after: "80% of SLO consumed"
+      notify: [application-owner, security-engineering]
+    - after: "SLO breached"
+      notify: [security-leadership, product-owner]
+      action: block-release
+
+# Dependency governance: deny introduction of unapproved packages. The shop
+# pulls from Chainguard Libraries (PyPI) as primary with PyPI as fallback —
+# governed here rather than by developer habit.
+dependency_governance:
+  default_action: deny
+  trusted_sources:
+    - https://libraries.cgr.dev/python-remediated/simple
+    - https://libraries.cgr.dev/python/simple
+    - https://pypi.org/simple
+  public_direct_access: false # resolved via governed index, not ad-hoc

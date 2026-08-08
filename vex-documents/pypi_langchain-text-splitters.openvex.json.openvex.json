@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-1bed687c86dbbbadc8da174b63a72267bebb55c9b649394db102c0ff83d188b5",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-6x2f-7ghg-4rhq",
+    "aliases": [
+     "CGA-cwg3-mwh5-gf68",
+     "CVE-2025-6985",
+     "GHSA-m42m-m8cr-8m58"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/langchain-text-splitters@0.3.8%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-11-06T06:01:23.676Z",
+   "last_updated": "2025-11-06T06:01:23.676Z"
+  }
+ ],
+ "timestamp": "2025-11-06T06:01:23Z",
+ "last_updated": "2025-11-06T06:01:23Z"
+}

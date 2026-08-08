@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-f56681586f79f24fbf251936044113d229f26bf12684e05413dd7627070ab672",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-g4jp-xjwp-rvj3",
+    "aliases": [
+     "CGA-q573-w4gv-fw58",
+     "CVE-2025-5279",
+     "GHSA-r244-wg5g-6w2r"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/redshift-connector@2.1.5%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-11-08T06:01:43.449Z",
+   "last_updated": "2025-11-08T06:01:43.449Z"
+  }
+ ],
+ "timestamp": "2025-11-08T06:01:43Z",
+ "last_updated": "2025-11-08T06:01:43Z"
+}

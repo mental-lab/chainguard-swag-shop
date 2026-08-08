@@ -60,6 +60,13 @@ logs/
 # CI/CD
 .scannerwork/
 
+# Internal / planning docs (kept local, not committed)
+PLAN.md
+PRESENTER_SCRIPT.md
+DEMO_CRITERIA.md
+docs/security/
+security-evidence/
+
 # Temporary files
 *.tmp
 *.temp

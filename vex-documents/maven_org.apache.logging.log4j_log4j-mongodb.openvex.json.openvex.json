@@ -1,0 +1,51 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-3fab2c2b60a821976d636e7205a76b6fb5dd886b82f00d03d0e5fb841ad1a980",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-2xmh-9gw4-44c2",
+    "aliases": [
+     "CGA-wqhw-vh22-jwgm",
+     "CVE-2026-34480",
+     "GHSA-3pxv-7cmr-fjr4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-mongodb@2.25.1-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-28T21:03:09.003Z",
+   "last_updated": "2026-07-28T21:03:09.003Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-hc79-94xr-wm4r",
+    "aliases": [
+     "CGA-qw63-23v7-p6qc",
+     "CVE-2026-34478",
+     "GHSA-445c-vh5m-36rj"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-mongodb@2.25.1-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-28T21:03:08.975Z",
+   "last_updated": "2026-07-28T21:03:08.975Z"
+  }
+ ],
+ "timestamp": "2026-07-28T21:03:08Z",
+ "last_updated": "2026-07-28T21:03:09Z"
+}

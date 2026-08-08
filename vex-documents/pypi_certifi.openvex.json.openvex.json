@@ -1,0 +1,36 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-4ff50628beebf4133d32f52475e2d1f7f076a20d51df13d8e3c89c7a0a8744e4",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-22g9-8qhp-q56g",
+    "aliases": [
+     "CGA-fhcx-m79g-26vp",
+     "CVE-2023-37920",
+     "GHSA-xqr8-7jwr-rhp7"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/certifi@2020.12.5%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/certifi@2021.10.8%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.326Z",
+   "last_updated": "2025-10-23T06:01:32.326Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-10-23T06:01:32Z"
+}

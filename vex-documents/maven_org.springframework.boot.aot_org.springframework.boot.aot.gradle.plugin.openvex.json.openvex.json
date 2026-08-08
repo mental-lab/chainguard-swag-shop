@@ -1,0 +1,226 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-83d69b5f0d7ef946f8870651c246e0bd4a635bfeb38c8dddc964682fa346637c",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-2fp7-4f47-gfp7",
+    "aliases": [
+     "CGA-vrjw-jjcq-h6wm",
+     "CVE-2026-22733",
+     "GHSA-mgvc-8q2h-5pgc"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.5-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-13T06:02:01.526Z",
+   "last_updated": "2026-05-14T06:02:58.319Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-3pvm-3274-j6c6",
+    "aliases": [
+     "CGA-q9w2-5fvj-m9fm",
+     "CVE-2026-40973",
+     "GHSA-wwpq-f5c3-7hvx"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.4.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-20T06:02:49.34Z",
+   "last_updated": "2026-06-24T06:02:27.113Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-56p8-4gg2-jcrx",
+    "aliases": [
+     "CGA-qmm4-hfpf-7hmh",
+     "CVE-2026-22731",
+     "GHSA-8hfc-fq58-r658"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.0-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.3-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.4-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.6-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.7-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.8-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.9-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-13T06:02:01.491Z",
+   "last_updated": "2026-05-14T06:02:58.354Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-82q8-cx86-frqv",
+    "aliases": [
+     "CGA-6ggh-r2vp-457q",
+     "CVE-2026-40975",
+     "GHSA-m4x9-hx6x-2c43"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot.aot/org.springframework.boot.aot.gradle.plugin@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-24T06:02:27.062Z",
+   "last_updated": "2026-06-24T06:02:27.062Z"
+  }
+ ],
+ "timestamp": "2026-05-13T06:02:01Z",
+ "last_updated": "2026-06-24T06:02:27Z"
+}

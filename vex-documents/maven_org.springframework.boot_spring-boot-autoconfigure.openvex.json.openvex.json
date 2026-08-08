@@ -1,0 +1,681 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-6104a12baaddebe9aec1f2ebbb9eb3a3bcf8cb6e5b187f9d94e997e11faa891a",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-2qqm-4fh5-hpmw",
+    "aliases": [
+     "CGA-6vgg-qx8j-v46q",
+     "CVE-2024-23672",
+     "GHSA-v682-8vv8-vpwr"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.33Z",
+   "last_updated": "2026-06-05T06:02:26.33Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-4jp6-4r29-hpxr",
+    "aliases": [
+     "CGA-g939-wc7w-9wcg",
+     "CVE-2024-38819",
+     "GHSA-g5vr-rgqm-vf78"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.433Z",
+   "last_updated": "2026-06-05T06:02:26.433Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-56q2-5jj6-qx49",
+    "aliases": [
+     "CGA-mg2c-38j6-4pxp",
+     "CVE-2022-38749",
+     "GHSA-c4r9-r8fh-9vj2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.11Z",
+   "last_updated": "2026-06-05T06:02:26.11Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-76f2-7hxf-j578",
+    "aliases": [
+     "CGA-q9w2-5fvj-m9fm",
+     "CVE-2026-40973",
+     "GHSA-wwpq-f5c3-7hvx"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.4.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-20T06:02:55.567Z",
+   "last_updated": "2026-06-24T06:02:31.492Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-7gxc-fx5w-qpmf",
+    "aliases": [
+     "CGA-pxhm-4j32-f4g4",
+     "CVE-2023-42795",
+     "GHSA-g8pj-r55q-5c2v"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.727Z",
+   "last_updated": "2026-06-05T06:02:26.727Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-7j64-jmqp-rh5q",
+    "aliases": [
+     "CGA-gmw6-3xjc-xf3x",
+     "CVE-2023-6378",
+     "GHSA-vmq6-5m68-f53m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.014Z",
+   "last_updated": "2026-06-05T06:02:26.014Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-7w4c-8c4r-4vhp",
+    "aliases": [
+     "CGA-wwph-fxq5-rj2m",
+     "CVE-2025-55754",
+     "GHSA-vfww-5hm6-hx2j"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.253Z",
+   "last_updated": "2026-06-05T06:02:26.253Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9q9r-j83x-xg77",
+    "aliases": [
+     "CGA-qmm4-hfpf-7hmh",
+     "CVE-2026-22731",
+     "GHSA-8hfc-fq58-r658"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.0-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.3-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.4-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.6-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.7-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.8-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.9-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-13T06:02:02.13Z",
+   "last_updated": "2026-05-14T06:02:58.55Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9r5m-6jxr-858f",
+    "aliases": [
+     "CGA-9chh-8q5j-3pcq",
+     "CVE-2024-24549",
+     "GHSA-7w75-32cg-r6g2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.364Z",
+   "last_updated": "2026-06-05T06:02:26.364Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-cfwx-9rrp-m963",
+    "aliases": [
+     "CGA-fxw6-vmq6-5gwv",
+     "CVE-2023-46589",
+     "GHSA-fccv-jmmp-qg76"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.179Z",
+   "last_updated": "2026-06-05T06:02:26.179Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-f7jv-jjj9-pghg",
+    "aliases": [
+     "CGA-jg26-97xh-9744",
+     "CVE-2025-55752",
+     "GHSA-wmwf-9ccg-fff5"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.585Z",
+   "last_updated": "2026-06-05T06:02:26.585Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fj68-94gm-f44p",
+    "aliases": [
+     "CGA-7h95-gfx9-4jv5",
+     "CVE-2025-22235",
+     "GHSA-rc42-6c7j-7h5r"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.7.18-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.7.18-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:06.724Z",
+   "last_updated": "2026-06-05T06:02:26.29Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fqvv-j37p-67gw",
+    "aliases": [
+     "CGA-pfvr-2rwf-cg7p",
+     "CVE-2026-33871",
+     "GHSA-w9fj-cfpg-grvv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.399Z",
+   "last_updated": "2026-06-05T06:02:26.399Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-g5xf-fcxr-f3cc",
+    "aliases": [
+     "CGA-vrjw-jjcq-h6wm",
+     "CVE-2026-22733",
+     "GHSA-mgvc-8q2h-5pgc"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.7.18-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.5-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:06.767Z",
+   "last_updated": "2026-06-05T06:02:26.695Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-ghqp-g4mm-c49c",
+    "aliases": [
+     "CGA-pcp8-xw84-x72j",
+     "CVE-2023-44487",
+     "GHSA-qppj-fm5r-hxr3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.541Z",
+   "last_updated": "2026-06-05T06:02:26.541Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-hw8r-8f5v-hqv6",
+    "aliases": [
+     "CGA-ff6f-wpxq-25h8",
+     "CVE-2024-50379",
+     "GHSA-5j33-cvvr-w245"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.215Z",
+   "last_updated": "2026-06-05T06:02:26.215Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-jg7c-rq4c-g8cm",
+    "aliases": [
+     "CGA-23pp-w78p-76cf",
+     "CVE-2026-42587",
+     "GHSA-f6hv-jmp6-3vwv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.624Z",
+   "last_updated": "2026-06-05T06:02:26.624Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-jp56-cmg4-q6g9",
+    "aliases": [
+     "CGA-xvpq-3fmc-q2jr",
+     "CVE-2025-24813",
+     "GHSA-83qj-6fr2-vhqg"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:25.982Z",
+   "last_updated": "2026-06-05T06:02:25.982Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-mfvr-cw5q-m2gg",
+    "aliases": [
+     "CGA-w4ff-2m4v-j788",
+     "CVE-2022-25857",
+     "GHSA-3mc7-4q67-w48m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.078Z",
+   "last_updated": "2026-06-05T06:02:26.078Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-p6vv-h864-72ch",
+    "aliases": [
+     "CGA-x88f-r7p4-m2wg",
+     "CVE-2023-45648",
+     "GHSA-r6j3-px5g-cq3x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.144Z",
+   "last_updated": "2026-06-05T06:02:26.144Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-pp9f-9qvx-c779",
+    "aliases": [
+     "CGA-jv8r-5vrc-9287",
+     "CVE-2025-41249",
+     "GHSA-jmp9-x22r-554x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.658Z",
+   "last_updated": "2026-06-05T06:02:26.658Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-qp2q-f4w5-jq7f",
+    "aliases": [
+     "CGA-jfvw-f67x-xrrh",
+     "CVE-2024-38816",
+     "GHSA-cx7f-g6mp-7hqm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.47Z",
+   "last_updated": "2026-06-05T06:02:26.47Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-qrxc-2c59-6vj9",
+    "aliases": [
+     "CGA-7vr7-8qxr-v5r4",
+     "CVE-2026-22737",
+     "GHSA-4773-3jfm-qmx3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.506Z",
+   "last_updated": "2026-06-05T06:02:26.506Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-v654-rw95-mj7g",
+    "aliases": [
+     "CGA-6ggh-r2vp-457q",
+     "CVE-2026-40975",
+     "GHSA-m4x9-hx6x-2c43"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-24T06:02:31.404Z",
+   "last_updated": "2026-06-24T06:02:31.404Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-vcvq-r5j3-65xw",
+    "aliases": [
+     "CGA-jrf8-j5gh-6f8p",
+     "CVE-2023-6481",
+     "GHSA-gm62-rw4g-vrc4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-autoconfigure@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:02:26.044Z",
+   "last_updated": "2026-06-05T06:02:26.044Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:56:06Z",
+ "last_updated": "2026-06-24T06:02:31Z"
+}

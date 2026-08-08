@@ -1,0 +1,86 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-ebe487f8bf08c2174d0c8d20c10ccf68306d7f010822f4577b784f569600f836",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-m576-m7wf-9g23",
+    "aliases": [
+     "CGA-rq3j-wwqw-vq94",
+     "CVE-2024-47874",
+     "GHSA-f96h-pmfr-66vw"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.27.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.37.2%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.38.6%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.996Z",
+   "last_updated": "2025-10-23T06:01:32.996Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-r79g-x2wf-m9qj",
+    "aliases": [
+     "CGA-mwr9-whh6-3ppf",
+     "CVE-2025-62727",
+     "GHSA-7f5h-v6xp-fcq8"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.40.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.41.2%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.46.1%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.46.2%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.47.2%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/starlette@0.48.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-11-04T06:01:33.76Z",
+   "last_updated": "2025-12-08T06:01:35.095Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-12-08T06:01:35Z"
+}

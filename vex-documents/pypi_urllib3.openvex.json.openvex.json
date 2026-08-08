@@ -1,0 +1,121 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-39373df2fb9a517a50f72cec2f26edc21ff8600fd5d292d478e95471fd48e58c",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-3mvj-gvw6-67ff",
+    "aliases": [
+     "CGA-xfvm-vv8w-pq2j",
+     "CVE-2026-21441",
+     "GHSA-38jv-5279-wg99"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.14%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.18%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.20%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@2.5.0%2Bcgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-01-09T06:01:51.495Z",
+   "last_updated": "2026-03-17T06:03:51.103Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9qr8-qwq2-w25h",
+    "aliases": [
+     "CGA-w59h-375r-3v44",
+     "CVE-2025-66418",
+     "GHSA-gm62-xv2j-4w53"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.14%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.14%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.18%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.18%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.20%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.20%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@2.5.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@2.5.0%2Bcgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-12-13T06:01:48.393Z",
+   "last_updated": "2026-03-17T06:03:51.073Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-w3w6-pcj9-xgmw",
+    "aliases": [
+     "CGA-vgg3-gvpc-fvqw",
+     "CVE-2023-43804",
+     "GHSA-v845-jxx5-vc9f"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/urllib3@1.26.7%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.835Z",
+   "last_updated": "2025-10-23T06:01:32.835Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2026-03-17T06:03:51Z"
+}

@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-eba9c9201a4eb0210ed81aba799273b461e9cc86a94531d643f7b23702beed73",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-v55g-5gjf-6xgh",
+    "aliases": [
+     "CGA-wfhm-8wcx-ghc4",
+     "CVE-2021-29063",
+     "GHSA-f865-m6cq-j9vx"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/mpmath@1.1.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.683Z",
+   "last_updated": "2025-10-23T06:01:32.683Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-10-23T06:01:32Z"
+}

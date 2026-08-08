@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-118e9674b0dbd7d807c42ceef8e97f88350ee5ae76294bf93bf1ac77a60965fc",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-jqqw-x724-9g5v",
+    "aliases": [
+     "CGA-8r46-4grh-qgm4",
+     "CVE-2023-52323",
+     "GHSA-j225-cvw7-qrx7"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pycryptodome@3.17%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.479Z",
+   "last_updated": "2025-10-23T06:01:32.479Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-10-23T06:01:32Z"
+}

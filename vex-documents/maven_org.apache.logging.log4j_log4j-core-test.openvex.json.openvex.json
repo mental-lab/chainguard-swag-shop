@@ -1,0 +1,61 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-24a5ef1412cfe4e73f564e395c509fdbd526255af4fd4531e24eb69c0bc1cc3b",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-23w9-w8f4-82q7",
+    "aliases": [
+     "CGA-wqhw-vh22-jwgm",
+     "CVE-2026-34480",
+     "GHSA-3pxv-7cmr-fjr4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-core-test@2.23.1-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-core-test@2.25.1-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-28T18:02:19.43Z",
+   "last_updated": "2026-07-28T21:03:07.604Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-hh5v-cp2x-7rf6",
+    "aliases": [
+     "CGA-qw63-23v7-p6qc",
+     "CVE-2026-34478",
+     "GHSA-445c-vh5m-36rj"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-core-test@2.23.1-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.logging.log4j/log4j-core-test@2.25.1-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-28T18:02:19.396Z",
+   "last_updated": "2026-07-28T21:03:07.571Z"
+  }
+ ],
+ "timestamp": "2026-07-28T18:02:19Z",
+ "last_updated": "2026-07-28T21:03:07Z"
+}

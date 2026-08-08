@@ -1,0 +1,56 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-b8300dd91b17c7908d6a6dfe0706494adbbb02b3bf036ee8773982c0812339c1",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-966r-jv52-v6mp",
+    "aliases": [
+     "CGA-397v-mwmx-qcj2",
+     "CVE-2020-10683",
+     "GHSA-hwj3-m3p6-hj38"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/dom4j/dom4j@1.6.1-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-15T15:02:03.127Z",
+   "last_updated": "2026-07-15T15:02:03.127Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-cgpp-vx55-c5g5",
+    "aliases": [
+     "CGA-hqm4-wh64-7q6q",
+     "CVE-2018-1000632",
+     "GHSA-6pcc-3rfx-4gpm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/dom4j/dom4j@1.6.1-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/dom4j/dom4j@1.6.1-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-10T00:02:40.854Z",
+   "last_updated": "2026-07-15T15:02:03.092Z"
+  }
+ ],
+ "timestamp": "2026-07-10T00:02:40Z",
+ "last_updated": "2026-07-15T15:02:03Z"
+}

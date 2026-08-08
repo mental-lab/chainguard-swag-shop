@@ -1,0 +1,681 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-f74b909640ea9c0a35fa27501ed29c2a66509643ccc657bc9815fa32b60b65a0",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-36qc-pcmv-ggx4",
+    "aliases": [
+     "CGA-qmm4-hfpf-7hmh",
+     "CVE-2026-22731",
+     "GHSA-8hfc-fq58-r658"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.0-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.3-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.4-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.6-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.7-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.8-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.9-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-13T06:02:06.173Z",
+   "last_updated": "2026-05-14T06:02:56.599Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-45xm-5w9h-mgwx",
+    "aliases": [
+     "CGA-6vgg-qx8j-v46q",
+     "CVE-2024-23672",
+     "GHSA-v682-8vv8-vpwr"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.899Z",
+   "last_updated": "2026-06-05T06:03:09.899Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-46qw-ffm2-95xh",
+    "aliases": [
+     "CGA-pfvr-2rwf-cg7p",
+     "CVE-2026-33871",
+     "GHSA-w9fj-cfpg-grvv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.976Z",
+   "last_updated": "2026-06-05T06:03:09.976Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-46xg-xhj9-p89m",
+    "aliases": [
+     "CGA-6ggh-r2vp-457q",
+     "CVE-2026-40975",
+     "GHSA-m4x9-hx6x-2c43"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-24T06:02:30.507Z",
+   "last_updated": "2026-06-24T06:02:30.507Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-57xg-ccc4-27v5",
+    "aliases": [
+     "CGA-23pp-w78p-76cf",
+     "CVE-2026-42587",
+     "GHSA-f6hv-jmp6-3vwv"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.584Z",
+   "last_updated": "2026-06-05T06:03:09.584Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-62jc-p9fq-gjfj",
+    "aliases": [
+     "CGA-fxw6-vmq6-5gwv",
+     "CVE-2023-46589",
+     "GHSA-fccv-jmmp-qg76"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:10.081Z",
+   "last_updated": "2026-06-05T06:03:10.081Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-6wfw-88m9-69wx",
+    "aliases": [
+     "CGA-7vr7-8qxr-v5r4",
+     "CVE-2026-22737",
+     "GHSA-4773-3jfm-qmx3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:10.008Z",
+   "last_updated": "2026-06-05T06:03:10.008Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-828g-7jrc-8hx3",
+    "aliases": [
+     "CGA-9chh-8q5j-3pcq",
+     "CVE-2024-24549",
+     "GHSA-7w75-32cg-r6g2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.935Z",
+   "last_updated": "2026-06-05T06:03:09.935Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-88ff-7833-982r",
+    "aliases": [
+     "CGA-w4ff-2m4v-j788",
+     "CVE-2022-25857",
+     "GHSA-3mc7-4q67-w48m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:10.043Z",
+   "last_updated": "2026-06-05T06:03:10.043Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9h6m-c4wv-hxvc",
+    "aliases": [
+     "CGA-ff6f-wpxq-25h8",
+     "CVE-2024-50379",
+     "GHSA-5j33-cvvr-w245"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.752Z",
+   "last_updated": "2026-06-05T06:03:09.752Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-chh4-gxrx-99hp",
+    "aliases": [
+     "CGA-jrf8-j5gh-6f8p",
+     "CVE-2023-6481",
+     "GHSA-gm62-rw4g-vrc4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.83Z",
+   "last_updated": "2026-06-05T06:03:09.83Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-f7m3-f5cf-w4v2",
+    "aliases": [
+     "CGA-g939-wc7w-9wcg",
+     "CVE-2024-38819",
+     "GHSA-g5vr-rgqm-vf78"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.617Z",
+   "last_updated": "2026-06-05T06:03:09.617Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fq4v-g3hc-w2c3",
+    "aliases": [
+     "CGA-vrjw-jjcq-h6wm",
+     "CVE-2026-22733",
+     "GHSA-mgvc-8q2h-5pgc"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.7.18-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.0-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.10-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.3-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.4-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.5-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.5-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.6-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.7-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.8-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.9-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:09.199Z",
+   "last_updated": "2026-06-05T06:03:09.655Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fqw5-wh82-2rqr",
+    "aliases": [
+     "CGA-jfvw-f67x-xrrh",
+     "CVE-2024-38816",
+     "GHSA-cx7f-g6mp-7hqm"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.392Z",
+   "last_updated": "2026-06-05T06:03:09.392Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-fv5q-c595-hxrp",
+    "aliases": [
+     "CGA-7h95-gfx9-4jv5",
+     "CVE-2025-22235",
+     "GHSA-rc42-6c7j-7h5r"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.7.18-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.7.18-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:56:09.151Z",
+   "last_updated": "2026-06-05T06:03:09.46Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-h3jp-gg8f-gjfj",
+    "aliases": [
+     "CGA-jg26-97xh-9744",
+     "CVE-2025-55752",
+     "GHSA-wmwf-9ccg-fff5"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.36Z",
+   "last_updated": "2026-06-05T06:03:09.36Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-j3rj-j52g-9r5c",
+    "aliases": [
+     "CGA-jv8r-5vrc-9287",
+     "CVE-2025-41249",
+     "GHSA-jmp9-x22r-554x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.423Z",
+   "last_updated": "2026-06-05T06:03:09.423Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-j99j-35p4-3p8v",
+    "aliases": [
+     "CGA-q9w2-5fvj-m9fm",
+     "CVE-2026-40973",
+     "GHSA-wwpq-f5c3-7hvx"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.4.13-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@3.5.13-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-20T06:02:56.679Z",
+   "last_updated": "2026-06-24T06:02:30.573Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-m2p2-vwgj-jx68",
+    "aliases": [
+     "CGA-pcp8-xw84-x72j",
+     "CVE-2023-44487",
+     "GHSA-qppj-fm5r-hxr3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.488Z",
+   "last_updated": "2026-06-05T06:03:09.488Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-m4hm-qgmp-72jh",
+    "aliases": [
+     "CGA-pxhm-4j32-f4g4",
+     "CVE-2023-42795",
+     "GHSA-g8pj-r55q-5c2v"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.718Z",
+   "last_updated": "2026-06-05T06:03:09.718Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-m985-fwmr-45f5",
+    "aliases": [
+     "CGA-gmw6-3xjc-xf3x",
+     "CVE-2023-6378",
+     "GHSA-vmq6-5m68-f53m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.685Z",
+   "last_updated": "2026-06-05T06:03:09.685Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-mcmg-g265-wpwx",
+    "aliases": [
+     "CGA-xvpq-3fmc-q2jr",
+     "CVE-2025-24813",
+     "GHSA-83qj-6fr2-vhqg"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.791Z",
+   "last_updated": "2026-06-05T06:03:09.791Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-p747-4g5r-fmwp",
+    "aliases": [
+     "CGA-x88f-r7p4-m2wg",
+     "CVE-2023-45648",
+     "GHSA-r6j3-px5g-cq3x"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.52Z",
+   "last_updated": "2026-06-05T06:03:09.52Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-ph83-v5cv-r5hw",
+    "aliases": [
+     "CGA-wwph-fxq5-rj2m",
+     "CVE-2025-55754",
+     "GHSA-vfww-5hm6-hx2j"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.553Z",
+   "last_updated": "2026-06-05T06:03:09.553Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-r3r2-7vw7-5xmr",
+    "aliases": [
+     "CGA-mg2c-38j6-4pxp",
+     "CVE-2022-38749",
+     "GHSA-c4r9-r8fh-9vj2"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.boot/spring-boot-starter-data-cassandra-reactive@2.5.15-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-05T06:03:09.864Z",
+   "last_updated": "2026-06-05T06:03:09.864Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:56:09Z",
+ "last_updated": "2026-06-24T06:02:30Z"
+}

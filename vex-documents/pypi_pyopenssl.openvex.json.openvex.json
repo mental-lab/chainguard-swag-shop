@@ -1,0 +1,111 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-3904ca77e247967c2d05edc6d7a155c79ec5c619eb0fc6ae9dd7a0031ce02423",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-q2r3-8mmw-c8mj",
+    "aliases": [
+     "CGA-qv3q-jpxp-cpmx",
+     "CVE-2026-27459",
+     "GHSA-5pwr-322w-8jr4"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@22.0.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@22.1.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@23.0.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@24.1.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@24.2.1%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@24.3.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@25.3.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-24T00:02:39.964Z",
+   "last_updated": "2026-08-07T15:01:48.995Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-wvff-4xqj-65x2",
+    "aliases": [
+     "CGA-855q-q8qp-fh5c",
+     "CVE-2026-27448",
+     "GHSA-vp96-hxj8-p424"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@22.0.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@22.1.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@23.0.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@24.1.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@24.2.1%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@24.3.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pyopenssl@25.3.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-24T00:02:39.883Z",
+   "last_updated": "2026-08-07T15:01:48.925Z"
+  }
+ ],
+ "timestamp": "2026-07-24T00:02:39Z",
+ "last_updated": "2026-08-07T15:01:48Z"
+}

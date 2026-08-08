@@ -1,0 +1,130 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-86a2dcd078725a47dcd2a5da6706355ecc6493356a4e4a92ff09f131823fb18c",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-4fmf-64g5-p5px",
+    "aliases": [
+     "CGA-gj88-qj5p-j3qr",
+     "CVE-2026-34446",
+     "GHSA-cmw6-hcpp-c6jp"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/onnx@1.18.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:02:58.948Z",
+   "last_updated": "2026-06-25T06:02:58.948Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-5h54-h3cg-6q9h",
+    "aliases": [
+     "CGA-jcqr-x7xr-ch3m",
+     "GHSA-q56x-g2fj-4rj6"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/onnx@1.18.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:02:59.054Z",
+   "last_updated": "2026-06-25T06:02:59.054Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-997w-4jvf-wqh3",
+    "aliases": [
+     "CGA-jv96-x67p-9w72",
+     "CVE-2026-27489",
+     "GHSA-3r9x-f23j-gc73"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/onnx@1.18.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:02:59.106Z",
+   "last_updated": "2026-06-25T06:02:59.106Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-qq2g-vvj4-v56w",
+    "aliases": [
+     "CGA-hjrq-x5p4-76xf",
+     "CVE-2026-34445",
+     "GHSA-538c-55jv-c5g9"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/onnx@1.18.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:02:58.9Z",
+   "last_updated": "2026-06-25T06:02:58.9Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-x453-mq44-cqff",
+    "aliases": [
+     "CGA-r8j8-xfm5-2jxw",
+     "CVE-2026-34447",
+     "GHSA-p433-9wv8-28xj"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/onnx@1.18.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:02:59Z",
+   "last_updated": "2026-06-25T06:02:59Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-xrf2-95m2-h7v5",
+    "aliases": [
+     "CGA-x7fc-8m86-jx94",
+     "CVE-2026-28500",
+     "GHSA-hqmj-h5c6-369m"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/onnx@1.18.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-06-25T06:02:58.847Z",
+   "last_updated": "2026-06-25T06:02:58.847Z"
+  }
+ ],
+ "timestamp": "2026-06-25T06:02:58Z",
+ "last_updated": "2026-06-25T06:02:59Z"
+}

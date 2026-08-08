@@ -1,0 +1,174 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+
+jobs:
+  # ── Scan: Draugr orchestrates Trivy (SCA + IaC), Gitleaks, Semgrep into one
+  #    SARIF report + one verdict. On PRs, "diff" mode posts a sticky
+  #    new-vs-fixed comment and can fail on new findings only. ──
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Draugr security scan
+        id: draugr
+        uses: draugr-dev/draugr@v0.72.0
+        with:
+          saga: draugr.saga.yaml
+          tools: true            # provision cosign-verified scanners on the runner
+          mode: auto             # diff on PRs (sticky new/fixed comment), scan otherwise
+          fail-on: error
+          output: draugr-out
+
+      - name: Upload merged SARIF to code scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.draugr.outputs.sarif }}
+
+      # Grype fs scan produces the JSON the OpenVEX advisor + Rego gate read.
+      # Grype natively understands OpenVEX, so the image scan in
+      # platform-build.yml can suppress findings Chainguard marked status=fixed.
+      - name: Filesystem vulnerability scan (Grype → JSON)
+        uses: anchore/scan-action@v6
+        with:
+          path: .
+          output-format: json
+          output-file: results/fs-scan.json
+          severity-cutoff: negligible
+          fail-build: false
+
+      - name: Upload scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-results
+          path: results/
+
+  unit-and-integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps (Chainguard Libraries PyPI endpoint)
+        env:
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple https://pypi.org/simple
+        run: pip install -r requirements.txt
+
+      - name: Unit tests
+        run: python -m pytest tests/ -v --ignore=tests/e2e
+
+  # ── Advise: suture cross-references findings against Chainguard's OpenVEX
+  #    feed and recommends the exact backport (incl. the same-version +cgr.N
+  #    build no generic tool surfaces). ──
+  remediation-advisor:
+    runs-on: ubuntu-latest
+    needs: scan
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: scan-results
+          path: results/
+
+      - name: Install suture
+        run: |
+          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          sudo install suture /usr/local/bin/
+
+      - name: Generate remediation recommendations from OpenVEX feed
+        run: |
+          suture advise \
+            --scan-dir results/ \
+            --assets security/asset-inventory.yaml \
+            --format markdown --out vex-report.md
+
+      - name: Post recommendation to PR (updates in place on re-run)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- remediation-advisor -->';
+            const body = marker + '\n' + fs.readFileSync('vex-report.md', 'utf8');
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(
+              github.rest.issues.listComments, { owner, repo, issue_number });
+            const existing = comments.find(c => c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment(
+                { owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment(
+                { owner, repo, issue_number, body });
+            }
+
+  # ── Gate: Conftest evaluates policy/vex/remediation.rego (scaffolded by
+  #    `suture policy export`) against the scan. Pure Rego deny rules,
+  #    fail-closed. ──
+  policy-gate:
+    runs-on: ubuntu-latest
+    needs: [scan, unit-and-integration-tests, remediation-advisor]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: scan-results
+          path: results/
+
+      - name: Install Conftest (OPA) + yq + suture
+        run: |
+          CONFTEST_VERSION=0.56.0
+          curl -sSL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin conftest
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          sudo install suture /usr/local/bin/
+          conftest --version && yq --version && suture --version
+
+      - name: Fetch OpenVEX fix cache
+        run: suture fetch --out data/vex-cache.json
+
+      # Build the gate inputs with jq/yq:
+      #   scan.json  Grype matches[] flattened to the {Results:[...]} the Rego reads
+      #   vex.json   fix cache nested under data.vex_cache
+      #   assets.json  inventory nested under data.assets.assets
+      - name: Reshape policy inputs (jq / yq)
+        run: |
+          mkdir -p policy-inputs
+          jq '{Results:[{Target:"requirements.txt", Vulnerabilities:[.matches[] |
+              {VulnerabilityID:.vulnerability.id, Severity:.vulnerability.severity,
+               PkgName:.artifact.name, InstalledVersion:.artifact.version}]}]}' \
+            results/fs-scan.json > policy-inputs/scan.json
+          jq '{vex_cache: .}' data/vex-cache.json > policy-inputs/vex.json
+          yq -o=json '{"assets": .}' security/asset-inventory.yaml > policy-inputs/assets.json
+
+      - name: Policy gate — deny internet-facing Critical/High with a Chainguard fix
+        run: |
+          conftest test policy-inputs/scan.json \
+            --policy policy/vex/remediation.rego \
+            --data policy-inputs/assets.json \
+            --data policy-inputs/vex.json

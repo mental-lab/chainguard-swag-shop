@@ -1,0 +1,131 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-b9511fae3948f2d2098ac98a841a4023b21b32ae6bb28d538e37365da2c236a0",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-3mj7-wxw9-qjx2",
+    "aliases": [
+     "CGA-j87j-7fw6-jfqx",
+     "CVE-2026-22732",
+     "GHSA-mf92-479x-3373"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.14-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.14-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.8.16-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@6.3.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@6.4.13-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:51:30.674Z",
+   "last_updated": "2026-05-08T16:43:02.342Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-c36h-ghp9-8gfg",
+    "aliases": [
+     "CGA-j2h4-853h-52pc",
+     "CVE-2024-22257",
+     "GHSA-f3jh-qvm4-mg39"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.11-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.11-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T16:43:02.159Z",
+   "last_updated": "2026-05-08T16:43:02.159Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-xfmg-2v68-5jqc",
+    "aliases": [
+     "CGA-6g73-q3c3-92w7",
+     "CVE-2024-38821",
+     "GHSA-c4q5-6c82-3qpw"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.11-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T16:43:02.254Z",
+   "last_updated": "2026-05-08T16:43:02.254Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-xj7f-98w6-pj9q",
+    "aliases": [
+     "CGA-35r4-qv8v-4x4v",
+     "CVE-2025-22228",
+     "GHSA-mg83-c7gq-rv5c"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.11-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.11-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.11-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-web@5.7.14-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T06:03:30.486Z",
+   "last_updated": "2026-05-08T16:43:02.426Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:51:30Z",
+ "last_updated": "2026-05-08T16:43:02Z"
+}

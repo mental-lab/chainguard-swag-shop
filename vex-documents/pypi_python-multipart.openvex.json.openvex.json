@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-58cfe5964a7541e6fdd15e8be0dee12837cbaaf33768e1d207fa904ca3a69da3",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-j52h-jhxq-mrpm",
+    "aliases": [
+     "CGA-wq5w-v398-m48r",
+     "CVE-2024-24762",
+     "GHSA-2jv5-9r88-3w3p"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/python-multipart@0.0.6%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.874Z",
+   "last_updated": "2025-10-23T06:01:32.874Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-10-23T06:01:32Z"
+}

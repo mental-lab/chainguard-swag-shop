@@ -1,0 +1,61 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-3945b1ac26ff781b11de42b50cd355134c484c723670837867fc7ed11e2929f8",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-8f9m-92rm-mg8m",
+    "aliases": [
+     "CGA-j68w-9qcm-867q",
+     "CVE-2025-59420",
+     "GHSA-9ggr-2464-2j32"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/authlib@1.6.1%2Bcgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.6Z",
+   "last_updated": "2025-10-23T06:01:32.6Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-r3r5-c2h8-jh5p",
+    "aliases": [
+     "CGA-mh3x-7cfq-533x",
+     "CVE-2025-61920",
+     "GHSA-pq5p-34cr-23v9"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/authlib@1.6.1%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/authlib@1.6.1%2Bcgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/authlib@1.6.4%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.648Z",
+   "last_updated": "2025-10-23T06:01:32.648Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-10-23T06:01:32Z"
+}

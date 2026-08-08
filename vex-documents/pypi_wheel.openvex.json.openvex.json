@@ -1,0 +1,70 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-d3dc63e010f90f419710d060ee97eb5ec03c72e773e121dc0126227932c62ce7",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-g96h-wvvv-q88f",
+    "aliases": [
+     "CGA-w2x3-fvxx-qqf5",
+     "CVE-2026-24049",
+     "GHSA-8rrh-rw8j-w5fx"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/wheel@0.45.1%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-16T06:02:40.029Z",
+   "last_updated": "2026-05-16T06:02:40.029Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-rv2j-r4xq-53p8",
+    "aliases": [
+     "CGA-q6cv-8f82-fw8x",
+     "GHSA-qwmp-2cf2-g9g6"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/wheel@0.34.2%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/wheel@0.35.1%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/wheel@0.36.2%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/wheel@0.37.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/wheel@0.37.1%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.559Z",
+   "last_updated": "2025-10-23T06:01:32.559Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2026-05-16T06:02:40Z"
+}

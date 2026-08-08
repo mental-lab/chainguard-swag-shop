@@ -1,0 +1,101 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-e70c37e18635b030910b9265fb1912e978951b03cf37497d3c37811855931d04",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-p33j-25fq-7jx4",
+    "aliases": [
+     "CGA-93xh-fprr-ggwg",
+     "CVE-2024-28219",
+     "GHSA-44wm-f244-xhp3"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pillow@10.2.0%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-12-04T06:01:31.371Z",
+   "last_updated": "2025-12-04T06:01:31.371Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-p5p5-4cg9-7w3c",
+    "aliases": [
+     "CGA-wcx6-xfwm-2p5p",
+     "CVE-2025-48379",
+     "GHSA-xg8h-j46f-w952"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pillow@11.2.1%2Bcgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.44Z",
+   "last_updated": "2025-10-23T06:01:32.44Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-qj74-pjh7-qxmf",
+    "aliases": [
+     "CGA-p8qm-3j6v-j8xp",
+     "CVE-2023-50447",
+     "GHSA-3f63-hfp8-52jq"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pillow@7.0.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pillow@8.4.0%2Bcgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pillow@8.4.0%2Bcgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-10-23T06:01:32.402Z",
+   "last_updated": "2025-11-30T06:01:35.78Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-v587-68x3-qwqr",
+    "aliases": [
+     "CGA-4v2j-w7vm-9pwj",
+     "CVE-2022-22817",
+     "GHSA-8vj2-vxx3-667w"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:pypi/pillow@8.4.0%2Bcgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2025-11-30T06:01:35.698Z",
+   "last_updated": "2025-11-30T06:01:35.698Z"
+  }
+ ],
+ "timestamp": "2025-10-23T06:01:32Z",
+ "last_updated": "2025-12-04T06:01:31Z"
+}

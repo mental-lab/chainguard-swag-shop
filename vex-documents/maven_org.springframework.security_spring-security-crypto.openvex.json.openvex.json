@@ -1,0 +1,131 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-ce3207c0532186f02cd3a237cf5001dfbd58a1a136e8f3d8fcffdabaab3cdb94",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-57m6-x3xf-x485",
+    "aliases": [
+     "CGA-j87j-7fw6-jfqx",
+     "CVE-2026-22732",
+     "GHSA-mf92-479x-3373"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.14-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.14-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.8.16-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@6.3.10-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@6.4.13-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-04-23T07:51:30.489Z",
+   "last_updated": "2026-05-08T16:43:01.087Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-9q6v-q5rm-vgwq",
+    "aliases": [
+     "CGA-35r4-qv8v-4x4v",
+     "CVE-2025-22228",
+     "GHSA-mg83-c7gq-rv5c"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.11-0.cgr.1"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.11-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.11-0.cgr.3"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.14-0.cgr.2"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T06:03:31.383Z",
+   "last_updated": "2026-05-08T16:43:00.845Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-g3p9-wxhf-7p7c",
+    "aliases": [
+     "CGA-6g73-q3c3-92w7",
+     "CVE-2024-38821",
+     "GHSA-c4q5-6c82-3qpw"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.11-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T16:43:01.001Z",
+   "last_updated": "2026-05-08T16:43:01.001Z"
+  },
+  {
+   "vulnerability": {
+    "name": "CGA-jpg9-2fgr-65cq",
+    "aliases": [
+     "CGA-j2h4-853h-52pc",
+     "CVE-2024-22257",
+     "GHSA-f3jh-qvm4-mg39"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.11-0.cgr.2"
+     }
+    },
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.springframework.security/spring-security-crypto@5.7.11-0.cgr.3"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-05-08T16:43:00.921Z",
+   "last_updated": "2026-05-08T16:43:00.921Z"
+  }
+ ],
+ "timestamp": "2026-04-23T07:51:30Z",
+ "last_updated": "2026-05-08T16:43:01Z"
+}

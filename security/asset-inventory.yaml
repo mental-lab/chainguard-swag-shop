@@ -1,0 +1,14 @@
+# Asset context consumed by the remediation policy (Rego + Python advisor).
+# Modeled on GitLab's own "properties.yml" categorization pattern:
+#   - categories[]     hard-coded policy-driving categories
+#   - system::name     scoped-label-style software-system grouping
+# This is what turns CVSS sorting into risk-based prioritization.
+version: 1
+assets:
+  swag-shop:
+    tier: tier-1
+    internet_exposed: true
+    environment: production
+    # A public e-commerce storefront handles customer identity + payment
+    # adjacency, so it carries red_data even though checkout here is a demo.
+    categories: [product, website, external, red_data, system::storefront]

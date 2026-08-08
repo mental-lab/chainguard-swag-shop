@@ -1,0 +1,31 @@
+{
+ "@context": "https://openvex.dev/ns/v0.2.0",
+ "@id": "https://openvex.dev/docs/public/vex-21ca505a5a067e6d149482f4b6cdd6be0a9af2f143de84c64dda61eba92341c3",
+ "author": "Chainguard Team",
+ "version": 1,
+ "supplier": "Chainguard",
+ "statements": [
+  {
+   "vulnerability": {
+    "name": "CGA-qg46-pcm9-jvcv",
+    "aliases": [
+     "CGA-w3rq-3g72-m7qg",
+     "CVE-2021-23926",
+     "GHSA-mw3r-pfmg-xp92"
+    ]
+   },
+   "products": [
+    {
+     "identifiers": {
+      "purl": "pkg:maven/org.apache.xmlbeans/xmlbeans@2.6.0-0.cgr.1"
+     }
+    }
+   ],
+   "status": "fixed",
+   "timestamp": "2026-07-21T00:02:19.165Z",
+   "last_updated": "2026-07-21T00:02:19.165Z"
+  }
+ ],
+ "timestamp": "2026-07-21T00:02:19Z",
+ "last_updated": "2026-07-21T00:02:19Z"
+}

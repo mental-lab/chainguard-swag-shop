@@ -111,8 +111,21 @@ jobs:
             > evidence/provenance.json
           echo "Provenance extracted"
 
-      # ── 6. Grype scan — fail on critical or high CVEs ──
-      - name: Grype vulnerability scan
+      # ── 6. Grype scan — VEX-aware, fail on residual critical/high ──
+      # Grype natively consumes OpenVEX documents and drops findings Chainguard
+      # has marked status=fixed, so the gate measures the residual CVE surface
+      # (what the team still owns), not the raw NVD match list.
+      - name: Install suture
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        run: |
+          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          sudo install suture /usr/local/bin/
+
+      - name: Fetch Chainguard OpenVEX documents
+        if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
+        run: suture fetch --write-docs vex-documents
+
+      - name: Grype vulnerability scan (VEX-aware)
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
         uses: anchore/scan-action@3343887d815d7b07465f6fdcd395bd66508d486a # v3
         env:
@@ -123,6 +136,7 @@ jobs:
           severity-cutoff: high
           output-format: json
           output-file: evidence/grype-results.json
+          vex: vex-documents/
 
       # ── 7. Copy build config into evidence bundle ──
       - name: Add build config to evidence bundle

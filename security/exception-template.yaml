@@ -1,0 +1,17 @@
+# Template for a compensating-control exception. Files live in
+# security-evidence/exceptions/ and MUST have an expiry — the policy gate
+# treats expired exceptions as non-existent (fail-closed).
+id: EXC-0000
+vulnerability: CVE-20XX-XXXXX
+severity: HIGH
+affected_service: swag-shop
+reason: >
+  Why upgrade/backport/replacement is not currently viable.
+compensating_controls:
+  - waf-rule-blocking-exploit-path
+  - network-segmentation
+residual_risk: low # must be justified
+approved_by: security-engineering
+created: "2026-01-01"
+expires: "2026-04-01" # hard expiry; renewal requires re-approval
+review_cadence_days: 30

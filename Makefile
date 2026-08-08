@@ -136,6 +136,7 @@ switch-cgr: ## Use Chainguard PyPI as primary and reinstall deps
 		'timeout = 30' \
 	> pip.conf
 	@test -d "$(VENV)" || { echo "Virtual environment not found. Run '\''make install'\'' first."; exit 1; }
+	@cp pip.conf $(VENV)/pip.conf
 	@echo "Reinstalling dependencies..."
 	@$(PY) -m pip install --upgrade pip
 	@$(PY) -m pip install --no-cache-dir --force-reinstall -r requirements.txt
@@ -153,6 +154,7 @@ switch-pypi: ## Use regular PyPI only and reinstall deps
 		'timeout = 30' \
 	> pip.conf
 	@test -d "$(VENV)" || { echo "Virtual environment not found. Run 'make install' first."; exit 1; }
+	@cp pip.conf $(VENV)/pip.conf
 	@echo "Reinstalling dependencies..."
 	@$(PY) -m pip install --upgrade pip
 	@$(PY) -m pip install --no-cache-dir --force-reinstall -r requirements.txt
