@@ -182,7 +182,10 @@ jobs:
 
       - name: Policy gate — deny internet-facing Critical/High with a Chainguard fix
         run: |
+          # --all-namespaces: conftest only evaluates the `main` package by
+          # default; our policy is `package remediation`.
           conftest test policy-inputs/scan.json \
             --policy policy/vex/remediation.rego \
             --data policy-inputs/assets.json \
-            --data policy-inputs/vex.json
+            --data policy-inputs/vex.json \
+            --all-namespaces
