@@ -1,24 +1,31 @@
 # Draugr descriptor for the swag shop. One file declares what the app is and
 # how exposed it is; Draugr runs the right scanners and produces one SARIF
 # verdict. This replaces hand-wiring Trivy/Grype steps in CI.
-name: chainguard-swag-shop
+release:
+  name: chainguard-swag-shop
+  version: "1.0"
+
+# Which controls to run. Draugr orchestrates the underlying OSS scanners.
+config:
+  controllers:
+    sca:
+      enabled: true      # dependency/CVE scan (Trivy fs) — the library + OS findings
+    iac:
+      enabled: true      # Dockerfile / config checks (Trivy)
+    secrets:
+      enabled: true      # Gitleaks
+    sast:
+      enabled: true      # Semgrep
 
 # The application: a Python/Flask storefront that builds to container images.
 components:
   - name: swag-shop
     # Exposure + criticality drive finding prioritization (P1-P4), so a
     # Critical in an internet-facing storefront outranks one in a dev tool.
-    exposure: internet
-    criticality: high
-    paths:
-      - .
-
-# Which controls to run. Draugr orchestrates the underlying OSS scanners.
-controls:
-  sca: true        # dependency/CVE scan (Trivy fs) — the library + OS findings
-  iac: true        # Dockerfile / config checks (Trivy)
-  secrets: true    # Gitleaks
-  sast: true       # Semgrep
+    exposure: public
+    criticality: critical
+    repositories:
+      - url: https://github.com/mental-lab/chainguard-swag-shop.git
 
 # Gate + reporting are handled by the Draugr GitHub Action (mode/fail-on inputs
 # in security.yml) and by Conftest evaluating policy/vex/remediation.rego.

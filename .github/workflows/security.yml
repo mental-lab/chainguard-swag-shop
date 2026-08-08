@@ -64,10 +64,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install deps (Chainguard Libraries PyPI endpoint)
+      # Main is the vulnerable-before state: deps come from public PyPI. The
+      # demo/chainguard-fix branch pins the Chainguard remediated index.
+      - name: Install deps
         env:
-          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
-          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple https://pypi.org/simple
+          PIP_INDEX_URL: https://pypi.org/simple
         run: pip install -r requirements.txt
 
       - name: Unit tests
