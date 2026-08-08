@@ -49,6 +49,15 @@ jobs:
         with:
           sarif_file: ${{ steps.draugr.outputs.sarif }}
 
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Draugr security scan"
+            echo
+            [ -f draugr-out/report.md ] && cat draugr-out/report.md || echo "No markdown report produced — see the step logs."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # Grype fs scan produces the JSON the OpenVEX advisor + Rego gate read.
       # Grype natively understands OpenVEX, so the image scan in
       # platform-build.yml can suppress findings Chainguard marked status=fixed.
@@ -115,6 +124,17 @@ jobs:
             --scan-dir results/ \
             --assets security/asset-inventory.yaml \
             --format markdown --out vex-report.md
+          # PRs get the sticky comment below; on pushes the job summary
+          # carries the same content.
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Chainguard remediation advisor"
+            echo
+            [ -f vex-report.md ] && cat vex-report.md || echo "No advisor report produced — see the step logs."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Post recommendation to PR (updates in place on re-run)
         if: github.event_name == 'pull_request'
@@ -184,8 +204,25 @@ jobs:
         run: |
           # --all-namespaces: conftest only evaluates the `main` package by
           # default; our policy is `package remediation`.
+          set +e
           conftest test policy-inputs/scan.json \
             --policy policy/vex/remediation.rego \
             --data policy-inputs/assets.json \
             --data policy-inputs/vex.json \
-            --all-namespaces
+            --all-namespaces | tee gate-output.txt
+          status=${PIPESTATUS[0]}
+          set -e
+          {
+            echo "## Policy gate"
+            echo
+            if [ "$status" -eq 0 ]; then
+              echo ":white_check_mark: **ALLOWED** — no internet-facing Critical/High finding has an unapplied Chainguard fix."
+            else
+              echo ":no_entry: **DENIED** — remediation required before merge:"
+            fi
+            echo
+            echo '```'
+            cat gate-output.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"

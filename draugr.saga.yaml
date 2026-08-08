@@ -7,6 +7,13 @@ release:
 
 # Which controls to run. Draugr orchestrates the underlying OSS scanners.
 config:
+  # A markdown report alongside the SARIF — security.yml appends it to the
+  # GitHub job summary so the verdict is visible without opening the logs.
+  reports:
+    - format: markdown
+  publishers:
+    - kind: file
+      dir: ./draugr-out
   controllers:
     sca:
       enabled: true      # dependency/CVE scan (Trivy fs) — the library + OS findings
