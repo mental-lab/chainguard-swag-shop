@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read            # code-scanning wait-for-processing polls the run
   security-events: write
   pull-requests: write
 
