@@ -29,7 +29,7 @@ jobs:
       # (or disappear, on the Chainguard branch). Runs here because the
       # image only exists on this runner — it is never pushed to a registry.
       - name: Image vulnerability scan (Trivy → JSON)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: swag-shop:ci
           format: json
@@ -39,6 +39,8 @@ jobs:
       - name: Image scan summary
         if: always()
         run: |
+          # tee: same markdown goes to the job summary and to a file the
+          # sticky-PR-comment step below reads.
           {
             echo "## Image scan — swag-shop:ci"
             echo
@@ -56,7 +58,30 @@ jobs:
                 else ($v[] | "| \(.Severity) | \(.PkgName) | \(.VulnerabilityID) | \(.InstalledVersion) | \(.FixedVersion // "—") |")
                 end
             ' image-scan.json
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee image-scan-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      # GitLab-MR-widget equivalent: the OS/image findings inline on the PR,
+      # updated in place on re-runs. This is where the Chainguard branch's
+      # before/after diff becomes visible without opening any logs.
+      - name: Comment image scan on PR (updates in place on re-run)
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (!fs.existsSync('image-scan-summary.md')) return;
+            const marker = '<!-- image-scan -->';
+            const body = marker + '\n' + fs.readFileSync('image-scan-summary.md', 'utf8');
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const comments = await github.paginate(
+              github.rest.issues.listComments, { owner, repo, issue_number });
+            const existing = comments.find(c => c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
 
       - name: Upload image scan
         if: always()
