@@ -1,5 +1,7 @@
 
 # syntax=docker/dockerfile:1
+# Intentional vulnerable baseline for the demo: upstream Debian-based image
+# with PyPI pins. The remediated state lives on demo/chainguard-fix.
 FROM python:3.12-slim
 WORKDIR /app
 
