@@ -25,6 +25,46 @@ jobs:
           touch empty.netrc
           docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
 
+      # The image is the OS story: this is where base-image CVEs show up
+      # (or disappear, on the Chainguard branch). Runs here because the
+      # image only exists on this runner — it is never pushed to a registry.
+      - name: Image vulnerability scan (Trivy → JSON)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: swag-shop:ci
+          format: json
+          output: image-scan.json
+          exit-code: "0"
+
+      - name: Image scan summary
+        if: always()
+        run: |
+          {
+            echo "## Image scan — swag-shop:ci"
+            echo
+            jq -r '
+              ([.Results[].Vulnerabilities // [] | .[]]) as $v |
+              "**\($v | length) findings** — " +
+              (["CRITICAL","HIGH","MEDIUM","LOW"] | map(. as $sev | "\($sev): \($v | map(select(.Severity == $sev)) | length)") | join(" · "))
+            ' image-scan.json
+            echo
+            echo "| Severity | Package | CVE | Installed | Fixed |"
+            echo "| --- | --- | --- | --- | --- |"
+            jq -r '
+              [.Results[].Vulnerabilities // [] | .[] | select(.Severity == "CRITICAL" or .Severity == "HIGH")] as $v
+              | if ($v | length) == 0 then "| — | — | _no Critical/High findings_ | — | — |"
+                else ($v[] | "| \(.Severity) | \(.PkgName) | \(.VulnerabilityID) | \(.InstalledVersion) | \(.FixedVersion // "—") |")
+                end
+            ' image-scan.json
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload image scan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-scan
+          path: image-scan.json
+
   # ── E2E: Playwright smoke tests against the freshly built container. ──
   e2e-smoke:
     runs-on: ubuntu-latest
