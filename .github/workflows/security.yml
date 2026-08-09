@@ -38,7 +38,7 @@ jobs:
 
       - name: Install E2E deps
         run: |
-          pip install -r requirements-e2e.txt
+          pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
 
       - name: Start app container
