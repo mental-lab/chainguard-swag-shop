@@ -21,9 +21,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build app image
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
         run: |
-          touch empty.netrc
-          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > netrc.ci
+          docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
+          rm netrc.ci
 
       # The image is the OS story: this is where base-image CVEs show up
       # (or disappear, on the Chainguard branch). Runs here because the
@@ -101,15 +108,29 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Configure Chainguard Libraries auth
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > ~/.netrc
+          chmod 600 ~/.netrc
+
       - name: Install E2E deps
         run: |
           pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
 
       - name: Start app container
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
         run: |
-          touch empty.netrc
-          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          printf '%s' "$CHAINGUARD_NETRC" > netrc.ci
+          docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
+          rm netrc.ci
           docker run -d --name app -p 8000:8000 \
             -e FLASK_ENV=production -e SECRET_KEY=test-secret-for-e2e \
             swag-shop:ci
@@ -137,7 +158,11 @@ jobs:
   #    new-vs-fixed comment and can fail on new findings only. ──
   scan:
     runs-on: ubuntu-latest
-    needs: [build, e2e-smoke, unit-and-integration-tests]
+    # No `needs:` — the fs scan operates on the repo, not the image. Keeping
+    # this independent means the advisor + gate still report the library
+    # story even when the image build is blocked (e.g. Libraries auth not
+    # yet provisioned).
+    needs: []
     steps:
       - uses: actions/checkout@v4
 
@@ -206,12 +231,21 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Main is the vulnerable-before state: deps come from public PyPI. The
-      # demo/chainguard-fix branch pins the Chainguard remediated index.
+      # Chainguard Libraries carries the +cgr.N backport builds; PyPI is the
+      # fallback for everything else. Auth comes from ~/.netrc below.
       - name: Install deps
         env:
-          PIP_INDEX_URL: https://pypi.org/simple
-        run: pip install -r requirements.txt
+          PIP_INDEX_URL: https://libraries.cgr.dev/python/simple
+          PIP_EXTRA_INDEX_URL: https://pypi.org/simple
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > ~/.netrc
+          chmod 600 ~/.netrc
+          pip install -r requirements.txt
 
       - name: Unit tests
         run: python -m pytest tests/ -v --ignore=tests/e2e

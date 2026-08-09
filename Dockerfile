@@ -1,6 +1,8 @@
-
 # syntax=docker/dockerfile:1
-FROM python:3.12-slim
+# Chainguard OS: hardened, minimal Python image. Public for the demo; swap
+# to cgr.dev/vulnfreeish.dev/python (Custom Assembly) once entitled.
+# Note: no shell, no apt — the netrc build secret carries Libraries auth.
+FROM cgr.dev/chainguard/python:latest-dev
 WORKDIR /app
 
 # Copy pip configuration
