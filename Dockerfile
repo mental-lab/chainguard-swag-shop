@@ -14,7 +14,7 @@ ENV PIP_NO_INPUT=1 \
 # Create venv
 RUN python3 -m venv "$VIRTUAL_ENV" && \
     mkdir -p /home/nonroot && \
-    chown nonroot:nonroot /home/nonroot
+    chown 65532:65532 /home/nonroot
 
 COPY requirements.txt /tmp/requirements.txt
 
