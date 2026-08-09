@@ -13,11 +13,62 @@ permissions:
   pull-requests: write
 
 jobs:
+  # ── Build: compile-stage gate. The Dockerfile mounts a netrc build secret
+  #    unconditionally; main pulls from public PyPI so an empty file
+  #    satisfies the mount. ──
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app image
+        run: |
+          touch empty.netrc
+          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+
+  # ── E2E: Playwright smoke tests against the freshly built container. ──
+  e2e-smoke:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install E2E deps
+        run: |
+          pip install -r requirements-e2e.txt
+          playwright install --with-deps chromium
+
+      - name: Start app container
+        run: |
+          touch empty.netrc
+          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          docker run -d --name app -p 8000:8000 \
+            -e FLASK_ENV=production -e SECRET_KEY=test-secret-for-e2e \
+            swag-shop:ci
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8000/ >/dev/null && exit 0
+            sleep 2
+          done
+          echo "App did not become healthy" >&2
+          docker logs app
+          exit 1
+
+      - name: Smoke tests (headless Chromium)
+        run: python -m pytest tests/e2e/test_smoke.py -v --browser chromium --base-url http://localhost:8000
+
+      - name: App logs on failure
+        if: failure()
+        run: docker logs app
+
   # ── Scan: Draugr orchestrates Trivy (SCA + IaC), Gitleaks, Semgrep into one
   #    SARIF report + one verdict. On PRs, "diff" mode posts a sticky
   #    new-vs-fixed comment and can fail on new findings only. ──
   scan:
     runs-on: ubuntu-latest
+    needs: [build, e2e-smoke, unit-and-integration-tests]
     steps:
       - uses: actions/checkout@v4
 
