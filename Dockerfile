@@ -1,8 +1,9 @@
 # syntax=docker/dockerfile:1
-# Chainguard OS: hardened, minimal Python image. Public for the demo; swap
-# to cgr.dev/vulnfreeish.dev/python (Custom Assembly) once entitled.
-# Note: no shell, no apt — the netrc build secret carries Libraries auth.
-FROM cgr.dev/chainguard/python:latest-dev
+# Chainguard OS: the org's Custom Assembly Python image. Floating `latest`
+# on purpose — every CI run compares the *current* upstream baseline against
+# the *current* Chainguard image, so the diff never goes stale.
+# Pull auth comes from chainctl OIDC in CI; pip auth from the netrc secret.
+FROM cgr.dev/vulnfreeish.dev/python:latest
 WORKDIR /app
 
 # Copy pip configuration

@@ -18,8 +18,23 @@ jobs:
   #    satisfies the mount. ──
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write    # chainctl OIDC — no stored registry secret needed
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
+
+      # Pulling cgr.dev/vulnfreeish.dev/* requires registry auth. OIDC via
+      # the CHAINGUARD_IDENTITY var — no long-lived secret in the repo.
+      - name: Authenticate to cgr.dev
+        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
+        with:
+          identity: ${{ vars.CHAINGUARD_IDENTITY }}
+
+      - name: Docker login cgr.dev
+        run: chainctl auth token | docker login cgr.dev -u oauth2accesstoken --password-stdin
+
       - name: Build app image
         env:
           CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
@@ -101,6 +116,9 @@ jobs:
   e2e-smoke:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      id-token: write    # chainctl OIDC for the cgr.dev image pull
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -123,6 +141,14 @@ jobs:
         run: |
           pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
+
+      - name: Authenticate to cgr.dev
+        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
+        with:
+          identity: ${{ vars.CHAINGUARD_IDENTITY }}
+
+      - name: Docker login cgr.dev
+        run: chainctl auth token | docker login cgr.dev -u oauth2accesstoken --password-stdin
 
       - name: Start app container
         env:
