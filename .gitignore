@@ -82,3 +82,9 @@ trace.zip
 *.webm
 .playwright/
 docs/workshops/
+
+# Demo materials (local only)
+SETUP.md
+PRESENTER_SCRIPT.md
+PLAN.md
+DEMO_CRITERIA.md

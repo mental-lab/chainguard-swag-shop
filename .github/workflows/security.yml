@@ -63,6 +63,10 @@ jobs:
         if: failure()
         run: docker logs app
 
+      - name: Stop app container
+        if: always()
+        run: docker rm -f app
+
   # ── Scan: Draugr orchestrates Trivy (SCA + IaC), Gitleaks, Semgrep into one
   #    SARIF report + one verdict. On PRs, "diff" mode posts a sticky
   #    new-vs-fixed comment and can fail on new findings only. ──
