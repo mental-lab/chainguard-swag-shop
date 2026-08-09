@@ -121,9 +121,9 @@ jobs:
           curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
 
-      - name: Fetch Chainguard OpenVEX documents
+      - name: Fetch Chainguard OpenVEX documents (scoped to the image's SBOM)
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
-        run: suture fetch --write-docs vex-documents
+        run: suture fetch --sbom evidence/sbom.json --write-docs vex-documents
 
       - name: Grype vulnerability scan (VEX-aware)
         if: steps.check-config.outputs.skip == 'false' && steps.build.outputs.skipped != 'true'
