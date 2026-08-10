@@ -52,7 +52,7 @@ jobs:
 
       - name: Install suture
         run: |
-          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.3.2/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
 
       # OpenVEX docs for the pinned packages. The image scan consumes them to
@@ -347,7 +347,7 @@ jobs:
 
       - name: Install suture
         run: |
-          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.3.2/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
 
       - name: Generate remediation recommendations from OpenVEX feed
@@ -420,7 +420,7 @@ jobs:
             | sudo tar -xz -C /usr/local/bin conftest
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
-          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.3.2/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
           conftest --version && yq --version && suture --version
 
