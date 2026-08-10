@@ -1,10 +1,12 @@
 # syntax=docker/dockerfile:1
-# Chainguard OS: the org's Custom Assembly Python image. Floating `latest`
-# on purpose — every CI run compares the *current* upstream baseline against
-# the *current* Chainguard image, so the diff never goes stale.
+# Chainguard OS: the org's Custom Assembly Python image, pinned to the 3.12
+# stream (tags float within the minor version — patches land automatically).
 # Multi-stage: the runtime image has no shell, so deps are built in the
 # -dev variant and the venv is copied into the minimal runtime image.
-FROM cgr.dev/vulnfreeish.dev/python:latest-dev AS builder
+# Pinned to 3.12: `latest` floated to Python 3.14, where the pinned Flask
+# 2.2.5 crashes (pkgutil.get_loader was removed) — interpreter moves are
+# their own change, not part of the vulnerability remediation.
+FROM cgr.dev/vulnfreeish.dev/python:3.12-dev AS builder
 WORKDIR /app
 
 USER root
@@ -32,7 +34,7 @@ RUN --mount=type=secret,id=netrc,target=/root/.netrc \
     pip install --no-cache-dir --force-reinstall -r /tmp/requirements.txt && \
     chown -R 65532:65532 /home/nonroot
 
-FROM cgr.dev/vulnfreeish.dev/python:latest
+FROM cgr.dev/vulnfreeish.dev/python:3.12
 WORKDIR /app
 
 ENV PIP_NO_INPUT=1 \
