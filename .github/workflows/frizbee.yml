@@ -1,8 +1,8 @@
 name: Frizbee — Pin Actions to commit SHAs
 
 on:
-  schedule:
-    - cron: "0 6 * * 1"  # Weekly on Monday at 6am UTC
+  # Manual-only: schedule removed for the demo period — run by hand when
+  # actions change, no weekly PR noise.
   workflow_dispatch:
 
 permissions:
