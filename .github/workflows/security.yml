@@ -140,6 +140,9 @@ jobs:
           chmod 600 ~/.netrc
 
       - name: Install E2E deps
+        env:
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple
         run: |
           pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
@@ -347,10 +350,19 @@ jobs:
   #    fail-closed. ──
   policy-gate:
     runs-on: ubuntu-latest
-    needs: [scan, unit-and-integration-tests, remediation-advisor]
+    needs: [build, scan, unit-and-integration-tests, remediation-advisor]
     if: always()
     steps:
       - uses: actions/checkout@v4
+
+      # The gate evaluates the IMAGE scan (what actually ships), not the
+      # manifest scan: pip dist-info preserves the +cgr.N local segment, so
+      # an applied backport reads as e.g. werkzeug 3.0.2+cgr.1 — while the
+      # manifest scan strips it and can never prove the fix landed.
+      - uses: actions/download-artifact@v4
+        with:
+          name: image-scan
+          path: results/
 
       - uses: actions/download-artifact@v4
         with:
@@ -372,16 +384,20 @@ jobs:
         run: suture fetch --out data/vex-cache.json
 
       # Build the gate inputs with jq/yq:
-      #   scan.json  Grype matches[] flattened to the {Results:[...]} the Rego reads
+      #   scan.json  Trivy image scan trimmed to the {Results:[...]} the Rego reads
       #   vex.json   fix cache nested under data.vex_cache
       #   assets.json  inventory nested under data.assets.assets
       - name: Reshape policy inputs (jq / yq)
         run: |
           mkdir -p policy-inputs
-          jq '{Results:[{Target:"requirements.txt", Vulnerabilities:[.matches[] |
-              {VulnerabilityID:.vulnerability.id, Severity:.vulnerability.severity,
-               PkgName:.artifact.name, InstalledVersion:.artifact.version}]}]}' \
-            results/fs-scan.json > policy-inputs/scan.json
+          if [ ! -f results/image-scan.json ]; then
+            echo "image-scan.json missing — image build is a gate prerequisite (fail-closed)" >&2
+            exit 1
+          fi
+          jq '{Results:[.Results[] | {Target, Vulnerabilities:
+              ((.Vulnerabilities // []) | map({VulnerabilityID, Severity,
+               PkgName, InstalledVersion}))}]}' \
+            results/image-scan.json > policy-inputs/scan.json
           jq '{vex_cache: .}' data/vex-cache.json > policy-inputs/vex.json
           yq -o=json '{"assets": .}' security/asset-inventory.yaml > policy-inputs/assets.json
 
