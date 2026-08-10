@@ -18,18 +18,43 @@ jobs:
   #    satisfies the mount. ──
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Build app image
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # Pulling cgr.dev/vulnfreeish.dev/* requires registry auth. Pull token
+      # (repository=oci, registry.pull on the org) stored as repo secrets —
+      # starter orgs can't create assumable identities, so OIDC is out.
+      - name: Docker login cgr.dev
+        env:
+          CHAINGUARD_REGISTRY_USER: ${{ secrets.CHAINGUARD_REGISTRY_USER }}
+          CHAINGUARD_REGISTRY_TOKEN: ${{ secrets.CHAINGUARD_REGISTRY_TOKEN }}
         run: |
-          touch empty.netrc
-          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          if [ -z "$CHAINGUARD_REGISTRY_TOKEN" ]; then
+            echo "CHAINGUARD_REGISTRY_TOKEN secret required: this branch pulls cgr.dev/vulnfreeish.dev/*" >&2
+            exit 1
+          fi
+          echo "$CHAINGUARD_REGISTRY_TOKEN" | docker login cgr.dev -u "$CHAINGUARD_REGISTRY_USER" --password-stdin
+
+      - name: Build app image
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > netrc.ci
+          docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
+          rm netrc.ci
 
       # The image is the OS story: this is where base-image CVEs show up
       # (or disappear, on the Chainguard branch). Runs here because the
       # image only exists on this runner — it is never pushed to a registry.
       - name: Image vulnerability scan (Trivy → JSON)
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           image-ref: swag-shop:ci
           format: json
@@ -65,7 +90,7 @@ jobs:
       # before/after diff becomes visible without opening any logs.
       - name: Comment image scan on PR (updates in place on re-run)
         if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const fs = require('fs');
@@ -85,7 +110,7 @@ jobs:
 
       - name: Upload image scan
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: image-scan
           path: image-scan.json
@@ -94,22 +119,52 @@ jobs:
   e2e-smoke:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
+      - name: Configure Chainguard Libraries auth
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > ~/.netrc
+          chmod 600 ~/.netrc
+
       - name: Install E2E deps
+        env:
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple
         run: |
           pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
 
-      - name: Start app container
+      - name: Docker login cgr.dev
+        env:
+          CHAINGUARD_REGISTRY_USER: ${{ secrets.CHAINGUARD_REGISTRY_USER }}
+          CHAINGUARD_REGISTRY_TOKEN: ${{ secrets.CHAINGUARD_REGISTRY_TOKEN }}
         run: |
-          touch empty.netrc
-          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          if [ -z "$CHAINGUARD_REGISTRY_TOKEN" ]; then
+            echo "CHAINGUARD_REGISTRY_TOKEN secret required: this branch pulls cgr.dev/vulnfreeish.dev/*" >&2
+            exit 1
+          fi
+          echo "$CHAINGUARD_REGISTRY_TOKEN" | docker login cgr.dev -u "$CHAINGUARD_REGISTRY_USER" --password-stdin
+
+      - name: Start app container
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          printf '%s' "$CHAINGUARD_NETRC" > netrc.ci
+          docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
+          rm netrc.ci
           docker run -d --name app -p 8000:8000 \
             -e FLASK_ENV=production -e SECRET_KEY=test-secret-for-e2e \
             swag-shop:ci
@@ -137,9 +192,13 @@ jobs:
   #    new-vs-fixed comment and can fail on new findings only. ──
   scan:
     runs-on: ubuntu-latest
-    needs: [build, e2e-smoke, unit-and-integration-tests]
+    # No `needs:` — the fs scan operates on the repo, not the image. Keeping
+    # this independent means the advisor + gate still report the library
+    # story even when the image build is blocked (e.g. Libraries auth not
+    # yet provisioned).
+    needs: []
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # Draugr clones the saga's repository URL itself; give git the workflow
       # token so the clone of this private repo authenticates.
@@ -154,7 +213,7 @@ jobs:
       # enforcement point.
       - name: Draugr security scan
         id: draugr
-        uses: draugr-dev/draugr@v0.72.0
+        uses: draugr-dev/draugr@facd7c5d7c6a55800ddca4bb41d47fd989faec71 # v0.72.0
         continue-on-error: true
         with:
           saga: draugr.saga.yaml
@@ -165,7 +224,7 @@ jobs:
 
       - name: Upload merged SARIF to code scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@c3400c2f38909e0dcf3c3a41f2030a8217be5d3e # v3
         with:
           sarif_file: ${{ steps.draugr.outputs.sarif }}
 
@@ -182,7 +241,7 @@ jobs:
       # Grype natively understands OpenVEX, so the image scan in
       # platform-build.yml can suppress findings Chainguard marked status=fixed.
       - name: Filesystem vulnerability scan (Grype → JSON)
-        uses: anchore/scan-action@v6
+        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e # v6
         with:
           path: .
           output-format: json
@@ -192,7 +251,7 @@ jobs:
 
       - name: Upload scan results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: scan-results
           path: results/
@@ -200,18 +259,27 @@ jobs:
   unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
-      # Main is the vulnerable-before state: deps come from public PyPI. The
-      # demo/chainguard-fix branch pins the Chainguard remediated index.
+      # Chainguard Libraries carries the +cgr.N backport builds; PyPI is the
+      # fallback for everything else. Auth comes from ~/.netrc below.
       - name: Install deps
         env:
-          PIP_INDEX_URL: https://pypi.org/simple
-        run: pip install -r requirements.txt
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > ~/.netrc
+          chmod 600 ~/.netrc
+          pip install -r requirements.txt
 
       - name: Unit tests
         run: python -m pytest tests/ -v --ignore=tests/e2e
@@ -226,9 +294,9 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: scan-results
           path: results/
@@ -258,7 +326,7 @@ jobs:
 
       - name: Post recommendation to PR (updates in place on re-run)
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const fs = require('fs');
@@ -282,12 +350,21 @@ jobs:
   #    fail-closed. ──
   policy-gate:
     runs-on: ubuntu-latest
-    needs: [scan, unit-and-integration-tests, remediation-advisor]
+    needs: [build, scan, unit-and-integration-tests, remediation-advisor]
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/download-artifact@v4
+      # The gate evaluates the IMAGE scan (what actually ships), not the
+      # manifest scan: pip dist-info preserves the +cgr.N local segment, so
+      # an applied backport reads as e.g. werkzeug 3.0.2+cgr.1 — while the
+      # manifest scan strips it and can never prove the fix landed.
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: image-scan
+          path: results/
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: scan-results
           path: results/
@@ -307,16 +384,20 @@ jobs:
         run: suture fetch --out data/vex-cache.json
 
       # Build the gate inputs with jq/yq:
-      #   scan.json  Grype matches[] flattened to the {Results:[...]} the Rego reads
+      #   scan.json  Trivy image scan trimmed to the {Results:[...]} the Rego reads
       #   vex.json   fix cache nested under data.vex_cache
       #   assets.json  inventory nested under data.assets.assets
       - name: Reshape policy inputs (jq / yq)
         run: |
           mkdir -p policy-inputs
-          jq '{Results:[{Target:"requirements.txt", Vulnerabilities:[.matches[] |
-              {VulnerabilityID:.vulnerability.id, Severity:.vulnerability.severity,
-               PkgName:.artifact.name, InstalledVersion:.artifact.version}]}]}' \
-            results/fs-scan.json > policy-inputs/scan.json
+          if [ ! -f results/image-scan.json ]; then
+            echo "image-scan.json missing — image build is a gate prerequisite (fail-closed)" >&2
+            exit 1
+          fi
+          jq '{Results:[.Results[] | {Target, Vulnerabilities:
+              ((.Vulnerabilities // []) | map({VulnerabilityID, Severity,
+               PkgName, InstalledVersion}))}]}' \
+            results/image-scan.json > policy-inputs/scan.json
           jq '{vex_cache: .}' data/vex-cache.json > policy-inputs/vex.json
           yq -o=json '{"assets": .}' security/asset-inventory.yaml > policy-inputs/assets.json
 

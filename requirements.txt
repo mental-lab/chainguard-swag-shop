@@ -1,6 +1,10 @@
+# Chainguard Libraries remediation (advisor-recommended):
+# - Werkzeug: GHSA-2g68-c3qc-8985 fixed by the +cgr backport build
+# - urllib3: no Chainguard coverage → compatible upstream upgrade (2.7.0)
 Flask==2.2.5
 gunicorn==22.0.0
-Werkzeug==2.2.3
+Werkzeug==3.0.2+cgr.1
+urllib3==2.7.0
 frozen-flask==1.0.2
 pytest==8.3.3
 pytest-html==4.1.1
