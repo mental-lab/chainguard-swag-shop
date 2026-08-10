@@ -307,17 +307,21 @@ jobs:
   #    build no generic tool surfaces). ──
   remediation-advisor:
     runs-on: ubuntu-latest
-    needs: scan
+    needs: [scan, build]
     permissions:
       contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+      # Advise on the IMAGE scan (VEX-aware — applied backports are already
+      # suppressed there), not the manifest scan: the manifest strips the
+      # +cgr.N local segment, so a patched pin reads as the vulnerable
+      # upstream version and the report could never go quiet.
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: scan-results
-          path: results/
+          name: image-scan
+          path: results-image/
 
       - name: Install suture
         run: |
@@ -327,7 +331,7 @@ jobs:
       - name: Generate remediation recommendations from OpenVEX feed
         run: |
           suture advise \
-            --scan-dir results/ \
+            --scan-dir results-image/ \
             --assets security/asset-inventory.yaml \
             --format markdown --out vex-report.md
           # PRs get the sticky comment below; on pushes the job summary
