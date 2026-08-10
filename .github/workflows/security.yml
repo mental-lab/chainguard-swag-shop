@@ -52,7 +52,7 @@ jobs:
 
       - name: Install suture
         run: |
-          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.4.0/suture_linux_amd64.tar.gz | tar xz suture
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.4.1/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
 
       # OpenVEX docs for the pinned packages. The image scan consumes them to
@@ -347,7 +347,7 @@ jobs:
 
       - name: Install suture
         run: |
-          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.4.0/suture_linux_amd64.tar.gz | tar xz suture
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.4.1/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
 
       - name: Generate remediation recommendations from OpenVEX feed
