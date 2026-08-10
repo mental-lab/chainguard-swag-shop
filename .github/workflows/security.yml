@@ -62,17 +62,9 @@ jobs:
       # +cgr.N so the artifact purl matches the VEX statement's product.
       - name: Fetch OpenVEX documents (scoped to requirements.txt + toolchain)
         run: |
-          suture fetch --packages-file requirements.txt --packages setuptools --write-docs vex-documents/
-          # Trivy --vex takes a file, not a directory: merge the per-package
-          # documents into one.
-          jq -s '{
-            "@context": "https://openvex.dev/ns/v0.2.0",
-            "@id": "https://github.com/mental-lab/chainguard-swag-shop/vex/merged",
-            author: "Chainguard Team (merged by suture fetch)",
-            version: 1,
-            timestamp: (now | todate),
-            statements: [.[].statements[]]
-          }' vex-documents/*.json > vex-merged.json
+          # --write-vex: one merged document — trivy --vex takes a file.
+          suture fetch --packages-file requirements.txt --packages setuptools \
+            --write-vex vex-merged.json --out /tmp/vex-cache.json
           # Trivy image analysis double-counts setuptools from the
           # wheel-embedded SBOM as a phantom bare 70.3.0 next to the real
           # 70.3.0+cgr.1. Attest it away ourselves: the bare component is
