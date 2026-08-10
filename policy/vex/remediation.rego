@@ -50,6 +50,8 @@ ecosystem_of(target) := "pypi" if contains(target, "pip")
 ecosystem_of(target) := "pypi" if endswith(target, ".py")
 ecosystem_of(target) := "pypi" if contains(target, "site-packages")
 ecosystem_of(target) := "pypi" if contains(target, ".venv")
+# Trivy image scans group language-package findings under the class name.
+ecosystem_of(target) := "pypi" if target == "Python"
 
 # ── decisions ───────────────────────────────────────────────────────────────
 recommendation[finding.id] := rec if {

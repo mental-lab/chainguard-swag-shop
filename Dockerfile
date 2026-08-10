@@ -17,9 +17,12 @@ ENV PIP_NO_INPUT=1 \
     VIRTUAL_ENV=/home/nonroot/.venv \
     PATH="/home/nonroot/.venv/bin:$PATH"
 
-# Create venv
-RUN python3 -m venv "$VIRTUAL_ENV" && \
-    mkdir -p /home/nonroot
+# Create venv. The venv seeds setuptools 70.3.0, which has CVE-2025-47273
+# (HIGH); pin the same-version Chainguard backport. Auth via netrc secret.
+RUN --mount=type=secret,id=netrc,target=/root/.netrc \
+    python3 -m venv "$VIRTUAL_ENV" && \
+    mkdir -p /home/nonroot && \
+    pip install --upgrade pip "setuptools==70.3.0+cgr.1"
 
 COPY requirements.txt /tmp/requirements.txt
 

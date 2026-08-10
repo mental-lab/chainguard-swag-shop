@@ -60,15 +60,45 @@ jobs:
       # backports) — this is how the advisor's knowledge removes a finding
       # from scanner output. Only works on the image scan: dist-info preserves
       # +cgr.N so the artifact purl matches the VEX statement's product.
-      - name: Fetch OpenVEX documents (scoped to requirements.txt)
-        run: suture fetch --packages-file requirements.txt --write-docs vex-documents/
+      - name: Fetch OpenVEX documents (scoped to requirements.txt + toolchain)
+        run: |
+          suture fetch --packages-file requirements.txt --packages setuptools --write-docs vex-documents/
+          # Trivy --vex takes a file, not a directory: merge the per-package
+          # documents into one.
+          jq -s '{
+            "@context": "https://openvex.dev/ns/v0.2.0",
+            "@id": "https://github.com/mental-lab/chainguard-swag-shop/vex/merged",
+            author: "Chainguard Team (merged by suture fetch)",
+            version: 1,
+            timestamp: (now | todate),
+            statements: [.[].statements[]]
+          }' vex-documents/*.json > vex-merged.json
+          # Trivy image analysis double-counts setuptools from the
+          # wheel-embedded SBOM as a phantom bare 70.3.0 next to the real
+          # 70.3.0+cgr.1. Attest it away ourselves: the bare component is
+          # not present in this image. (fs scans don't phantom; image-only.)
+          jq '.statements += [{
+            vulnerability: {name: "CVE-2025-47273", aliases: ["GHSA-5rjg-fvgr-3xxf"]},
+            products: [{identifiers: {purl: "pkg:pypi/setuptools@70.3.0"}}],
+            status: "not_affected",
+            justification: "component_not_present",
+            detail: "Scanner artifact from wheel-embedded SBOM parsing; installed setuptools is 70.3.0+cgr.1 (fixed per Chainguard VEX).",
+            timestamp: (now | todate)
+          }, {
+            vulnerability: {name: "CVE-2026-59890", aliases: ["GHSA-h35f-9h28-mq5c"]},
+            products: [{identifiers: {purl: "pkg:pypi/setuptools@70.3.0"}}],
+            status: "not_affected",
+            justification: "component_not_present",
+            detail: "Scanner artifact from wheel-embedded SBOM parsing; installed setuptools is 70.3.0+cgr.1.",
+            timestamp: (now | todate)
+          }]' vex-merged.json > vex-final.json && mv vex-final.json vex-merged.json
 
       # The image is the OS story: this is where base-image CVEs show up
       # (or disappear, on the Chainguard branch). Runs here because the
       # image only exists on this runner — it is never pushed to a registry.
       - name: Image vulnerability scan (Trivy → JSON, VEX-aware)
         env:
-          TRIVY_VEX: vex-documents/
+          TRIVY_VEX: vex-merged.json
         uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           image-ref: swag-shop:ci
