@@ -19,21 +19,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write    # chainctl OIDC — no stored registry secret needed
       contents: read
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
-      # Pulling cgr.dev/vulnfreeish.dev/* requires registry auth. OIDC via
-      # the CHAINGUARD_IDENTITY var — no long-lived secret in the repo.
-      - name: Authenticate to cgr.dev
-        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
-        with:
-          identity: ${{ vars.CHAINGUARD_IDENTITY }}
-
+      # Pulling cgr.dev/vulnfreeish.dev/* requires registry auth. Pull token
+      # (repository=oci, registry.pull on the org) stored as repo secrets —
+      # starter orgs can't create assumable identities, so OIDC is out.
       - name: Docker login cgr.dev
-        run: chainctl auth token | docker login cgr.dev -u oauth2accesstoken --password-stdin
+        env:
+          CHAINGUARD_REGISTRY_USER: ${{ secrets.CHAINGUARD_REGISTRY_USER }}
+          CHAINGUARD_REGISTRY_TOKEN: ${{ secrets.CHAINGUARD_REGISTRY_TOKEN }}
+        run: |
+          if [ -z "$CHAINGUARD_REGISTRY_TOKEN" ]; then
+            echo "CHAINGUARD_REGISTRY_TOKEN secret required: this branch pulls cgr.dev/vulnfreeish.dev/*" >&2
+            exit 1
+          fi
+          echo "$CHAINGUARD_REGISTRY_TOKEN" | docker login cgr.dev -u "$CHAINGUARD_REGISTRY_USER" --password-stdin
 
       - name: Build app image
         env:
@@ -117,7 +120,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write    # chainctl OIDC for the cgr.dev image pull
       contents: read
     steps:
       - uses: actions/checkout@v4
@@ -142,13 +144,16 @@ jobs:
           pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
 
-      - name: Authenticate to cgr.dev
-        uses: chainguard-dev/setup-chainctl@f52718d822dc73d21a04ef2082822c4a203163b3 # v0.2.2
-        with:
-          identity: ${{ vars.CHAINGUARD_IDENTITY }}
-
       - name: Docker login cgr.dev
-        run: chainctl auth token | docker login cgr.dev -u oauth2accesstoken --password-stdin
+        env:
+          CHAINGUARD_REGISTRY_USER: ${{ secrets.CHAINGUARD_REGISTRY_USER }}
+          CHAINGUARD_REGISTRY_TOKEN: ${{ secrets.CHAINGUARD_REGISTRY_TOKEN }}
+        run: |
+          if [ -z "$CHAINGUARD_REGISTRY_TOKEN" ]; then
+            echo "CHAINGUARD_REGISTRY_TOKEN secret required: this branch pulls cgr.dev/vulnfreeish.dev/*" >&2
+            exit 1
+          fi
+          echo "$CHAINGUARD_REGISTRY_TOKEN" | docker login cgr.dev -u "$CHAINGUARD_REGISTRY_USER" --password-stdin
 
       - name: Start app container
         env:
@@ -261,8 +266,8 @@ jobs:
       # fallback for everything else. Auth comes from ~/.netrc below.
       - name: Install deps
         env:
-          PIP_INDEX_URL: https://libraries.cgr.dev/python/simple
-          PIP_EXTRA_INDEX_URL: https://pypi.org/simple
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple
           CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
         run: |
           if [ -z "$CHAINGUARD_NETRC" ]; then
