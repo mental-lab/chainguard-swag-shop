@@ -18,11 +18,11 @@ config:
     sca:
       enabled: true      # dependency/CVE scan (Trivy fs) — the library + OS findings
     iac:
-      enabled: true      # Dockerfile / config checks (Trivy)
+      enabled: false     # Dockerfile/config lint is off-demo; findings were annotation noise
     secrets:
       enabled: true      # Gitleaks
     sast:
-      enabled: true      # Semgrep
+      enabled: false     # Semgrep off-demo; workflow-lint findings were annotation noise
 
 # The application: a Python/Flask storefront that builds to container images.
 components:
