@@ -50,10 +50,25 @@ jobs:
           docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
           rm netrc.ci
 
+      - name: Install suture
+        run: |
+          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          sudo install suture /usr/local/bin/
+
+      # OpenVEX docs for the pinned packages. The image scan consumes them to
+      # suppress findings Chainguard marked status=fixed (the +cgr.N
+      # backports) — this is how the advisor's knowledge removes a finding
+      # from scanner output. Only works on the image scan: dist-info preserves
+      # +cgr.N so the artifact purl matches the VEX statement's product.
+      - name: Fetch OpenVEX documents (scoped to requirements.txt)
+        run: suture fetch --packages-file requirements.txt --write-docs vex-documents/
+
       # The image is the OS story: this is where base-image CVEs show up
       # (or disappear, on the Chainguard branch). Runs here because the
       # image only exists on this runner — it is never pushed to a registry.
-      - name: Image vulnerability scan (Trivy → JSON)
+      - name: Image vulnerability scan (Trivy → JSON, VEX-aware)
+        env:
+          TRIVY_VEX: vex-documents/
         uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           image-ref: swag-shop:ci
@@ -222,8 +237,11 @@ jobs:
           fail-on: error
           output: draugr-out
 
+      # main-only: PR annotations from SARIF are noise here (the manifest
+      # phantom finding + IaC lint) — the Draugr sticky comment already tells
+      # the PR story. Uploads on main keep the Security tab baseline current.
       - name: Upload merged SARIF to code scanning
-        if: always()
+        if: always() && github.event_name == 'push'
         uses: github/codeql-action/upload-sarif@c3400c2f38909e0dcf3c3a41f2030a8217be5d3e # v3
         with:
           sarif_file: ${{ steps.draugr.outputs.sarif }}
