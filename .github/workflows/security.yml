@@ -229,10 +229,12 @@ jobs:
   #    new-vs-fixed comment and can fail on new findings only. ──
   scan:
     runs-on: ubuntu-latest
-    # No `needs:` — the fs scan operates on the repo, not the image. Keeping
-    # this independent means the advisor + gate still report the library
-    # story even when the image build is blocked (e.g. Libraries auth not
-    # yet provisioned).
+    # Main-only: keeps the Security-tab SARIF baseline current. On PRs the
+    # image scan (build job) already covers the dependency story, and the
+    # Draugr sticky comment + annotations were drowning the PR signal.
+    # Nothing downstream needs this job: the advisor + gate consume the
+    # image scan.
+    if: github.event_name == 'push'
     needs: []
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -277,25 +279,6 @@ jobs:
             [ -f draugr-out/report.md ] && cat draugr-out/report.md || echo "No markdown report produced — see the step logs."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      # Grype fs scan produces the JSON the OpenVEX advisor + Rego gate read.
-      # Grype natively understands OpenVEX, so the image scan in
-      # platform-build.yml can suppress findings Chainguard marked status=fixed.
-      - name: Filesystem vulnerability scan (Grype → JSON)
-        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e # v6
-        with:
-          path: .
-          output-format: json
-          output-file: results/fs-scan.json
-          severity-cutoff: negligible
-          fail-build: false
-
-      - name: Upload scan results
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: scan-results
-          path: results/
-
   unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
@@ -329,7 +312,7 @@ jobs:
   #    build no generic tool surfaces). ──
   remediation-advisor:
     runs-on: ubuntu-latest
-    needs: [scan, build]
+    needs: [build]
     permissions:
       contents: read
       pull-requests: write
@@ -379,6 +362,17 @@ jobs:
             [ -f vex-report.md ] && cat vex-report.md || echo "No advisor report produced — see the step logs."
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # Dependabot-shaped: the advisor only speaks when something is
+      # actionable (backport waiting or exposed Crit/High needing an
+      # upgrade). Clean report → no comment; a stale comment from a
+      # previously-actionable run gets deleted.
+      - name: Count actionable recommendations
+        id: actionable
+        run: |
+          count=$(jq '[.remediation_recommendations[] |
+            select(.action=="backport" or .action=="upgrade-or-replace")] | length' vex-report.json)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
       - name: Post recommendation to PR (updates in place on re-run)
         if: github.event_name == 'pull_request'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
@@ -386,12 +380,18 @@ jobs:
           script: |
             const fs = require('fs');
             const marker = '<!-- remediation-advisor -->';
-            const body = marker + '\n' + fs.readFileSync('vex-report.md', 'utf8');
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const comments = await github.paginate(
               github.rest.issues.listComments, { owner, repo, issue_number });
             const existing = comments.find(c => c.body.startsWith(marker));
+            const actionable = ${{ steps.actionable.outputs.count }} > 0;
+            if (!actionable) {
+              if (existing) await github.rest.issues.deleteComment(
+                { owner, repo, comment_id: existing.id });
+              return;
+            }
+            const body = marker + '\n' + fs.readFileSync('vex-report.md', 'utf8');
             if (existing) {
               await github.rest.issues.updateComment(
                 { owner, repo, comment_id: existing.id, body });
