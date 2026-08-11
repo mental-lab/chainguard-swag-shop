@@ -1,0 +1,72 @@
+name: Chainguard backports
+
+# Dependabot-style: on a schedule, find pinned packages with a same-version
+# Chainguard backport available and open a PR applying them. The security
+# workflow runs on the auto-PR like any other — tests + advisor + gate are
+# the proof the backport is safe to merge.
+on:
+  schedule:
+    - cron: "0 13 * * 1" # Mondays 6am PT
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  backports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # Dependabot-style identity: PRs are authored by a GitHub App, not
+      # GITHUB_TOKEN — app-authored pushes trigger the security workflow on
+      # the auto-PR (GITHUB_TOKEN pushes never do, by design). Setup: repo
+      # variable BACKPORTS_APP_ID + secret BACKPORTS_APP_KEY (private key)
+      # for an app with Contents + Pull requests write on this repo.
+      - name: Mint backports-bot token
+        id: bot
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.BACKPORTS_APP_ID }}
+          private-key: ${{ secrets.BACKPORTS_APP_KEY }}
+
+      - name: Install suture
+        run: |
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.5.1/suture_linux_amd64.tar.gz | tar xz suture
+          sudo install suture /usr/local/bin/
+
+      # Manifest scan is enough here: the advisor only needs package
+      # name + installed version to find backports. Already-applied
+      # +cgr.N pins come out as no-ops (pin == fix), so re-runs on a
+      # remediated tree open no PR.
+      - name: Filesystem vulnerability scan (Grype → JSON)
+        uses: anchore/scan-action@1638637db639e0ade3258b51db49a9a137574c3e # v6
+        with:
+          path: .
+          output-format: json
+          output-file: results/fs-scan.json
+          severity-cutoff: negligible
+          fail-build: false
+
+      - name: Find backports (advisor)
+        run: |
+          suture advise \
+            --scan-dir results/ \
+            --assets security/asset-inventory.yaml \
+            --format json --out vex-report.json
+
+      - name: Apply backports (suture fix)
+        run: suture fix --from vex-report.json --write --out summary.md
+
+      # create-pull-request is a no-op when the working tree is clean —
+      # nothing actionable means no PR, Dependabot-style quiet.
+      - name: Open or update the backports PR
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.bot.outputs.token }}
+          branch: suture/backports
+          delete-branch: true
+          title: "chore: apply Chainguard backports"
+          body-path: summary.md
+          labels: dependencies, security
