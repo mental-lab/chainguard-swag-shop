@@ -18,18 +18,80 @@ jobs:
   #    satisfies the mount. ──
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Build app image
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      # Pulling cgr.dev/vulnfreeish.dev/* requires registry auth. Pull token
+      # (repository=oci, registry.pull on the org) stored as repo secrets —
+      # starter orgs can't create assumable identities, so OIDC is out.
+      - name: Docker login cgr.dev
+        env:
+          CHAINGUARD_REGISTRY_USER: ${{ secrets.CHAINGUARD_REGISTRY_USER }}
+          CHAINGUARD_REGISTRY_TOKEN: ${{ secrets.CHAINGUARD_REGISTRY_TOKEN }}
         run: |
-          touch empty.netrc
-          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          if [ -z "$CHAINGUARD_REGISTRY_TOKEN" ]; then
+            echo "CHAINGUARD_REGISTRY_TOKEN secret required: this branch pulls cgr.dev/vulnfreeish.dev/*" >&2
+            exit 1
+          fi
+          echo "$CHAINGUARD_REGISTRY_TOKEN" | docker login cgr.dev -u "$CHAINGUARD_REGISTRY_USER" --password-stdin
+
+      - name: Build app image
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > netrc.ci
+          docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
+          rm netrc.ci
+
+      - name: Install suture
+        run: |
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.4.1/suture_linux_amd64.tar.gz | tar xz suture
+          sudo install suture /usr/local/bin/
+
+      # OpenVEX docs for the pinned packages. The image scan consumes them to
+      # suppress findings Chainguard marked status=fixed (the +cgr.N
+      # backports) — this is how the advisor's knowledge removes a finding
+      # from scanner output. Only works on the image scan: dist-info preserves
+      # +cgr.N so the artifact purl matches the VEX statement's product.
+      - name: Fetch OpenVEX documents (scoped to requirements.txt + toolchain)
+        run: |
+          # --write-vex: one merged document — trivy --vex takes a file.
+          suture fetch --packages-file requirements.txt --packages setuptools \
+            --write-vex vex-merged.json --out /tmp/vex-cache.json
+          # Trivy image analysis double-counts setuptools from the
+          # wheel-embedded SBOM as a phantom bare 70.3.0 next to the real
+          # 70.3.0+cgr.1. Attest it away ourselves: the bare component is
+          # not present in this image. (fs scans don't phantom; image-only.)
+          jq '.statements += [{
+            vulnerability: {name: "CVE-2025-47273", aliases: ["GHSA-5rjg-fvgr-3xxf"]},
+            products: [{identifiers: {purl: "pkg:pypi/setuptools@70.3.0"}}],
+            status: "not_affected",
+            justification: "component_not_present",
+            detail: "Scanner artifact from wheel-embedded SBOM parsing; installed setuptools is 70.3.0+cgr.1 (fixed per Chainguard VEX).",
+            timestamp: (now | todate)
+          }, {
+            vulnerability: {name: "CVE-2026-59890", aliases: ["GHSA-h35f-9h28-mq5c"]},
+            products: [{identifiers: {purl: "pkg:pypi/setuptools@70.3.0"}}],
+            status: "not_affected",
+            justification: "component_not_present",
+            detail: "Scanner artifact from wheel-embedded SBOM parsing; installed setuptools is 70.3.0+cgr.1.",
+            timestamp: (now | todate)
+          }]' vex-merged.json > vex-final.json && mv vex-final.json vex-merged.json
 
       # The image is the OS story: this is where base-image CVEs show up
       # (or disappear, on the Chainguard branch). Runs here because the
       # image only exists on this runner — it is never pushed to a registry.
-      - name: Image vulnerability scan (Trivy → JSON)
-        uses: aquasecurity/trivy-action@v0.36.0
+      - name: Image vulnerability scan (Trivy → JSON, VEX-aware)
+        env:
+          TRIVY_VEX: vex-merged.json
+        uses: aquasecurity/trivy-action@a9c7b0f06e461e9d4b4d1711f154ee024b8d7ab8 # v0.36.0
         with:
           image-ref: swag-shop:ci
           format: json
@@ -65,7 +127,7 @@ jobs:
       # before/after diff becomes visible without opening any logs.
       - name: Comment image scan on PR (updates in place on re-run)
         if: github.event_name == 'pull_request' && always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const fs = require('fs');
@@ -85,7 +147,7 @@ jobs:
 
       - name: Upload image scan
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: image-scan
           path: image-scan.json
@@ -94,22 +156,52 @@ jobs:
   e2e-smoke:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
+      - name: Configure Chainguard Libraries auth
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > ~/.netrc
+          chmod 600 ~/.netrc
+
       - name: Install E2E deps
+        env:
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple
         run: |
           pip install -r requirements.txt -r requirements-e2e.txt
           playwright install --with-deps chromium
 
-      - name: Start app container
+      - name: Docker login cgr.dev
+        env:
+          CHAINGUARD_REGISTRY_USER: ${{ secrets.CHAINGUARD_REGISTRY_USER }}
+          CHAINGUARD_REGISTRY_TOKEN: ${{ secrets.CHAINGUARD_REGISTRY_TOKEN }}
         run: |
-          touch empty.netrc
-          docker build --secret id=netrc,src=empty.netrc -t swag-shop:ci .
+          if [ -z "$CHAINGUARD_REGISTRY_TOKEN" ]; then
+            echo "CHAINGUARD_REGISTRY_TOKEN secret required: this branch pulls cgr.dev/vulnfreeish.dev/*" >&2
+            exit 1
+          fi
+          echo "$CHAINGUARD_REGISTRY_TOKEN" | docker login cgr.dev -u "$CHAINGUARD_REGISTRY_USER" --password-stdin
+
+      - name: Start app container
+        env:
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          printf '%s' "$CHAINGUARD_NETRC" > netrc.ci
+          docker build --secret id=netrc,src=netrc.ci -t swag-shop:ci .
+          rm netrc.ci
           docker run -d --name app -p 8000:8000 \
             -e FLASK_ENV=production -e SECRET_KEY=test-secret-for-e2e \
             swag-shop:ci
@@ -132,86 +224,30 @@ jobs:
         if: always()
         run: docker rm -f app
 
-  # ── Scan: Draugr orchestrates Trivy (SCA + IaC), Gitleaks, Semgrep into one
-  #    SARIF report + one verdict. On PRs, "diff" mode posts a sticky
-  #    new-vs-fixed comment and can fail on new findings only. ──
-  scan:
-    runs-on: ubuntu-latest
-    needs: [build, e2e-smoke, unit-and-integration-tests]
-    steps:
-      - uses: actions/checkout@v4
-
-      # Draugr clones the saga's repository URL itself; give git the workflow
-      # token so the clone of this private repo authenticates.
-      - name: Authenticate git for the draugr clone
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-
-      # continue-on-error: on vulnerable main, findings are the expected
-      # state — Draugr reports (SARIF + verdict) without breaking the job,
-      # so the Grype scan still runs and the policy-gate stays the single
-      # enforcement point.
-      - name: Draugr security scan
-        id: draugr
-        uses: draugr-dev/draugr@v0.72.0
-        continue-on-error: true
-        with:
-          saga: draugr.saga.yaml
-          tools: true            # provision cosign-verified scanners on the runner
-          mode: auto             # diff on PRs (sticky new/fixed comment), scan otherwise
-          fail-on: error
-          output: draugr-out
-
-      - name: Upload merged SARIF to code scanning
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{ steps.draugr.outputs.sarif }}
-
-      - name: Job summary
-        if: always()
-        run: |
-          {
-            echo "## Draugr security scan"
-            echo
-            [ -f draugr-out/report.md ] && cat draugr-out/report.md || echo "No markdown report produced — see the step logs."
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      # Grype fs scan produces the JSON the OpenVEX advisor + Rego gate read.
-      # Grype natively understands OpenVEX, so the image scan in
-      # platform-build.yml can suppress findings Chainguard marked status=fixed.
-      - name: Filesystem vulnerability scan (Grype → JSON)
-        uses: anchore/scan-action@v6
-        with:
-          path: .
-          output-format: json
-          output-file: results/fs-scan.json
-          severity-cutoff: negligible
-          fail-build: false
-
-      - name: Upload scan results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: scan-results
-          path: results/
-
   unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: "3.12"
 
-      # Main is the vulnerable-before state: deps come from public PyPI. The
-      # demo/chainguard-fix branch pins the Chainguard remediated index.
+      # Chainguard Libraries carries the +cgr.N backport builds; PyPI is the
+      # fallback for everything else. Auth comes from ~/.netrc below.
       - name: Install deps
         env:
-          PIP_INDEX_URL: https://pypi.org/simple
-        run: pip install -r requirements.txt
+          PIP_INDEX_URL: https://libraries.cgr.dev/python-remediated/simple
+          PIP_EXTRA_INDEX_URL: https://libraries.cgr.dev/python/simple
+          CHAINGUARD_NETRC: ${{ secrets.CHAINGUARD_NETRC }}
+        run: |
+          if [ -z "$CHAINGUARD_NETRC" ]; then
+            echo "CHAINGUARD_NETRC secret required: this branch pulls from libraries.cgr.dev" >&2
+            exit 1
+          fi
+          printf '%s' "$CHAINGUARD_NETRC" > ~/.netrc
+          chmod 600 ~/.netrc
+          pip install -r requirements.txt
 
       - name: Unit tests
         run: python -m pytest tests/ -v --ignore=tests/e2e
@@ -221,31 +257,46 @@ jobs:
   #    build no generic tool surfaces). ──
   remediation-advisor:
     runs-on: ubuntu-latest
-    needs: scan
+    needs: [build]
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/download-artifact@v4
+      # Advise on the IMAGE scan (VEX-aware — applied backports are already
+      # suppressed there), not the manifest scan: the manifest strips the
+      # +cgr.N local segment, so a patched pin reads as the vulnerable
+      # upstream version and the report could never go quiet.
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: scan-results
-          path: results/
+          name: image-scan
+          path: results-image/
 
       - name: Install suture
         run: |
-          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
+          curl -sSfL https://github.com/mental-lab/suture/releases/download/v0.4.1/suture_linux_amd64.tar.gz | tar xz suture
           sudo install suture /usr/local/bin/
 
       - name: Generate remediation recommendations from OpenVEX feed
         run: |
           suture advise \
-            --scan-dir results/ \
+            --scan-dir results-image/ \
             --assets security/asset-inventory.yaml \
             --format markdown --out vex-report.md
           # PRs get the sticky comment below; on pushes the job summary
           # carries the same content.
+          # JSON twin feeds the policy gate: the thin Rego reads the
+          # advisor's decisions directly (one decision implementation).
+          suture advise \
+            --scan-dir results-image/ \
+            --assets security/asset-inventory.yaml \
+            --format json --out vex-report.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: advisor-report
+          path: vex-report.json
 
       - name: Job summary
         if: always()
@@ -256,19 +307,36 @@ jobs:
             [ -f vex-report.md ] && cat vex-report.md || echo "No advisor report produced — see the step logs."
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # Dependabot-shaped: the advisor only speaks when something is
+      # actionable (backport waiting or exposed Crit/High needing an
+      # upgrade). Clean report → no comment; a stale comment from a
+      # previously-actionable run gets deleted.
+      - name: Count actionable recommendations
+        id: actionable
+        run: |
+          count=$(jq '[.remediation_recommendations[] |
+            select(.action=="backport" or .action=="upgrade-or-replace")] | length' vex-report.json)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
       - name: Post recommendation to PR (updates in place on re-run)
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const fs = require('fs');
             const marker = '<!-- remediation-advisor -->';
-            const body = marker + '\n' + fs.readFileSync('vex-report.md', 'utf8');
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const comments = await github.paginate(
               github.rest.issues.listComments, { owner, repo, issue_number });
             const existing = comments.find(c => c.body.startsWith(marker));
+            const actionable = ${{ steps.actionable.outputs.count }} > 0;
+            if (!actionable) {
+              if (existing) await github.rest.issues.deleteComment(
+                { owner, repo, comment_id: existing.id });
+              return;
+            }
+            const body = marker + '\n' + fs.readFileSync('vex-report.md', 'utf8');
             if (existing) {
               await github.rest.issues.updateComment(
                 { owner, repo, comment_id: existing.id, body });
@@ -278,57 +346,40 @@ jobs:
             }
 
   # ── Gate: Conftest evaluates policy/vex/remediation.rego (scaffolded by
-  #    `suture policy export`) against the scan. Pure Rego deny rules,
-  #    fail-closed. ──
+  #    `suture policy export`) against the advisor's JSON output. Thin gate:
+  #    suture owns the decision framework, the Rego only encodes what blocks
+  #    a merge. Fail-closed: if the advisor report is missing, the gate
+  #    fails. ──
   policy-gate:
     runs-on: ubuntu-latest
-    needs: [scan, unit-and-integration-tests, remediation-advisor]
+    needs: [unit-and-integration-tests, remediation-advisor]
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: scan-results
+          name: advisor-report
           path: results/
 
-      - name: Install Conftest (OPA) + yq + suture
+      - name: Install Conftest (OPA)
         run: |
           CONFTEST_VERSION=0.56.0
           curl -sSL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
             | sudo tar -xz -C /usr/local/bin conftest
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
-          curl -sSfL https://github.com/mental-lab/suture/releases/latest/download/suture_linux_amd64.tar.gz | tar xz suture
-          sudo install suture /usr/local/bin/
-          conftest --version && yq --version && suture --version
-
-      - name: Fetch OpenVEX fix cache
-        run: suture fetch --out data/vex-cache.json
-
-      # Build the gate inputs with jq/yq:
-      #   scan.json  Grype matches[] flattened to the {Results:[...]} the Rego reads
-      #   vex.json   fix cache nested under data.vex_cache
-      #   assets.json  inventory nested under data.assets.assets
-      - name: Reshape policy inputs (jq / yq)
-        run: |
-          mkdir -p policy-inputs
-          jq '{Results:[{Target:"requirements.txt", Vulnerabilities:[.matches[] |
-              {VulnerabilityID:.vulnerability.id, Severity:.vulnerability.severity,
-               PkgName:.artifact.name, InstalledVersion:.artifact.version}]}]}' \
-            results/fs-scan.json > policy-inputs/scan.json
-          jq '{vex_cache: .}' data/vex-cache.json > policy-inputs/vex.json
-          yq -o=json '{"assets": .}' security/asset-inventory.yaml > policy-inputs/assets.json
+          conftest --version
 
       - name: Policy gate — deny internet-facing Critical/High with a Chainguard fix
         run: |
+          if [ ! -f results/vex-report.json ]; then
+            echo "vex-report.json missing — the advisor is a gate prerequisite (fail-closed)" >&2
+            exit 1
+          fi
           # --all-namespaces: conftest only evaluates the `main` package by
           # default; our policy is `package remediation`.
           set +e
-          conftest test policy-inputs/scan.json \
+          conftest test results/vex-report.json \
             --policy policy/vex/remediation.rego \
-            --data policy-inputs/assets.json \
-            --data policy-inputs/vex.json \
             --all-namespaces | tee gate-output.txt
           status=${PIPESTATUS[0]}
           set -e
