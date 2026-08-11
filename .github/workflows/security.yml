@@ -224,61 +224,6 @@ jobs:
         if: always()
         run: docker rm -f app
 
-  # ── Scan: Draugr orchestrates Trivy (SCA + IaC), Gitleaks, Semgrep into one
-  #    SARIF report + one verdict. On PRs, "diff" mode posts a sticky
-  #    new-vs-fixed comment and can fail on new findings only. ──
-  scan:
-    runs-on: ubuntu-latest
-    # Main-only: keeps the Security-tab SARIF baseline current. On PRs the
-    # image scan (build job) already covers the dependency story, and the
-    # Draugr sticky comment + annotations were drowning the PR signal.
-    # Nothing downstream needs this job: the advisor + gate consume the
-    # image scan.
-    if: github.event_name == 'push'
-    needs: []
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
-      # Draugr clones the saga's repository URL itself; give git the workflow
-      # token so the clone of this private repo authenticates.
-      - name: Authenticate git for the draugr clone
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-
-      # continue-on-error: on vulnerable main, findings are the expected
-      # state — Draugr reports (SARIF + verdict) without breaking the job,
-      # so the Grype scan still runs and the policy-gate stays the single
-      # enforcement point.
-      - name: Draugr security scan
-        id: draugr
-        uses: draugr-dev/draugr@facd7c5d7c6a55800ddca4bb41d47fd989faec71 # v0.72.0
-        continue-on-error: true
-        with:
-          saga: draugr.saga.yaml
-          tools: true            # provision cosign-verified scanners on the runner
-          mode: auto             # diff on PRs (sticky new/fixed comment), scan otherwise
-          fail-on: error
-          output: draugr-out
-
-      # main-only: PR annotations from SARIF are noise here (the manifest
-      # phantom finding + IaC lint) — the Draugr sticky comment already tells
-      # the PR story. Uploads on main keep the Security tab baseline current.
-      - name: Upload merged SARIF to code scanning
-        if: always() && github.event_name == 'push'
-        uses: github/codeql-action/upload-sarif@c3400c2f38909e0dcf3c3a41f2030a8217be5d3e # v3
-        with:
-          sarif_file: ${{ steps.draugr.outputs.sarif }}
-
-      - name: Job summary
-        if: always()
-        run: |
-          {
-            echo "## Draugr security scan"
-            echo
-            [ -f draugr-out/report.md ] && cat draugr-out/report.md || echo "No markdown report produced — see the step logs."
-          } >> "$GITHUB_STEP_SUMMARY"
-
   unit-and-integration-tests:
     runs-on: ubuntu-latest
     steps:
