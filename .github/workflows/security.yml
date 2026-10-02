@@ -18,6 +18,10 @@ jobs:
   #    satisfies the mount. ──
   build:
     runs-on: ubuntu-latest
+    # Skip on demo/* branches to keep Actions-governance demo PRs focused
+    # on the finding being demonstrated, without touching real CI for
+    # every other branch/PR.
+    if: ${{ !startsWith(github.head_ref, 'demo/') }}
     steps:
       - uses: actions/checkout@v4
       - name: Build app image
@@ -94,6 +98,7 @@ jobs:
   e2e-smoke:
     runs-on: ubuntu-latest
     needs: build
+    if: ${{ !startsWith(github.head_ref, 'demo/') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -138,6 +143,7 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     needs: [build, e2e-smoke, unit-and-integration-tests]
+    if: ${{ !startsWith(github.head_ref, 'demo/') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -199,6 +205,7 @@ jobs:
 
   unit-and-integration-tests:
     runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.head_ref, 'demo/') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -222,6 +229,7 @@ jobs:
   remediation-advisor:
     runs-on: ubuntu-latest
     needs: scan
+    if: ${{ !startsWith(github.head_ref, 'demo/') }}
     permissions:
       contents: read
       pull-requests: write
@@ -283,7 +291,7 @@ jobs:
   policy-gate:
     runs-on: ubuntu-latest
     needs: [scan, unit-and-integration-tests, remediation-advisor]
-    if: always()
+    if: ${{ always() && !startsWith(github.head_ref, 'demo/') }}
     steps:
       - uses: actions/checkout@v4
 
